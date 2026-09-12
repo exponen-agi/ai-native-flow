@@ -1,0 +1,104 @@
+# Method
+
+How the blueprint is derived, so a reader can argue with the rules rather than guess at them.
+
+## The single idea
+
+Treat the business as an intelligence layer with people at the edge, not as a company that owns some
+AI tools. Every stage of work ends by committing an artifact the next stage can read, and the chain
+of those artifacts is both the handoff format and the audit trail. Agents start cold and share no
+memory, so an artifact is not documentation hygiene, it is the only way work survives a handoff.
+
+Two consequences drive every rule here:
+
+1. **The bottleneck moves.** When the build step collapses, the constraint becomes the steps either
+   side of it: planning, review, release, and the governance that routes through weekly meetings.
+2. **Controls have to change form, not disappear.** Reviewing every line by hand made sense when a
+   person wrote every line. The control objective survives; the enforcement becomes a written policy
+   the agent reads, a deterministic hook it cannot talk past, an adversarial model pass, and a human
+   at the gates that need judgment.
+
+## The four tiers
+
+Tier is derived from code-facing headcount and budget, then capped by constraints. It describes how
+much autonomy the flow can carry, not how good the company is.
+
+| Tier | Name | Derivation |
+| --- | --- | --- |
+| 1 | Assisted artifact chain | Fewer than four code-facing people, or budget under $200/month |
+| 2 | Guardrailed build | At least one code-facing person and budget above $200/month |
+| 3 | Parallel and self-verifying | Four or more people and budget above $2,000/month |
+| 4 | Governed autonomous loop | Fifteen or more people, or enterprise stage, with budget above $2,000/month |
+
+Caps: no CI pipeline holds the flow at tier 2, because tiers 3 and 4 both run agents inside a
+pipeline. A small business with nobody in house is held at tier 1 regardless of budget, because
+autonomy without a technical reviewer produces software nobody can operate.
+
+Regulated data does not lower the tier. It adds governance nodes (managed settings, approval gates,
+scheduled scans, a policy owner in the spec loop) and multiplies the calendar by 1.5. Legacy systems
+add a source-of-truth map and 1.25. Enterprise stage adds 1.25. Client codebases add 1.15.
+
+## Six lanes and a spine
+
+Lanes are the stages of work: Intake, Shape, Build, Verify, Ship, Operate. The spine holds what every
+lane reads: the artifact home, `CLAUDE.md`, skills as policy, hooks, managed settings, `REVIEW.md`,
+the source-of-truth map, and the spend envelope.
+
+Each node declares `after` for its upstream links. Nodes excluded by the rules are bridged, so the
+chain stays connected at every tier. The Operate lane loops back to Intake, because a diagnosed
+finding re-enters the flow as the next `intent.md` rather than bypassing the gates.
+
+## Rollout order
+
+Phases follow dependency order, not lane order, and overlap by roughly a third. Each ends in
+something demonstrable:
+
+1. **Ground the artifact chain.** Artifact home, `CLAUDE.md`, intent capture, and a one-command
+   self-check. The self-check is the prerequisite for every tier above the first.
+2. **Make the plan the reviewable unit.** Spec pass, plan mode as the default, branch protection.
+3. **Encode policy, then enforce it.** Skills with named owners, hooks behind the ones that must
+   always hold, `REVIEW.md`, the test-file lock.
+4. **Layer the review, keep one human gate.** Defect, security and intent-match passes; a code owner
+   who judges intent and risk; a production approval hook.
+5. **Run streams in parallel.** Worktrees, a knowledge curator, evals in CI, pipeline judgment steps.
+6. **Close the loop.** Deterministic control bands, a diagnosis agent that writes findings as intent,
+   scheduled scans, and finally the overnight learning agent.
+
+The last phase is last for a reason: an autonomous loop needs every gate above it to already exist.
+
+## Measurement
+
+Leading indicators move in weeks and say the change took. Lagging ones settle over a quarter and say
+it was worth it. Every metric offered here already exists in a system the company owns: git
+timestamps, pull request metadata, the CI system, the incident tracker, the usage export. Nothing
+requires new instrumentation, because a measurement plan that needs a project never runs.
+
+## Sources
+
+- Anthropic, *The AI-Native SDLC Playbook* (August 2026). The six stages, the artifact chain
+  (`intent.md`, `spec.md`, `plan.md`, diff, review findings, incident record), skills as advisory
+  policy with hooks as deterministic enforcement, layered agentic review with `REVIEW.md`, continuous
+  evals on agent configuration, managed settings as the floor, control bands with tiered response,
+  and the per-stage leading and lagging indicators.
+- Diana Hu, Y Combinator, *How To Build A Company With AI From The Ground Up* (May 2026). The
+  company as a closed loop rather than an open one, making the organization queryable so every action
+  leaves an artifact, software factories where humans own spec and tests, and the surviving roles:
+  individual contributor, directly responsible individual, founder who still builds.
+- Y Combinator Root Access, *Building And Structuring An AI Native Company* (August 2026). The AI
+  loop as signals, policy, tools, quality gate and learning; the quality gate as a second adversarial
+  model rather than a person; the worked example of an overnight agent that reads yesterday's failed
+  interactions and opens pull requests; humans at the edge where the system meets reality.
+- Rob Shocks, *Claude Code's new intent.md* (September 2026). Artifacts as the cold-start handoff
+  between independent agents and subagents; permissions dialled in as the precondition for unattended
+  work; standardise the convention and stop changing it.
+- Field patterns from fractional CTO engagements: the subscription-as-strategy failure, two sources of
+  truth with no link, review volume with no written threshold, and unmetered autonomous loops.
+
+## What this tool deliberately does not do
+
+- **Interpret prose.** The free-text problem statement is echoed and exported, never parsed. Rules run
+  on structured answers so the output is reproducible.
+- **Estimate cost per change.** Too dependent on model, context size and how often a loop fires. The
+  blueprint prescribes a spend envelope and a monthly review instead of a number that would be wrong.
+- **Replace the judgment call.** It names where a human belongs and what that human owns. It does not
+  tell anyone what to decide.
