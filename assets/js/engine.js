@@ -21,14 +21,14 @@ function governanceWeight(c) {
   return w;
 }
 
-function selectNodes(c, tier) {
-  return NODES.filter(n => (n.when ? n.when(c, tier) : true));
+function selectNodes(c, tier, list) {
+  return (list || NODES).filter(n => (n.when ? n.when(c, tier) : true));
 }
 
 /* Bridge over excluded nodes so a dropped step never breaks the chain. */
-function buildEdges(nodes) {
+function buildEdges(nodes, list) {
   const byId = new Map(nodes.map(n => [n.id, n]));
-  const kb = new Map(NODES.map(n => [n.id, n]));
+  const kb = new Map((list || NODES).map(n => [n.id, n]));
   const resolve = (id, seen = new Set()) => {
     if (seen.has(id)) return [];
     seen.add(id);

@@ -4,186 +4,208 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI-Native Flow Blueprint</title>
-<meta name="description" content="Answer six questions and get a prescriptive AI-native delivery flow: the agents, the human roles, the control gates and the order to build them in.">
+<meta name="description" content="Answer six questions and get a prescriptive AI-native company blueprint: every function as a loop, the tool stack and how its data reaches your context layer, the delivery lifecycle, and the learning loop that feeds it all back.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
-<a class="skip" href="#intake">Skip to the questions</a>
+<a class="skip" href="#intake-form">Skip to the questions</a>
 
 <header class="masthead">
   <div class="wrap masthead-inner">
-    <div>
+    <div class="masthead-copy">
       <p class="eyebrow">Prescriptive playbook</p>
       <h1>AI-Native Flow Blueprint</h1>
-      <p class="lede">Most AI adoption fails at the process, not the model. Answer six questions and this
-        lays out the delivery flow for a company your size: which steps an agent owns, which stay human,
-        where the gates go, and the order to build it in.</p>
+      <p class="lede">AI adoption fails at the process, not the model. Answer six questions and this lays
+        out the company your size should run: every function as a loop, the tools and how their data
+        reaches your context layer, the delivery lifecycle inside it, and the learning loop that feeds
+        the whole thing back.</p>
     </div>
     <dl class="assurance">
-      <div><dt>Runs</dt><dd>Entirely in your browser</dd></div>
-      <div><dt>Sends</dt><dd>Nothing. No account, no model call</dd></div>
-      <div><dt>Method</dt><dd>Fixed rules, same answers same flow</dd></div>
+      <div><dt>Runs</dt><dd>In your browser</dd></div>
+      <div><dt>Sends</dt><dd>Nothing, ever</dd></div>
+      <div><dt>Method</dt><dd>Fixed rules</dd></div>
     </dl>
   </div>
 </header>
 
-<main class="wrap">
-  <section id="intake" class="panel intake" aria-labelledby="intake-h">
-    <div class="panel-head">
-      <h2 id="intake-h">Your situation</h2>
-      <p class="panel-note">Loaded with an example so you can see the output. Change anything and regenerate.</p>
-    </div>
-    <form id="answers" class="grid-form">
-      <p class="field">
-        <label for="stage">Stage of the business</label>
-        <select id="stage" name="stage">
-          <option value="solo">Solo founder or one-person product</option>
-          <option value="startup" selected>Early startup, pre or post seed</option>
-          <option value="growth">Growth stage, product in market</option>
-          <option value="smb">Small or medium business, software is not the product</option>
-          <option value="enterprise">Mid-market or enterprise, established process</option>
-        </select>
-      </p>
-      <p class="field">
-        <label for="engineers">People who write or review code</label>
-        <select id="engineers" name="engineers">
-          <option value="none">Nobody in house</option>
-          <option value="solo">One to three</option>
-          <option value="small" selected>Four to fifteen</option>
-          <option value="large">More than fifteen</option>
-        </select>
-      </p>
-      <p class="field">
-        <label for="budget">Monthly budget for AI tooling</label>
-        <select id="budget" name="budget">
-          <option value="under200">Under $200</option>
-          <option value="to2k" selected>$200 to $2,000</option>
-          <option value="to10k">$2,000 to $10,000</option>
-          <option value="over10k">Over $10,000</option>
-        </select>
-      </p>
-      <p class="field">
-        <label for="domain">What you build or run</label>
-        <select id="domain" name="domain">
-          <option value="saas" selected>Web product or SaaS</option>
-          <option value="mobile">Mobile app</option>
-          <option value="ecommerce">E-commerce or marketplace</option>
-          <option value="data-ai">Data or AI product</option>
-          <option value="internal-ops">Internal systems and operations</option>
-          <option value="services">Client delivery or services</option>
-        </select>
-      </p>
-      <p class="field">
-        <label for="goal">The problem you actually want solved</label>
-        <select id="goal" name="goal">
-          <option value="ship-faster" selected>Ship the roadmap faster</option>
-          <option value="fewer-defects">Fewer defects reaching customers</option>
-          <option value="less-rework">Stop building the wrong thing</option>
-          <option value="support-load">Reduce support load</option>
-          <option value="ops-cost">Cut operational cost</option>
-          <option value="scale-without-hiring">Add capacity without hiring</option>
-        </select>
-      </p>
-      <fieldset class="field field-wide">
-        <legend>Constraints that apply</legend>
-        <div class="chips">
-          <label class="chip"><input type="checkbox" name="constraints" value="regulated"> Regulated or sensitive data</label>
-          <label class="chip"><input type="checkbox" name="constraints" value="legacy-systems"> Existing tracker or legacy systems stay</label>
-          <label class="chip"><input type="checkbox" name="constraints" value="no-ci"> No CI pipeline yet</label>
-          <label class="chip"><input type="checkbox" name="constraints" value="client-code"> We work in client codebases</label>
+<div class="console">
+  <div class="wrap">
+    <details class="intake" id="intake-wrap" open>
+      <summary class="intake-summary">
+        <span class="intake-label">Your situation</span>
+        <span class="answer-chips" id="answer-chips"></span>
+        <span class="intake-toggle" aria-hidden="true"></span>
+      </summary>
+      <form id="intake-form" class="grid-form">
+        <p class="field">
+          <label for="stage">Stage</label>
+          <select id="stage" name="stage">
+            <option value="solo">Solo founder or one-person product</option>
+            <option value="startup" selected>Early startup, pre or post seed</option>
+            <option value="growth">Growth stage, product in market</option>
+            <option value="smb">Small or medium business, software is not the product</option>
+            <option value="enterprise">Mid-market or enterprise, established process</option>
+          </select>
+        </p>
+        <p class="field">
+          <label for="engineers">People writing or reviewing code</label>
+          <select id="engineers" name="engineers">
+            <option value="none">Nobody in house</option>
+            <option value="solo">One to three</option>
+            <option value="small" selected>Four to fifteen</option>
+            <option value="large">More than fifteen</option>
+          </select>
+        </p>
+        <p class="field">
+          <label for="budget">Monthly AI budget</label>
+          <select id="budget" name="budget">
+            <option value="under200">Under $200</option>
+            <option value="to2k" selected>$200 to $2,000</option>
+            <option value="to10k">$2,000 to $10,000</option>
+            <option value="over10k">Over $10,000</option>
+          </select>
+        </p>
+        <p class="field">
+          <label for="domain">What you build or run</label>
+          <select id="domain" name="domain">
+            <option value="saas" selected>Web product or SaaS</option>
+            <option value="mobile">Mobile app</option>
+            <option value="ecommerce">E-commerce or marketplace</option>
+            <option value="data-ai">Data or AI product</option>
+            <option value="internal-ops">Internal systems and operations</option>
+            <option value="services">Client delivery or services</option>
+          </select>
+        </p>
+        <p class="field">
+          <label for="goal">The problem to solve</label>
+          <select id="goal" name="goal">
+            <option value="ship-faster" selected>Ship the roadmap faster</option>
+            <option value="fewer-defects">Fewer defects reaching customers</option>
+            <option value="less-rework">Stop building the wrong thing</option>
+            <option value="support-load">Reduce support load</option>
+            <option value="ops-cost">Cut operational cost</option>
+            <option value="scale-without-hiring">Add capacity without hiring</option>
+          </select>
+        </p>
+        <fieldset class="field">
+          <legend>Constraints</legend>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" name="constraints" value="regulated"> Regulated or sensitive data</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="legacy-systems"> Legacy systems stay</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="no-ci"> No CI pipeline yet</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="client-code"> Client codebases</label>
+          </div>
+        </fieldset>
+        <p class="field field-wide">
+          <label for="problem">The problem in your own words <span class="optional">optional, stays in your browser</span></label>
+          <input type="text" id="problem" name="problem" placeholder="Handlers spend a third of call time on status-only queries, and every fix waits two weeks for a spec.">
+        </p>
+        <div class="actions">
+          <button type="submit" class="btn primary">Generate the blueprint</button>
+          <button type="button" class="btn" id="share">Copy link</button>
         </div>
-      </fieldset>
-      <p class="field field-wide">
-        <label for="problem">The problem in your own words <span class="optional">optional, and it stays in your browser</span></label>
-        <textarea id="problem" name="problem" rows="2" placeholder="Handlers spend a third of call time on status-only queries, and every fix waits two weeks for a spec."></textarea>
-      </p>
-      <div class="actions">
-        <button type="submit" class="btn primary">Generate the blueprint</button>
-        <button type="button" class="btn" id="share">Copy a link to this blueprint</button>
-      </div>
-    </form>
-  </section>
+      </form>
+    </details>
 
-  <section class="summary" aria-labelledby="sum-h">
-    <div class="tier-card">
-      <p class="eyebrow" id="tier-eyebrow">Tier 2 of 4</p>
-      <h2 id="sum-h">Guardrailed build</h2>
-      <p class="tier-thesis" id="tier-thesis"></p>
-      <p class="tier-ceiling"><span>Autonomy ceiling</span> <em id="tier-ceiling"></em></p>
+    <div class="strip">
+      <p class="strip-tier"><span class="strip-tier-n" id="tier-n">Tier 2 of 4</span>
+        <strong id="tier-name">Guardrailed build</strong></p>
+      <dl class="strip-stats">
+        <div><dt>Agent roles</dt><dd id="stat-ai">0</dd></div>
+        <div><dt>Human roles</dt><dd id="stat-human">0</dd></div>
+        <div><dt>Gates</dt><dd id="stat-gate">0</dd></div>
+        <div><dt>Tool slots</dt><dd id="stat-tool">0</dd></div>
+        <div><dt>Horizon</dt><dd id="stat-weeks">0<span class="unit">wk</span></dd></div>
+      </dl>
+      <button type="button" class="btn ghost" id="why-toggle" aria-expanded="false" aria-controls="why">Why this shape</button>
     </div>
-    <div class="stat-row">
-      <div class="stat"><dt>Agent roles</dt><dd id="stat-ai">0</dd></div>
-      <div class="stat"><dt>Human roles</dt><dd id="stat-human">0</dd></div>
-      <div class="stat"><dt>Gates and checks</dt><dd id="stat-gate">0</dd></div>
-      <div class="stat"><dt>To full flow</dt><dd id="stat-weeks">0<span class="unit">weeks</span></dd></div>
-    </div>
-    <div class="reads">
+    <div class="why" id="why" hidden>
+      <p id="read-ceiling"></p>
       <p id="read-goal"></p>
       <p id="read-stage"></p>
       <p id="read-budget"></p>
       <p id="read-problem" class="echo" hidden></p>
     </div>
+
+    <nav class="tabs" role="tablist" aria-label="Blueprint sections">
+      <button role="tab" class="tab" id="tab-company" data-tab="company" data-view="company" aria-selected="true">Company</button>
+      <button role="tab" class="tab" id="tab-delivery" data-tab="delivery" data-view="delivery" aria-selected="false">Delivery</button>
+      <button role="tab" class="tab" id="tab-stack" data-tab="stack" data-view="stack" aria-selected="false">Tool stack</button>
+      <button role="tab" class="tab" id="tab-improve" data-tab="improve" data-view="improve" aria-selected="false">Learning loop</button>
+      <span class="tab-sep" aria-hidden="true"></span>
+      <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" aria-selected="false">Rollout</button>
+      <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false">Measure</button>
+      <button role="tab" class="tab" id="tab-risks" data-tab="risks" aria-selected="false">Risks</button>
+      <button role="tab" class="tab" id="tab-export" data-tab="export" aria-selected="false">Export</button>
+    </nav>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="panel panel-graph" id="panel-graph" role="tabpanel" aria-labelledby="tab-company">
+    <div class="panel-head">
+      <h2 id="view-title">Company</h2>
+      <p class="panel-note" id="view-blurb"></p>
+      <ul class="legend">
+        <li class="kind-ai">AI agent</li>
+        <li class="kind-human">Human role</li>
+        <li class="kind-gate">Gate or policy</li>
+        <li class="kind-system">System or signal</li>
+        <li class="kind-artifact">Artifact or tool slot</li>
+      </ul>
+    </div>
+    <div class="workbench">
+      <div class="work-graph">
+        <div class="graph-scroll" id="graph" tabindex="0" aria-label="Flow diagram, scrolls sideways"></div>
+        <div class="spine" id="spine-wrap" hidden>
+          <p class="spine-label" id="spine-label">Shared context, read by every lane</p>
+          <div class="spine-chips" id="spine"></div>
+        </div>
+      </div>
+      <article class="detail" id="detail" aria-live="polite"></article>
+    </div>
+    <div class="stack-table" id="stack-table" hidden></div>
   </section>
 
-  <section class="panel" aria-labelledby="graph-h">
+  <section class="panel" id="panel-rollout" role="tabpanel" aria-labelledby="tab-rollout" hidden>
     <div class="panel-head">
-      <h2 id="graph-h">The flow</h2>
-      <p class="panel-note">Click any box for its purpose, its indicative prompt, and the artifact it writes.
-        Work runs left to right and the last lane feeds the first.</p>
-    </div>
-    <ul class="legend">
-      <li class="kind-ai">AI agent</li>
-      <li class="kind-human">Human role</li>
-      <li class="kind-gate">Control gate</li>
-      <li class="kind-system">Deterministic check</li>
-    </ul>
-    <div class="graph-scroll" id="graph" tabindex="0" aria-label="Flow diagram, scrolls sideways"></div>
-    <div class="spine">
-      <p class="spine-label">Read by every stage</p>
-      <div class="spine-chips" id="spine"></div>
-    </div>
-    <article class="detail" id="detail" aria-live="polite"></article>
-  </section>
-
-  <section class="panel" aria-labelledby="phases-h">
-    <div class="panel-head">
-      <h2 id="phases-h">Build it in this order</h2>
-      <p class="panel-note">Phases overlap deliberately. Each one ends with something you can point at,
-        and nothing depends on a step you have not built yet.</p>
+      <h2>Build it in this order</h2>
+      <p class="panel-note">Dependency order, not lane order, and phases overlap. Each ends in something
+        you can point at. Click any part to open it in its view.</p>
     </div>
     <ol class="phases" id="phases"></ol>
   </section>
 
-  <section class="panel" aria-labelledby="metrics-h">
+  <section class="panel" id="panel-measure" role="tabpanel" aria-labelledby="tab-measure" hidden>
     <div class="panel-head">
-      <h2 id="metrics-h">How you know it worked</h2>
-      <p class="panel-note">Leading indicators move in weeks and tell you the change took. Lagging ones
-        settle over a quarter and tell you it was worth it. Every one is already in a system you own.</p>
+      <h2>How you know it worked</h2>
+      <p class="panel-note">Leading indicators move in weeks and say the change took. Lagging ones settle
+        over a quarter and say it was worth it. Each comes from a system you already own.</p>
     </div>
     <div class="table-scroll">
       <table class="metrics">
-        <thead><tr><th>Stage</th><th>Leading</th><th>Lagging</th><th>Where it comes from</th></tr></thead>
+        <thead><tr><th>Stage</th><th>Leading</th><th>Lagging</th><th>Source</th></tr></thead>
         <tbody id="metrics"></tbody>
       </table>
     </div>
   </section>
 
-  <section class="panel" aria-labelledby="risks-h">
+  <section class="panel" id="panel-risks" role="tabpanel" aria-labelledby="tab-risks" hidden>
     <div class="panel-head">
-      <h2 id="risks-h">What goes wrong at your stage</h2>
-      <p class="panel-note">These are the failure patterns that match your answers, not a generic list.</p>
+      <h2>What goes wrong at your stage</h2>
+      <p class="panel-note">Selected against your answers, not a generic list.</p>
     </div>
     <div class="risks" id="risks"></div>
   </section>
 
-  <section class="panel export" aria-labelledby="export-h">
+  <section class="panel" id="panel-export" role="tabpanel" aria-labelledby="tab-export" hidden>
     <div class="panel-head">
-      <h2 id="export-h">Take it with you</h2>
-      <p class="panel-note">The brief is plain Markdown, ready to paste into a doc or commit as the first
-        artifact in the chain it describes.</p>
+      <h2>Take it with you</h2>
+      <p class="panel-note">Plain Markdown, ready to paste into a doc or commit as the first artifact in
+        the chain it describes.</p>
     </div>
     <div class="actions">
       <button type="button" class="btn primary" id="copy-brief">Copy the brief as Markdown</button>
@@ -191,20 +213,26 @@
       <button type="button" class="btn" id="print">Print or save as PDF</button>
     </div>
     <p class="disclaimer"><strong>On the prompts.</strong> Every prompt here is indicative: a starting
-      shape that shows the altitude and the constraints to name. Rewrite each one in your own vocabulary,
-      against your own repository, before you rely on it. A prompt that has never been run is a hypothesis.</p>
+      shape that shows the altitude and the constraints worth naming. Rewrite each in your own
+      vocabulary, against your own systems, before you rely on it. A prompt that has never been run is
+      a hypothesis.</p>
+    <p class="disclaimer alt"><strong>On the tools.</strong> Named products are common choices at each
+      stage, not endorsements, and the landscape moves faster than this page. The category, what it
+      emits, and how that data reaches your context layer are the durable parts. Swap the product.</p>
   </section>
 </main>
 
 <footer class="wrap site-foot">
-  <p>Built from Anthropic's AI-native software development lifecycle playbook, Y Combinator's material on
-    AI-native companies and closed-loop operations, and field patterns from fractional engineering work.
-    Method and rules: <a href="docs/METHOD.md">docs/METHOD.md</a>.</p>
+  <p>Built from Anthropic's AI-native software development lifecycle playbook, Y Combinator's material
+    on AI-native companies and closed-loop operations, and field patterns from fractional engineering
+    work. Method and rules: <a href="docs/METHOD.md">docs/METHOD.md</a>.</p>
   <p class="fine">A blueprint is not a decision. Judgment, risk acceptance and the production gate stay with a named human.</p>
 </footer>
 
 <script src="assets/js/kb.js"></script>
+<script src="assets/js/kb-company.js"></script>
 <script src="assets/js/engine.js"></script>
+<script src="assets/js/engine-views.js"></script>
 <script src="assets/js/graph.js"></script>
 <script src="assets/js/app.js"></script>
 </body>

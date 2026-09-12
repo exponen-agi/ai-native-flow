@@ -1,9 +1,11 @@
 # ai-native-flow
 
-A self-service blueprint generator for AI-native delivery. A business answers six questions about
-its stage, team, budget, domain, goal and constraints, and gets back a prescriptive flow: which
-steps an AI agent owns, which stay human, where the control gates sit, the order to build it in,
-and how to tell whether it worked.
+A self-service blueprint generator for AI-native operations. A business answers six questions about
+its stage, team, budget, domain, goal and constraints, and gets back a prescriptive operating model
+across four views: the company as interacting loops, the delivery lifecycle inside it, the tool
+ecosystem with the path each tool's data travels into the context layer, and the learning loop that
+turns recorded work back into context. Plus the order to build it in, the metrics to watch, and the
+failure patterns that match those answers.
 
 **Live page:** `index.html` at the repository root. Nothing else is required to run it.
 
@@ -23,11 +25,25 @@ Static by design. No server, no build step, no model call, no analytics, no cook
 | --- | --- |
 | `index.html` | Page structure and the intake form |
 | `assets/css/app.css` | Design tokens and every style, both themes |
-| `assets/js/kb.js` | Knowledge base: lanes, tiers, and every node with its inclusion rule |
-| `assets/js/engine.js` | Deterministic generator: tier, node selection, edges, phases, metrics, risks |
-| `assets/js/graph.js` | Hand-rolled layered SVG renderer and selection highlighting |
-| `assets/js/app.js` | Form wiring, detail panel, Markdown export, URL state |
+| `assets/js/kb.js` | Delivery knowledge base: lanes, tiers, and every node with its inclusion rule |
+| `assets/js/kb-company.js` | Company loops, the tool catalogue with fit rules, and the learning-loop stages |
+| `assets/js/engine.js` | Tier derivation, node selection, edge bridging, delivery metrics and risks |
+| `assets/js/engine-views.js` | Builds the four views, picks tools, schedules the company-wide rollout |
+| `assets/js/graph.js` | Hand-rolled layered SVG renderer, reused by all four views |
+| `assets/js/app.js` | Tabs, intake, detail panel, Markdown export, URL state |
 | `docs/METHOD.md` | The rules in prose, and the sources behind them |
+
+### The four views
+
+| View | Answers |
+| --- | --- |
+| Company | Which functions run as loops, what signals feed them, which gates hold, where the outcome goes |
+| Delivery | The product loop's internals: intent, spec, plan, build, verify, ship, operate |
+| Tool stack | Which tool fills each slot at this stage, what it emits, and how that reaches the context store |
+| Learning loop | Record, index, distill, serve, gate, improve: how work becomes context for the next session |
+
+All four are generated from the same six answers and share one cross-view index, so a rollout phase
+can name a part from any view and clicking it opens that view with the part selected.
 
 ### Why no LLM call
 
@@ -92,6 +108,16 @@ Every element of the flow is one object in `assets/js/kb.js`:
 - `when(answers, tier)` decides inclusion. Omit it to always include.
 - `after` lists upstream ids. Excluded nodes are bridged automatically, so removing a step never
   breaks the chain.
-- `lane: 'spine'` renders in the governance band beneath the graph instead of in a column.
+- `lane: 'spine'` renders in the shared-context band beneath the graph instead of in a column.
+- Company loops, learning-loop stages and tool categories live in `kb-company.js` and follow the
+  same shape. A tool category carries `options`, each with a `fit(answers)` score; the highest score
+  becomes the recommendation and the rest stay visible as alternatives.
 
 Add a node, reload the page. There is nothing to rebuild.
+
+### On naming products
+
+The tool catalogue names real products because a blueprint that says "a CRM" helps nobody. They are
+common choices per stage, not endorsements, and the page says so twice. Keep option notes functional
+(what it is good for, who it suits) rather than claims about features, because those age badly. The
+durable content is the category, what it emits, and how that data reaches the context layer.
