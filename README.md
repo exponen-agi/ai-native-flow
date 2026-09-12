@@ -61,8 +61,18 @@ Fonts load from Google Fonts; everything else is local, so it degrades to system
 
 ## Deploying to GitHub Pages
 
-Settings → Pages → Build from branch → `main` / root. `.nojekyll` is present so the `assets/`
-directory is served verbatim.
+Two supported routes. Pick one, they are mutually exclusive.
+
+**GitHub Actions (this repository's setup).** Settings → Pages → Build and deployment → Source:
+GitHub Actions. `.github/workflows/pages.yml` then publishes the repository root on every push to
+`main`, after checking the entry point and that every script parses. The live URL appears on the
+workflow run and under Settings → Pages.
+
+**Deploy from a branch.** Settings → Pages → Source: Deploy from a branch → `main` / root. No
+workflow needed; delete `.github/workflows/pages.yml` if you take this route.
+
+`.nojekyll` is present either way, so the `assets/` directory is served verbatim rather than being
+run through Jekyll.
 
 ## Extending the knowledge base
 

@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+# The site is static: no build step, no dependencies. This workflow uploads the
+# repository as-is and hands it to Pages. Pages source must be set to
+# "GitHub Actions" under Settings, Pages, Build and deployment.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a queued deploy finish rather than cancelling it mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Fail fast if an entry point or asset is missing
+        run: |
+          set -euo pipefail
+          for f in index.html assets/css/app.css assets/js/kb.js \
+                   assets/js/engine.js assets/js/graph.js assets/js/app.js; do
+            test -f "$f" || { echo "missing $f"; exit 1; }
+          done
+          for f in assets/js/*.js; do node --check "$f"; done
+          echo "entry point and assets present, scripts parse"
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
