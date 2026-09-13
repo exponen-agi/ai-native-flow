@@ -25,7 +25,6 @@ Static by design. No server, no build step, no model call, no analytics, no cook
 | --- | --- |
 | `index.html` | Page structure and the intake form |
 | `assets/css/app.css` | Design tokens and every style, both themes |
-| `assets/img/exl-logo.svg` | ExponenLabs mark, used in the top bar and the footer |
 | `assets/js/kb.js` | Delivery knowledge base: lanes, tiers, and every node with its inclusion rule |
 | `assets/js/kb-company.js` | Company loops, the tool catalogue with fit rules, and the learning-loop stages |
 | `assets/js/engine.js` | Tier derivation, node selection, edge bridging, delivery metrics and risks |
@@ -74,8 +73,8 @@ Firestore collection, and none of them change the generator. Keep the engine sta
 python3 -m http.server 8000    # then open http://localhost:8000
 ```
 
-Fonts load from Google Fonts (Geist and Inter, the same two faces as exponenlabs.tech); everything
-else is local, so it degrades to system fonts offline.
+Fonts load from Google Fonts (Geist and Inter); everything else is local, so it degrades to
+system fonts offline.
 
 ## Deploying to GitHub Pages
 
