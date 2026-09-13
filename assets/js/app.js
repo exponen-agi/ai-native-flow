@@ -10,8 +10,8 @@ let currentView = 'company';
 let selected = {};
 
 const KIND_LABEL = {
-  ai: 'AI agent', human: 'Human role', gate: 'Gate or policy',
-  system: 'System or signal', artifact: 'Artifact or tool slot'
+  ai: 'Done by AI', human: 'Done by a person', gate: 'Approval or policy',
+  system: 'A system or signal', artifact: 'A document or tool'
 };
 const ANSWER_LABEL = {
   stage: { solo: 'Solo', startup: 'Early startup', growth: 'Growth stage', smb: 'SMB', enterprise: 'Enterprise' },
