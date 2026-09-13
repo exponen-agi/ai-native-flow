@@ -280,7 +280,22 @@ function renderView(id) {
     : (view.nodes.find(n => n.id === current.focus.node) ? current.focus.node : view.nodes[0].id);
   select(want);
   graphMount.scrollLeft = 0;
+  markGraphOverflow();
 }
+
+/* On a phone or a narrow tablet the diagram bottoms out at its legibility floor and
+   the box scrolls. A touch device shows no scrollbar until you already touch it, so
+   say so in words -- but only when it is actually true at this size. */
+function markGraphOverflow() {
+  const over = graphMount.scrollWidth > Math.ceil(graphMount.getBoundingClientRect().width) + 1;
+  document.getElementById('panel-graph').classList.toggle('graph-overflows', over);
+}
+
+let resizeTick;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTick);
+  resizeTick = setTimeout(markGraphOverflow, 120);
+}, { passive: true });
 
 /* ------------------------------------------------------------ flat panels */
 
@@ -489,6 +504,7 @@ document.getElementById('zoom-toggle').addEventListener('click', ev => {
   const actual = box.classList.toggle('is-actual');
   ev.currentTarget.setAttribute('aria-pressed', String(actual));
   ev.currentTarget.textContent = actual ? 'Fit to screen' : 'Show at full size';
+  markGraphOverflow();
 });
 
 document.getElementById('why-toggle').addEventListener('click', ev => {

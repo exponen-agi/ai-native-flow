@@ -122,6 +122,8 @@
    beat the display rules below it. Panels and collapsibles rely on it. */
 [hidden] { display: none !important; }
 
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
 body {
   margin: 0;
   background: var(--paper);
@@ -494,6 +496,8 @@ fieldset.field legend { margin-bottom: 6px; }
 }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; list-style: none; margin: 0; padding: 0; }
 .graph-hint { margin: 0 0 12px; font-size: 12.5px; color: var(--ink-3); }
+.swipe-note { display: none; }
+.graph-overflows .swipe-note { display: inline; }
 .legend li {
   display: flex; align-items: center; gap: 7px;
   font-size: 12.5px; color: var(--ink-2);
@@ -770,6 +774,41 @@ code.artifact {
   .blob > span { opacity: .14; }
   .masthead h1 { font-size: 27px; }
   .steps { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------- small screens and touch */
+/* Eight tabs wrapped onto three rows and the bar is sticky, so on a phone it held
+   120px -- a fifth of the viewport, a quarter in landscape -- permanently. One row
+   that scrolls sideways is the usual phone treatment and costs about 40px. */
+@media (max-width: 760px) {
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-inline: 2px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; }
+  .tab-sep { flex: 0 0 auto; margin: 0 4px; }
+}
+
+/* iOS Safari zooms the whole page when a form control under 16px takes focus, and
+   leaves it zoomed. The controls carry 16px on small screens for that reason alone. */
+@media (max-width: 860px) {
+  select, textarea, input[type="text"] { font-size: 16px; }
+}
+
+/* Touch has no hover to aim with, so the small controls that are comfortable with a
+   mouse get a finger-sized target. Padding rather than height keeps them laid out
+   the same; only the hit area grows. */
+@media (pointer: coarse) {
+  .btn, .tab { min-height: 44px; }
+  .btn.ghost { padding-block: 11px; }
+  .tool-chip, .part-chip, .mini-btn, .chip { min-height: 44px; padding-block: 10px; }
+  .spine-chip { min-height: 48px; }
+  .intake-summary { padding-block: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
