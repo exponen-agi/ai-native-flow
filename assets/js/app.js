@@ -280,7 +280,22 @@ function renderView(id) {
     : (view.nodes.find(n => n.id === current.focus.node) ? current.focus.node : view.nodes[0].id);
   select(want);
   graphMount.scrollLeft = 0;
+  markGraphOverflow();
 }
+
+/* On a phone or a narrow tablet the diagram bottoms out at its legibility floor and
+   the box scrolls. A touch device shows no scrollbar until you already touch it, so
+   say so in words -- but only when it is actually true at this size. */
+function markGraphOverflow() {
+  const over = graphMount.scrollWidth > Math.ceil(graphMount.getBoundingClientRect().width) + 1;
+  document.getElementById('panel-graph').classList.toggle('graph-overflows', over);
+}
+
+let resizeTick;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTick);
+  resizeTick = setTimeout(markGraphOverflow, 120);
+}, { passive: true });
 
 /* ------------------------------------------------------------ flat panels */
 
@@ -479,6 +494,17 @@ document.querySelector('.tabs').addEventListener('keydown', ev => {
   ev.preventDefault();
   tabs[next].focus();
   switchTab(tabs[next].dataset.tab);
+});
+
+/* Fit is the default and needs no thought. The toggle is the escape hatch for a
+   narrow screen where fitting has scaled the labels down further than someone
+   wants to squint at: it drops back to natural size and lets the box scroll. */
+document.getElementById('zoom-toggle').addEventListener('click', ev => {
+  const box = document.getElementById('graph');
+  const actual = box.classList.toggle('is-actual');
+  ev.currentTarget.setAttribute('aria-pressed', String(actual));
+  ev.currentTarget.textContent = actual ? 'Fit to screen' : 'Show at full size';
+  markGraphOverflow();
 });
 
 document.getElementById('why-toggle').addEventListener('click', ev => {

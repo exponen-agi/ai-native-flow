@@ -158,22 +158,26 @@
   </div>
 </div>
 
-<main class="wrap">
+<main>
   <section class="panel panel-graph" id="panel-graph" role="tabpanel" aria-labelledby="tab-company">
     <div class="panel-head">
       <h2 id="view-title">Company</h2>
       <p class="panel-note" id="view-blurb"></p>
-      <ul class="legend">
-        <li class="kind-ai">Done by AI</li>
-        <li class="kind-human">Done by a person</li>
-        <li class="kind-gate">Approval or policy</li>
-        <li class="kind-system">A system or signal</li>
-        <li class="kind-artifact">A document or tool</li>
-      </ul>
+      <div class="legend-row">
+        <ul class="legend">
+          <li class="kind-ai">Done by AI</li>
+          <li class="kind-human">Done by a person</li>
+          <li class="kind-gate">Approval or policy</li>
+          <li class="kind-system">A system or signal</li>
+          <li class="kind-artifact">A document or tool</li>
+        </ul>
+        <button type="button" class="btn ghost" id="zoom-toggle" aria-pressed="false">Show at full size</button>
+      </div>
+      <p class="graph-hint">Click any box to read what it is, who owns it, and why it is there.<span class="swipe-note"> On a small screen, swipe the diagram sideways to see the rest.</span></p>
     </div>
     <div class="workbench">
       <div class="work-graph">
-        <div class="graph-scroll" id="graph" tabindex="0" aria-label="Flow diagram, scrolls sideways"></div>
+        <div class="graph-scroll" id="graph" tabindex="0" aria-label="Flow diagram"></div>
         <div class="spine" id="spine-wrap" hidden>
           <p class="spine-label" id="spine-label">Shared context, read by every lane</p>
           <div class="spine-chips" id="spine"></div>

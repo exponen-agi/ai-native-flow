@@ -3,6 +3,12 @@
 
 const GEO = { w: 202, h: 70, vgap: 20, lane: 250, head: 56, pad: 26, foot: 84 };
 
+/* The diagram is drawn at a fixed natural size and then scaled to whatever width
+   the page can give it. Below this fraction the node labels stop being readable,
+   so the graph holds that size and its box scrolls sideways instead of shrinking
+   further. Above 1 it would only bloat the type, so it never scales up. */
+const MIN_SCALE = 0.66;
+
 function wrap(text, max) {
   const words = String(text).split(' ');
   const lines = [];
@@ -157,6 +163,13 @@ function renderGraph(view, mount, onSelect) {
     nodeLayer.appendChild(g);
   });
   svg.appendChild(nodeLayer);
+  /* width:100% + height:auto against the viewBox scales the whole drawing to the
+     column. max-width pins the top at natural size; min-width is the floor, and it
+     is what makes .graph-scroll overflow rather than shrink past legibility. */
+  svg.style.width = '100%';
+  svg.style.height = 'auto';
+  svg.style.maxWidth = L.width + 'px';
+  svg.style.minWidth = Math.round(L.width * MIN_SCALE) + 'px';
   mount.appendChild(svg);
   return L;
 }
