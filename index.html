@@ -7,35 +7,59 @@
 <meta name="description" content="Answer six questions and get a prescriptive AI-native company blueprint: every function as a loop, the tool stack and how its data reaches your context layer, the delivery lifecycle, and the learning loop that feeds it all back.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
 <a class="skip" href="#intake-form">Skip to the questions</a>
 
-<header class="masthead">
-  <div class="wrap masthead-inner">
-    <div class="masthead-copy">
-      <p class="eyebrow">Prescriptive playbook</p>
-      <h1>AI-Native Flow Blueprint</h1>
-      <p class="lede">AI adoption fails at the process, not the model. Answer six questions and this lays
-        out the company your size should run: every function as a loop, the tools and how their data
-        reaches your context layer, the delivery lifecycle inside it, and the learning loop that feeds
-        the whole thing back.</p>
-    </div>
-    <dl class="assurance">
-      <div><dt>Runs</dt><dd>In your browser</dd></div>
-      <div><dt>Sends</dt><dd>Nothing, ever</dd></div>
-      <div><dt>Method</dt><dd>Fixed rules</dd></div>
-    </dl>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="https://www.exponenlabs.tech" aria-label="ExponenLabs home">
+      <img src="assets/img/exl-logo.svg" alt="" width="26" height="26">
+      <span>ExponenLabs</span>
+    </a>
+    <a class="btn primary btn-sm" href="https://www.exponenlabs.tech/contact">Talk to a CTO</a>
   </div>
 </header>
+
+<section class="masthead">
+  <div class="blob blob-a" aria-hidden="true"><span></span></div>
+  <div class="blob blob-b" aria-hidden="true"><span></span></div>
+  <div class="wrap masthead-inner">
+    <div class="masthead-copy">
+      <p class="eyebrow">AI-Native Flow Blueprint</p>
+      <h1>See exactly how AI should run in your business.</h1>
+      <p class="lede">AI efforts stall on how the work flows, not on the technology. Answer six plain
+        questions and get the plan a company your size should run: what each team repeats as a loop,
+        which tools to use, where a person still decides, and the order to build it in.</p>
+      <p class="assure">Runs in your browser &middot; Nothing is sent anywhere &middot; Same answers, same plan</p>
+    </div>
+    <ol class="steps">
+      <li>
+        <span class="step-n">1</span>
+        <span class="step-t">Answer six questions</span>
+        <span class="step-d">Your stage, team, budget and goal. About two minutes.</span>
+      </li>
+      <li>
+        <span class="step-n">2</span>
+        <span class="step-t">Read your plan</span>
+        <span class="step-d">The loops, the tools, the people and the checks, drawn out.</span>
+      </li>
+      <li>
+        <span class="step-n">3</span>
+        <span class="step-t">Take it with you</span>
+        <span class="step-d">Copy it into a document, or refine it with your own AI.</span>
+      </li>
+    </ol>
+  </div>
+</section>
 
 <div class="console">
   <div class="wrap">
     <details class="intake" id="intake-wrap" open>
       <summary class="intake-summary">
-        <span class="intake-label">Your situation</span>
+        <span class="intake-label">Your answers</span>
         <span class="answer-chips" id="answer-chips"></span>
         <span class="intake-toggle" aria-hidden="true"></span>
       </summary>
@@ -114,13 +138,13 @@
       <p class="strip-tier"><span class="strip-tier-n" id="tier-n">Tier 2 of 4</span>
         <strong id="tier-name">Guardrailed build</strong></p>
       <dl class="strip-stats">
-        <div><dt>Agent roles</dt><dd id="stat-ai">0</dd></div>
-        <div><dt>Human roles</dt><dd id="stat-human">0</dd></div>
-        <div><dt>Gates</dt><dd id="stat-gate">0</dd></div>
-        <div><dt>Tool slots</dt><dd id="stat-tool">0</dd></div>
-        <div><dt>Horizon</dt><dd id="stat-weeks">0<span class="unit">wk</span></dd></div>
+        <div><dt>AI steps</dt><dd id="stat-ai">0</dd></div>
+        <div><dt>People</dt><dd id="stat-human">0</dd></div>
+        <div><dt>Approvals</dt><dd id="stat-gate">0</dd></div>
+        <div><dt>Tools</dt><dd id="stat-tool">0</dd></div>
+        <div><dt>Timeline</dt><dd id="stat-weeks">0<span class="unit">wk</span></dd></div>
       </dl>
-      <button type="button" class="btn ghost" id="why-toggle" aria-expanded="false" aria-controls="why">Why this shape</button>
+      <button type="button" class="btn ghost" id="why-toggle" aria-expanded="false" aria-controls="why">Why this plan</button>
     </div>
     <div class="why" id="why" hidden>
       <p id="read-ceiling"></p>
@@ -150,11 +174,11 @@
       <h2 id="view-title">Company</h2>
       <p class="panel-note" id="view-blurb"></p>
       <ul class="legend">
-        <li class="kind-ai">AI agent</li>
-        <li class="kind-human">Human role</li>
-        <li class="kind-gate">Gate or policy</li>
-        <li class="kind-system">System or signal</li>
-        <li class="kind-artifact">Artifact or tool slot</li>
+        <li class="kind-ai">Done by AI</li>
+        <li class="kind-human">Done by a person</li>
+        <li class="kind-gate">Approval or policy</li>
+        <li class="kind-system">A system or signal</li>
+        <li class="kind-artifact">A document or tool</li>
       </ul>
     </div>
     <div class="workbench">
@@ -222,11 +246,27 @@
   </section>
 </main>
 
-<footer class="wrap site-foot">
-  <p>Built from Anthropic's AI-native software development lifecycle playbook, Y Combinator's material
-    on AI-native companies and closed-loop operations, and field patterns from fractional engineering
-    work. Method and rules: <a href="docs/METHOD.md">docs/METHOD.md</a>.</p>
-  <p class="fine">A blueprint is not a decision. Judgment, risk acceptance and the production gate stay with a named human.</p>
+<footer class="site-foot">
+  <div class="wrap site-foot-inner">
+    <div class="foot-brand">
+      <a class="brand" href="https://www.exponenlabs.tech" aria-label="ExponenLabs home">
+        <img src="assets/img/exl-logo.svg" alt="" width="24" height="24">
+        <span>ExponenLabs</span>
+      </a>
+      <p class="foot-tag">Get a CTO to lead your AI &mdash; grow your business.</p>
+      <p class="foot-links">
+        <a href="https://www.exponenlabs.tech/services/ai-native-cto-os">AI-Native CTO OS</a>
+        <a href="https://www.exponenlabs.tech/how-we-work">How we work</a>
+        <a href="https://www.exponenlabs.tech/contact">Book a call</a>
+      </p>
+    </div>
+    <div class="foot-note">
+      <p>Built from Anthropic&rsquo;s AI-native software development lifecycle playbook, Y Combinator&rsquo;s
+        material on AI-native companies and closed-loop operations, and field patterns from fractional
+        engineering work. Method and rules: <a href="docs/METHOD.md">docs/METHOD.md</a>.</p>
+      <p class="fine">A blueprint is not a decision. Judgment, risk acceptance and the production gate stay with a named human.</p>
+    </div>
+  </div>
 </footer>
 
 <script src="assets/js/kb.js"></script>

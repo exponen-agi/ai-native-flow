@@ -132,9 +132,9 @@ function renderGraph(view, mount, onSelect) {
     const g = svgEl('g', {
       class: `node kind-${n.kind}`, transform: `translate(${p.x} ${p.y})`,
       tabindex: 0, role: 'button', 'data-id': n.id,
-      'aria-label': `${n.title}. ${n.kind === 'ai' ? 'AI agent' : n.kind === 'human' ? 'Human role' : n.kind === 'gate' ? 'Control gate' : 'System'}. ${n.subtitle}`
+      'aria-label': `${n.title}. ${n.kind === 'ai' ? 'Done by AI' : n.kind === 'human' ? 'Done by a person' : n.kind === 'gate' ? 'Approval or policy' : 'A system or signal'}. ${n.subtitle}`
     });
-    g.appendChild(svgEl('rect', { class: 'node-box', width: GEO.w, height: GEO.h, rx: 3 }));
+    g.appendChild(svgEl('rect', { class: 'node-box', width: GEO.w, height: GEO.h, rx: 6 }));
     g.appendChild(svgEl('rect', { class: 'node-stripe', width: 4, height: GEO.h, rx: 1.5 }));
     const lines = wrap(n.title, 24);
     lines.forEach((line, i) => {
