@@ -259,7 +259,19 @@ h1, h2, h3 {
 .step-d { font-size: 13px; color: var(--ink-3); line-height: 1.45; }
 
 /* ---------------------------------------------------------------- panels */
-main { padding-block: 18px 40px; display: grid; gap: 16px; }
+main {
+  padding-block: 18px 40px;
+  padding-inline: 20px;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+@media (min-width: 768px) { main { padding-inline: 32px; } }
+/* Text panels keep the reading measure. The diagram is the point of the page, so it
+   takes the screen instead -- capped only so the lanes do not drift apart on a very
+   wide monitor. */
+.panel { width: 100%; max-width: var(--wrap); }
+.panel-graph { max-width: 1920px; }
 /* Grid and flex items default to min-width:auto, which lets the wide diagram
    push the whole page sideways. Every scrolling container is pinned here. */
 main > *, .summary > *, .reads, .detail, .phase > * { min-width: 0; }
@@ -447,7 +459,27 @@ fieldset.field legend { margin-bottom: 6px; }
   position: sticky; top: 54px; align-self: start;
   max-height: calc(100vh - 70px); overflow-y: auto;
 }
-@media (max-width: 1080px) {
+/* Stacked under a full-width diagram the reading panel is far wider than its own
+   measure, so it runs in two columns with the identity across the top rather than
+   one narrow ribbon of text beside an empty half. */
+@media (min-width: 1000px) and (max-width: 1800px) {
+  .workbench > .detail {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: 44px;
+    align-content: start;
+    /* Without this a short block stretches to the height of whatever sits beside
+       it, dragging its left rule down through empty space. */
+    align-items: start;
+  }
+  .workbench > .detail > .detail-head,
+  .workbench > .detail > .detail-title,
+  .workbench > .detail > .detail-purpose { grid-column: 1 / -1; }
+}
+
+/* The detail column costs the diagram 360px. That only pays for itself once the
+   screen is wide enough that the diagram still gets its full natural width beside
+   it; below that the reading panel goes underneath and the graph takes everything. */
+@media (max-width: 1800px) {
   .workbench { grid-template-columns: 1fr; }
   .workbench .detail {
     position: static; max-height: none;
@@ -456,7 +488,12 @@ fieldset.field legend { margin-bottom: 6px; }
 }
 
 /* ----------------------------------------------------------------- graph */
-.legend { display: flex; flex-wrap: wrap; gap: 14px; list-style: none; margin: 0 0 12px; padding: 0; }
+.legend-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px 18px; margin-bottom: 6px;
+}
+.legend { display: flex; flex-wrap: wrap; gap: 14px; list-style: none; margin: 0; padding: 0; }
+.graph-hint { margin: 0 0 12px; font-size: 12.5px; color: var(--ink-3); }
 .legend li {
   display: flex; align-items: center; gap: 7px;
   font-size: 12.5px; color: var(--ink-2);
@@ -469,15 +506,22 @@ fieldset.field legend { margin-bottom: 6px; }
 .legend .kind-artifact::before { background: var(--artifact); }
 
 .graph-scroll {
-  overflow: auto;
-  max-height: min(68vh, 780px);
-  overscroll-behavior: contain;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
   border: 1px solid var(--rule-soft);
   border-radius: var(--r-md);
   background: var(--surface-2);
-  padding: 8px 4px;
+  padding: 10px;
 }
-.graph-scroll svg { display: block; max-width: none; }
+.graph-scroll svg { display: block; }
+/* The escape hatch: natural size, and the box scrolls under it. */
+.graph-scroll.is-actual svg {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+}
 
 .lane-rule { stroke: var(--rule-soft); stroke-width: 1; }
 .lane-index { font-family: var(--display); font-size: 11px; font-weight: 500; fill: var(--ink-3); }
@@ -734,11 +778,11 @@ code.artifact {
 
 @media print {
   body { background: #fff; }
-  .intake, .tabs, .actions, .skip, .legend, .btn, .blob, .steps { display: none; }
+  .intake, .tabs, .actions, .skip, .legend, .legend-row, .graph-hint, .btn, .blob, .steps { display: none; }
   .panel { border-color: #bbb; box-shadow: none; break-inside: avoid; display: block !important; }
   .panel[hidden] { display: block !important; }
   .why[hidden] { display: block !important; }
   .workbench { grid-template-columns: 1fr; }
-  .graph-scroll { overflow: visible; max-height: none; }
+  .graph-scroll { overflow: visible; }
   .workbench .detail { position: static; max-height: none; }
 }
