@@ -1,7 +1,7 @@
 /* Hand-rolled layered SVG graph. Lanes are columns, work flows left to right,
    and the operate lane loops back to intake because that is the whole point. */
 
-const GEO = { w: 198, h: 64, vgap: 22, lane: 246, head: 56, pad: 26, foot: 84 };
+const GEO = { w: 202, h: 70, vgap: 20, lane: 250, head: 56, pad: 26, foot: 84 };
 
 function wrap(text, max) {
   const words = String(text).split(' ');
@@ -21,8 +21,9 @@ function svgEl(name, attrs = {}) {
   return el;
 }
 
-function layout(blueprint) {
-  const laneNodes = LANES.map(l => blueprint.nodes.filter(n => n.lane === l.id));
+function layout(view) {
+  const lanes = view.lanes;
+  const laneNodes = lanes.map(l => view.nodes.filter(n => n.lane === l.id));
   const rows = Math.max(...laneNodes.map(n => n.length), 1);
   const pos = new Map();
   laneNodes.forEach((list, li) => {
@@ -35,8 +36,8 @@ function layout(blueprint) {
     });
   });
   return {
-    pos, laneNodes, rows,
-    width: GEO.pad * 2 + (LANES.length - 1) * GEO.lane + GEO.w,
+    pos, laneNodes, rows, lanes,
+    width: GEO.pad * 2 + (lanes.length - 1) * GEO.lane + GEO.w,
     height: GEO.head + rows * (GEO.h + GEO.vgap) + GEO.foot
   };
 }
@@ -53,13 +54,14 @@ function edgePath(a, b) {
   return `M ${ax} ${ay} C ${ax + dx} ${ay} ${bx - dx} ${by} ${bx} ${by}`;
 }
 
-function renderGraph(blueprint, mount, onSelect) {
-  const L = layout(blueprint);
+function renderGraph(view, mount, onSelect) {
+  const L = layout(view);
   mount.innerHTML = '';
   const svg = svgEl('svg', {
     viewBox: `0 0 ${L.width} ${L.height}`,
     width: L.width, height: L.height,
-    role: 'group', 'aria-label': 'Your AI-native delivery flow, six lanes from intake to operate'
+    role: 'group',
+    'aria-label': 'Flow diagram, lanes: ' + L.lanes.map(l => l.label).join(', ')
   });
 
   const defs = svgEl('defs');
@@ -75,7 +77,7 @@ function renderGraph(blueprint, mount, onSelect) {
 
   /* lane headers and dividers */
   const laneLayer = svgEl('g', { class: 'lanes' });
-  LANES.forEach((lane, i) => {
+  L.lanes.forEach((lane, i) => {
     const x = GEO.pad + i * GEO.lane;
     if (i > 0) {
       laneLayer.appendChild(svgEl('line', {
@@ -95,7 +97,7 @@ function renderGraph(blueprint, mount, onSelect) {
 
   /* edges under nodes */
   const edgeLayer = svgEl('g', { class: 'edges' });
-  blueprint.edges.forEach(e => {
+  view.edges.forEach(e => {
     const a = L.pos.get(e.from), b = L.pos.get(e.to);
     if (!a || !b) return;
     edgeLayer.appendChild(svgEl('path', {
@@ -105,11 +107,12 @@ function renderGraph(blueprint, mount, onSelect) {
   });
   svg.appendChild(edgeLayer);
 
-  /* the closing loop: last operate node back to the first intake node */
-  const operate = L.laneNodes[5], intake = L.laneNodes[0];
-  if (operate.length && intake.length) {
-    const from = L.pos.get(operate[operate.length - 1].id);
-    const to = L.pos.get(intake[0].id);
+  /* the closing loop: the last lane's final node back to the first lane */
+  const fromLane = L.laneNodes[L.lanes.findIndex(l => l.id === view.loopFrom)] || [];
+  const toLane = L.laneNodes[L.lanes.findIndex(l => l.id === view.loopTo)] || [];
+  if (fromLane.length && toLane.length) {
+    const from = L.pos.get(fromLane[fromLane.length - 1].id);
+    const to = L.pos.get(toLane[0].id);
     const baseY = L.height - GEO.foot + 44;
     const sx = from.x + GEO.w / 2, sy = from.y + GEO.h;
     const tx = to.x + GEO.w / 2, ty = to.y + GEO.h;
@@ -117,13 +120,13 @@ function renderGraph(blueprint, mount, onSelect) {
                L ${tx + 40} ${baseY} C ${tx} ${baseY} ${tx} ${baseY} ${tx} ${ty}`;
     svg.appendChild(svgEl('path', { d, class: 'edge loop', 'marker-end': 'url(#arrow-loop)' }));
     const label = svgEl('text', { x: (sx + tx) / 2, y: baseY - 10, class: 'loop-label' });
-    label.textContent = 'every finding re-enters as the next intent.md';
+    label.textContent = view.loopLabel;
     svg.appendChild(label);
   }
 
   /* nodes */
   const nodeLayer = svgEl('g', { class: 'nodes' });
-  blueprint.nodes.forEach(n => {
+  view.nodes.forEach(n => {
     const p = L.pos.get(n.id);
     if (!p) return;
     const g = svgEl('g', {
@@ -135,11 +138,11 @@ function renderGraph(blueprint, mount, onSelect) {
     g.appendChild(svgEl('rect', { class: 'node-stripe', width: 4, height: GEO.h, rx: 1.5 }));
     const lines = wrap(n.title, 24);
     lines.forEach((line, i) => {
-      const t = svgEl('text', { x: 16, y: lines.length === 1 ? 28 : 23 + i * 15, class: 'node-title' });
+      const t = svgEl('text', { x: 16, y: lines.length === 1 ? 30 : 24 + i * 16, class: 'node-title' });
       t.textContent = line;
       g.appendChild(t);
     });
-    const sub = svgEl('text', { x: 16, y: GEO.h - 15, class: 'node-sub' });
+    const sub = svgEl('text', { x: 16, y: GEO.h - 14, class: 'node-sub' });
     sub.textContent = n.subtitle.length > 31 ? n.subtitle.slice(0, 30) + '…' : n.subtitle;
     g.appendChild(sub);
     const badge = svgEl('text', { x: GEO.w - 12, y: 18, class: 'node-kind', 'text-anchor': 'end' });
@@ -158,12 +161,12 @@ function renderGraph(blueprint, mount, onSelect) {
   return L;
 }
 
-function highlight(mount, id, blueprint) {
+function highlight(mount, id, view) {
   mount.querySelectorAll('.node').forEach(g => {
     g.classList.toggle('is-selected', g.dataset.id === id);
   });
   const linked = new Set();
-  blueprint.edges.forEach(e => {
+  view.edges.forEach(e => {
     if (e.from === id || e.to === id) { linked.add(e.from + '>' + e.to); }
   });
   mount.querySelectorAll('.edge').forEach(p => {
