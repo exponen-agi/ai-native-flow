@@ -78,20 +78,20 @@ function buildDeliveryView(c, tier) {
 
 const VIEW_META = {
   company: {
-    label: 'Company',
-    blurb: 'Every function of the business as a loop: signals in, work, gates, action, learning. Each loop writes to the shared context underneath.'
+    label: 'The company',
+    blurb: 'Each part of the business as a loop that runs and improves: what it learns each day, who does the work, what has to be checked, what changes, and what you learn back. Everything writes to the shared knowledge underneath.'
   },
   delivery: {
-    label: 'Delivery',
-    blurb: 'The internals of the product loop, the one function with a full lifecycle of its own, from intent through to production.'
+    label: 'Building software',
+    blurb: 'What happens inside the product loop, from someone having an idea to it running for customers. This is the one part with a full lifecycle of its own.'
   },
   stack: {
-    label: 'Tool stack',
-    blurb: 'The tools you already run, the path each one\'s data travels to reach the context store, and who reads it at the other end.'
+    label: 'Tools and data',
+    blurb: 'The tools you already pay for, how each one\'s information travels into a single place the AI can read, and who reads it at the other end. Start with what you have.'
   },
   improve: {
-    label: 'Learning loop',
-    blurb: 'How recorded work becomes context: record, index, distill, serve, gate, improve. This is the loop that makes every other loop better.'
+    label: 'Getting better',
+    blurb: 'How today\'s work becomes tomorrow\'s knowledge: record it, make it findable, boil it down, feed it back in, check it, improve. This is what makes every other loop get better instead of staying flat.'
   }
 };
 

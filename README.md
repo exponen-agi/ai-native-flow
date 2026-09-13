@@ -24,7 +24,7 @@ Static by design. No server, no build step, no model call, no analytics, no cook
 | File | Role |
 | --- | --- |
 | `index.html` | Page structure and the intake form |
-| `assets/css/app.css` | Design tokens and every style, both themes |
+| `assets/css/app.css` | Design tokens and every style, on the ExponenLabs system |
 | `assets/js/kb.js` | Delivery knowledge base: lanes, tiers, and every node with its inclusion rule |
 | `assets/js/kb-company.js` | Company loops, the tool catalogue with fit rules, and the learning-loop stages |
 | `assets/js/engine.js` | Tier derivation, node selection, edge bridging, delivery metrics and risks |
@@ -66,6 +66,26 @@ carried into the exported brief, and used in the refinement prompt.
 Only three things justify one, and none of them is generation: capturing leads, saving named
 blueprints, and tracking which inputs people pick. All three fit Firebase Hosting plus one
 Firestore collection, and none of them change the generator. Keep the engine static either way.
+
+## Design system
+
+Taken from the ExponenLabs stack (`exponen-agi/ai-readiness-scorecard`) so this tool sits beside the
+rest of the brand rather than beside itself:
+
+| Token | Value |
+| --- | --- |
+| Typeface | Inter, one face, headings at 600 |
+| Ground / surface | `#fafafa` / `#ffffff` |
+| Ink / muted ink | `#171717` / `#737373` |
+| Border | `#e9e9e9` |
+| Primary action | near-black fill, near-white text |
+| Radius | `0.5rem`, with `-2px` and `-4px` steps |
+| Container | 1080px, 20px side padding, 32px from the medium breakpoint |
+
+Light only, matching the source system, so every colour is painted explicitly rather than inherited
+from the viewer's theme. Colour carries meaning and nothing else: emerald for what AI does, amber for
+where a person decides, blue for a guardrail, neutral for systems and documents. Those four appear as
+3px marks and small labels, never as fills.
 
 ## Local use
 

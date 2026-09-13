@@ -10,12 +10,12 @@ let currentView = 'company';
 let selected = {};
 
 const KIND_LABEL = {
-  ai: 'AI agent', human: 'Human role', gate: 'Gate or policy',
-  system: 'System or signal', artifact: 'Artifact or tool slot'
+  ai: 'AI does it', human: 'A person decides', gate: 'Guardrail',
+  system: 'System or signal', artifact: 'Tool or document'
 };
 const ANSWER_LABEL = {
   stage: { solo: 'Solo', startup: 'Early startup', growth: 'Growth stage', smb: 'SMB', enterprise: 'Enterprise' },
-  engineers: { none: 'No in-house devs', solo: '1–3 devs', small: '4–15 devs', large: '15+ devs' },
+  engineers: { none: 'No tech team', solo: '1–3 in tech', small: '4–15 in tech', large: '15+ in tech' },
   budget: { under200: '<$200/mo', to2k: '$200–2k/mo', to10k: '$2–10k/mo', over10k: '$10k+/mo' },
   domain: { saas: 'SaaS', mobile: 'Mobile', ecommerce: 'E-commerce', 'data-ai': 'Data or AI', 'internal-ops': 'Internal ops', services: 'Services' },
   goal: { 'ship-faster': 'Ship faster', 'fewer-defects': 'Fewer defects', 'less-rework': 'Less rework', 'support-load': 'Support load', 'ops-cost': 'Ops cost', 'scale-without-hiring': 'Capacity' },

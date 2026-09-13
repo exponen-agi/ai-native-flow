@@ -7,7 +7,7 @@
 <meta name="description" content="Answer six questions and get a prescriptive AI-native company blueprint: every function as a loop, the tool stack and how its data reaches your context layer, the delivery lifecycle, and the learning loop that feeds it all back.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
@@ -18,10 +18,9 @@
     <div class="masthead-copy">
       <p class="eyebrow">Prescriptive playbook</p>
       <h1>AI-Native Flow Blueprint</h1>
-      <p class="lede">AI adoption fails at the process, not the model. Answer six questions and this lays
-        out the company your size should run: every function as a loop, the tools and how their data
-        reaches your context layer, the delivery lifecycle inside it, and the learning loop that feeds
-        the whole thing back.</p>
+      <p class="lede">Buying AI tools is not a plan. Answer six questions and this shows how a business
+        your size should actually run with AI: what each part of the company does, which tools feed it,
+        who stays in charge, and what to do first.</p>
     </div>
     <dl class="assurance">
       <div><dt>Runs</dt><dd>In your browser</dd></div>
@@ -51,7 +50,7 @@
           </select>
         </p>
         <p class="field">
-          <label for="engineers">People writing or reviewing code</label>
+          <label for="engineers">Tech team size</label>
           <select id="engineers" name="engineers">
             <option value="none">Nobody in house</option>
             <option value="solo">One to three</option>
@@ -60,7 +59,7 @@
           </select>
         </p>
         <p class="field">
-          <label for="budget">Monthly AI budget</label>
+          <label for="budget">AI budget</label>
           <select id="budget" name="budget">
             <option value="under200">Under $200</option>
             <option value="to2k" selected>$200 to $2,000</option>
@@ -69,7 +68,7 @@
           </select>
         </p>
         <p class="field">
-          <label for="domain">What you build or run</label>
+          <label for="domain">Your product</label>
           <select id="domain" name="domain">
             <option value="saas" selected>Web product or SaaS</option>
             <option value="mobile">Mobile app</option>
@@ -80,7 +79,7 @@
           </select>
         </p>
         <p class="field">
-          <label for="goal">The problem to solve</label>
+          <label for="goal">Main goal</label>
           <select id="goal" name="goal">
             <option value="ship-faster" selected>Ship the roadmap faster</option>
             <option value="fewer-defects">Fewer defects reaching customers</option>
@@ -91,7 +90,7 @@
           </select>
         </p>
         <fieldset class="field">
-          <legend>Constraints</legend>
+          <legend>Anything special</legend>
           <div class="chips">
             <label class="chip"><input type="checkbox" name="constraints" value="regulated"> Regulated or sensitive data</label>
             <label class="chip"><input type="checkbox" name="constraints" value="legacy-systems"> Legacy systems stay</label>
@@ -100,7 +99,7 @@
           </div>
         </fieldset>
         <p class="field field-wide">
-          <label for="problem">The problem in your own words <span class="optional">optional, stays in your browser</span></label>
+          <label for="problem">In your own words <span class="optional">optional, stays in your browser</span></label>
           <input type="text" id="problem" name="problem" placeholder="Handlers spend a third of call time on status-only queries, and every fix waits two weeks for a spec.">
         </p>
         <div class="actions">
@@ -131,14 +130,14 @@
     </div>
 
     <nav class="tabs" role="tablist" aria-label="Blueprint sections">
-      <button role="tab" class="tab" id="tab-company" data-tab="company" data-view="company" aria-selected="true">Company</button>
-      <button role="tab" class="tab" id="tab-delivery" data-tab="delivery" data-view="delivery" aria-selected="false">Delivery</button>
-      <button role="tab" class="tab" id="tab-stack" data-tab="stack" data-view="stack" aria-selected="false">Tool stack</button>
-      <button role="tab" class="tab" id="tab-improve" data-tab="improve" data-view="improve" aria-selected="false">Learning loop</button>
+      <button role="tab" class="tab" id="tab-company" data-tab="company" data-view="company" aria-selected="true">The company</button>
+      <button role="tab" class="tab" id="tab-delivery" data-tab="delivery" data-view="delivery" aria-selected="false">Building software</button>
+      <button role="tab" class="tab" id="tab-stack" data-tab="stack" data-view="stack" aria-selected="false">Tools &amp; data</button>
+      <button role="tab" class="tab" id="tab-improve" data-tab="improve" data-view="improve" aria-selected="false">Getting better</button>
       <span class="tab-sep" aria-hidden="true"></span>
-      <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" aria-selected="false">Rollout</button>
-      <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false">Measure</button>
-      <button role="tab" class="tab" id="tab-risks" data-tab="risks" aria-selected="false">Risks</button>
+      <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" aria-selected="false">What to do first</button>
+      <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false">Measuring it</button>
+      <button role="tab" class="tab" id="tab-risks" data-tab="risks" aria-selected="false">What goes wrong</button>
       <button role="tab" class="tab" id="tab-export" data-tab="export" aria-selected="false">Export</button>
     </nav>
   </div>
@@ -150,18 +149,18 @@
       <h2 id="view-title">Company</h2>
       <p class="panel-note" id="view-blurb"></p>
       <ul class="legend">
-        <li class="kind-ai">AI agent</li>
-        <li class="kind-human">Human role</li>
-        <li class="kind-gate">Gate or policy</li>
+        <li class="kind-ai">AI does it</li>
+        <li class="kind-human">A person decides</li>
+        <li class="kind-gate">Guardrail</li>
         <li class="kind-system">System or signal</li>
-        <li class="kind-artifact">Artifact or tool slot</li>
+        <li class="kind-artifact">Tool or document</li>
       </ul>
     </div>
     <div class="workbench">
       <div class="work-graph">
         <div class="graph-scroll" id="graph" tabindex="0" aria-label="Flow diagram, scrolls sideways"></div>
         <div class="spine" id="spine-wrap" hidden>
-          <p class="spine-label" id="spine-label">Shared context, read by every lane</p>
+          <p class="spine-label" id="spine-label">Shared knowledge every part reads</p>
           <div class="spine-chips" id="spine"></div>
         </div>
       </div>
@@ -173,8 +172,8 @@
   <section class="panel" id="panel-rollout" role="tabpanel" aria-labelledby="tab-rollout" hidden>
     <div class="panel-head">
       <h2>Build it in this order</h2>
-      <p class="panel-note">Dependency order, not lane order, and phases overlap. Each ends in something
-        you can point at. Click any part to open it in its view.</p>
+      <p class="panel-note">Each phase ends in something you can point at, and nothing depends on a step
+        you have not built yet. Phases overlap on purpose. Click any part to see what it is.</p>
     </div>
     <ol class="phases" id="phases"></ol>
   </section>
@@ -182,12 +181,13 @@
   <section class="panel" id="panel-measure" role="tabpanel" aria-labelledby="tab-measure" hidden>
     <div class="panel-head">
       <h2>How you know it worked</h2>
-      <p class="panel-note">Leading indicators move in weeks and say the change took. Lagging ones settle
-        over a quarter and say it was worth it. Each comes from a system you already own.</p>
+      <p class="panel-note">The early column moves within weeks and tells you the change took. The later
+        column settles over a quarter and tells you it was worth the money. Every number already exists
+        in a system you own, so none of this needs a new project to measure.</p>
     </div>
     <div class="table-scroll">
       <table class="metrics">
-        <thead><tr><th>Stage</th><th>Leading</th><th>Lagging</th><th>Source</th></tr></thead>
+        <thead><tr><th>Area</th><th>Early signal, weeks</th><th>Real result, a quarter</th><th>Where the number lives</th></tr></thead>
         <tbody id="metrics"></tbody>
       </table>
     </div>
@@ -196,7 +196,8 @@
   <section class="panel" id="panel-risks" role="tabpanel" aria-labelledby="tab-risks" hidden>
     <div class="panel-head">
       <h2>What goes wrong at your stage</h2>
-      <p class="panel-note">Selected against your answers, not a generic list.</p>
+      <p class="panel-note">Chosen against your answers, not a generic list. These are the ways money gets
+        spent without anything improving.</p>
     </div>
     <div class="risks" id="risks"></div>
   </section>
@@ -212,13 +213,13 @@
       <button type="button" class="btn" id="copy-prompt">Copy a prompt to refine it with your own AI</button>
       <button type="button" class="btn" id="print">Print or save as PDF</button>
     </div>
-    <p class="disclaimer"><strong>On the prompts.</strong> Every prompt here is indicative: a starting
-      shape that shows the altitude and the constraints worth naming. Rewrite each in your own
-      vocabulary, against your own systems, before you rely on it. A prompt that has never been run is
-      a hypothesis.</p>
-    <p class="disclaimer alt"><strong>On the tools.</strong> Named products are common choices at each
-      stage, not endorsements, and the landscape moves faster than this page. The category, what it
-      emits, and how that data reaches your context layer are the durable parts. Swap the product.</p>
+    <p class="disclaimer"><strong>About the prompts.</strong> Each one is a starting point that shows the
+      shape and the limits worth stating, not a finished instruction. Reword it for your own business and
+      systems before you rely on it. A prompt nobody has run yet is a guess.</p>
+    <p class="disclaimer alt"><strong>About the tools.</strong> The named products are common choices at
+      your stage, not recommendations we are paid for, and this market changes faster than this page. What
+      lasts is the job each tool does and how its information reaches the rest of the system. Swap the
+      product freely.</p>
   </section>
 </main>
 
