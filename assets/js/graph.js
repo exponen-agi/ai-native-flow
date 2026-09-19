@@ -160,30 +160,90 @@ function renderGraph(view, mount, onSelect) {
     g.addEventListener('keydown', ev => {
       if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(); }
     });
+    /* Hover traces without committing to it, so the chain can be followed by moving
+       the mouse rather than by clicking through every box and reading each panel. */
+    g.addEventListener('mouseenter', () => trace(mount, n.id, view));
+    g.addEventListener('mouseleave', () => trace(mount, selectedId(mount), view));
     nodeLayer.appendChild(g);
   });
   svg.appendChild(nodeLayer);
-  /* width:100% + height:auto against the viewBox scales the whole drawing to the
-     column. max-width pins the top at natural size; min-width is the floor, and it
-     is what makes .graph-scroll overflow rather than shrink past legibility. */
-  svg.style.width = '100%';
-  svg.style.height = 'auto';
-  svg.style.maxWidth = L.width + 'px';
-  svg.style.minWidth = Math.round(L.width * MIN_SCALE) + 'px';
   mount.appendChild(svg);
+  /* Natural width is stashed on the box so the zoom control can size against it
+     without re-running the layout. */
+  mount.dataset.naturalWidth = L.width;
+  applyZoom(mount, Number(mount.dataset.zoom || 0) || 0);
   return L;
+}
+
+/* The id the graph is currently selected on, read back off the DOM so hover can
+   restore it on mouseleave without the caller threading state through. */
+function selectedId(mount) {
+  const sel = mount.querySelector('.node.is-selected');
+  return sel ? sel.dataset.id : null;
+}
+
+/* Traces one part's immediate chain: what feeds it, what it feeds, and the edges
+   between. Everything else fades rather than disappearing, because a box you can
+   still see is a box you can still aim at.
+
+   Immediate neighbours only, not the whole transitive chain: at four lanes deep
+   every box ends up connected to every other one, and a picture where nothing is
+   dimmed says nothing. */
+function trace(mount, id, view) {
+  const linked = new Set();
+  const near = new Set(id ? [id] : []);
+  if (id) {
+    view.edges.forEach(e => {
+      if (e.from === id) { linked.add(e.from + '>' + e.to); near.add(e.to); }
+      else if (e.to === id) { linked.add(e.from + '>' + e.to); near.add(e.from); }
+    });
+  }
+
+  mount.querySelectorAll('.node').forEach(g => {
+    const on = near.has(g.dataset.id);
+    g.classList.toggle('is-near', on);
+    g.classList.toggle('is-dimmed', Boolean(id) && !on);
+  });
+  mount.querySelectorAll('.edge').forEach(p => {
+    if (p.classList.contains('loop')) return;
+    const on = linked.has(p.dataset.from + '>' + p.dataset.to);
+    p.classList.toggle('is-linked', on);
+    p.classList.toggle('is-dimmed', Boolean(id) && !on);
+  });
+  /* The closing loop belongs to the lanes at either end of it, not to one box. */
+  const loop = mount.querySelector('.edge.loop');
+  if (loop) {
+    const node = id ? view.nodes.find(n => n.id === id) : null;
+    const onLoop = Boolean(node) && (node.lane === view.loopFrom || node.lane === view.loopTo);
+    loop.classList.toggle('is-linked', onLoop);
+    loop.classList.toggle('is-dimmed', Boolean(id) && !onLoop);
+  }
 }
 
 function highlight(mount, id, view) {
   mount.querySelectorAll('.node').forEach(g => {
     g.classList.toggle('is-selected', g.dataset.id === id);
   });
-  const linked = new Set();
-  view.edges.forEach(e => {
-    if (e.from === id || e.to === id) { linked.add(e.from + '>' + e.to); }
-  });
-  mount.querySelectorAll('.edge').forEach(p => {
-    const key = p.dataset.from + '>' + p.dataset.to;
-    p.classList.toggle('is-linked', linked.has(key));
-  });
+  trace(mount, id, view);
+}
+
+/* Zoom as an explicit number rather than a fit/natural toggle.
+   0 means fit: scale to the column but never below the legibility floor, which is
+   what makes the box scroll instead of shrinking the labels into decoration. */
+function applyZoom(mount, zoom) {
+  const natural = Number(mount.dataset.naturalWidth || 0);
+  const svg = mount.querySelector('svg');
+  if (!svg || !natural) return;
+  mount.dataset.zoom = zoom;
+  svg.style.height = 'auto';
+  if (!zoom) {
+    svg.style.width = '100%';
+    svg.style.maxWidth = natural + 'px';
+    svg.style.minWidth = Math.round(natural * MIN_SCALE) + 'px';
+  } else {
+    const w = Math.round(natural * zoom);
+    svg.style.width = w + 'px';
+    svg.style.maxWidth = 'none';
+    svg.style.minWidth = w + 'px';
+  }
 }

@@ -59,7 +59,7 @@ function applyHash() {
   const cs = (p.get('c') || '').split(',').filter(Boolean);
   form.querySelectorAll('input[name="constraints"]').forEach(i => { i.checked = cs.includes(i.value); });
   const v = p.get('v');
-  if (v && (VIEW_META[v] || ['rollout', 'measure', 'risks', 'export'].includes(v))) currentView = v;
+  if (v && (VIEW_META[v] || ['network', 'rollout', 'measure', 'risks', 'export'].includes(v))) currentView = v;
 }
 
 /* ------------------------------------------------------------------ header */
@@ -213,6 +213,17 @@ function renderDetail(id) {
 function select(id) {
   selected[currentView] = id;
   highlight(graphMount, id, current.views[currentView]);
+  const status = document.getElementById('graph-status');
+  if (status) {
+    const n = current.views[currentView].nodes.find(x => x.id === id);
+    status.innerHTML = '';
+    if (n) {
+      status.appendChild(document.createTextNode('Selected: '));
+      status.appendChild(el('strong', null, n.title));
+    } else {
+      status.textContent = 'Nothing selected';
+    }
+  }
   document.querySelectorAll('.spine-chip').forEach(c => c.classList.toggle('is-selected', c.dataset.id === id));
   renderDetail(id);
 }
@@ -359,8 +370,29 @@ function renderRisks(b) {
 
 const PANELS = {
   company: 'panel-graph', delivery: 'panel-graph', stack: 'panel-graph', improve: 'panel-graph',
+  network: 'panel-network',
   rollout: 'panel-rollout', measure: 'panel-measure', risks: 'panel-risks', export: 'panel-export'
 };
+
+/* Pan/zoom controls for the network canvas, handed back by renderNetwork. The view is
+   drawn on first open rather than on every generate: it is the one view that is not
+   on screen when the answers change, and redrawing it would reset a pan nobody asked
+   to lose. */
+let netControls = null;
+let netDirty = true;
+
+function renderNetworkView() {
+  const mount = document.getElementById('network');
+  const panel = document.getElementById('net-panel');
+  if (!mount || !panel) return;
+  netControls = renderNetwork(current, mount, panel, id => {
+    const entry = current.index.get(id);
+    if (!entry) return;
+    switchTab(entry.view);
+    select(id);
+  });
+  netDirty = false;
+}
 
 function switchTab(tab) {
   const panelId = PANELS[tab];
@@ -369,7 +401,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === tab)));
   document.getElementById(panelId).setAttribute('aria-labelledby', 'tab-' + tab);
   if (VIEW_META[tab]) renderView(tab);
-  else currentView = currentView;
+  else if (tab === 'network' && netDirty) renderNetworkView();
   writeHash(current.answers);
 }
 
@@ -472,6 +504,10 @@ function render() {
   renderPhases(current);
   renderMetrics(current);
   renderRisks(current);
+  netDirty = true;
+  netControls = null;
+  const netPanel = document.getElementById('net-panel');
+  if (netPanel) { netPanel.hidden = true; netPanel.innerHTML = ''; }
   switchTab(VIEW_META[currentView] || PANELS[currentView] ? currentView : 'company');
 }
 
@@ -496,16 +532,56 @@ document.querySelector('.tabs').addEventListener('keydown', ev => {
   switchTab(tabs[next].dataset.tab);
 });
 
-/* Fit is the default and needs no thought. The toggle is the escape hatch for a
-   narrow screen where fitting has scaled the labels down further than someone
-   wants to squint at: it drops back to natural size and lets the box scroll. */
-document.getElementById('zoom-toggle').addEventListener('click', ev => {
-  const box = document.getElementById('graph');
-  const actual = box.classList.toggle('is-actual');
-  ev.currentTarget.setAttribute('aria-pressed', String(actual));
-  ev.currentTarget.textContent = actual ? 'Fit to screen' : 'Show at full size';
+/* Zoom as a number the visitor can see and step, rather than a two-state toggle
+   between "fit" and "natural". Fit stays the default and stays one click away,
+   because on a phone it is the only setting that shows the whole shape. */
+const GRAPH_ZOOMS = [0.7, 0.85, 1, 1.25, 1.5, 2];
+
+function setGraphZoom(zoom) {
+  applyZoom(graphMount, zoom);
+  const out = document.getElementById('graph-zoom-level');
+  if (out) out.textContent = zoom ? Math.round(zoom * 100) + '%' : 'Fit';
   markGraphOverflow();
+}
+
+function stepGraphZoom(dir) {
+  const box = document.getElementById('graph');
+  const now = Number(box.dataset.zoom || 0) || 0;
+  /* Fit is not on the ladder, so stepping away from it starts from whatever it
+     currently resolves to on this screen. */
+  const from = now || (box.getBoundingClientRect().width / Number(box.dataset.naturalWidth || 1));
+  let next = null;
+  if (dir > 0) next = GRAPH_ZOOMS.find(z => z > from + 0.01);
+  else next = [...GRAPH_ZOOMS].reverse().find(z => z < from - 0.01);
+  setGraphZoom(next || (dir > 0 ? GRAPH_ZOOMS[GRAPH_ZOOMS.length - 1] : GRAPH_ZOOMS[0]));
+}
+
+document.getElementById('graph-zoom-in').addEventListener('click', () => stepGraphZoom(1));
+document.getElementById('graph-zoom-out').addEventListener('click', () => stepGraphZoom(-1));
+document.getElementById('graph-zoom-level').addEventListener('click', () => setGraphZoom(0));
+
+/* Full screen is a fixed overlay rather than the Fullscreen API: nothing to permit,
+   and the page keeps its scroll position underneath. */
+const graphPanel = document.getElementById('panel-graph');
+function setFullscreen(on) {
+  graphPanel.classList.toggle('is-fullscreen', on);
+  document.body.style.overflow = on ? 'hidden' : '';
+  const btn = document.getElementById('graph-fullscreen');
+  btn.setAttribute('aria-pressed', String(on));
+  btn.textContent = on ? 'Leave full screen' : 'Full screen';
+  markGraphOverflow();
+}
+document.getElementById('graph-fullscreen').addEventListener('click', ev => {
+  setFullscreen(!graphPanel.classList.contains('is-fullscreen'));
+  ev.currentTarget.blur();
 });
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && graphPanel.classList.contains('is-fullscreen')) setFullscreen(false);
+});
+
+document.getElementById('net-zoom-in').addEventListener('click', () => netControls && netControls.zoomIn());
+document.getElementById('net-zoom-out').addEventListener('click', () => netControls && netControls.zoomOut());
+document.getElementById('net-zoom-level').addEventListener('click', () => netControls && netControls.reset());
 
 document.getElementById('why-toggle').addEventListener('click', ev => {
   const why = document.getElementById('why');

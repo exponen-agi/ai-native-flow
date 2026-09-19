@@ -38,9 +38,9 @@ Regulated data does not lower the tier. It adds governance nodes (managed settin
 scheduled scans, a policy owner in the spec loop) and multiplies the calendar by 1.5. Legacy systems
 add a source-of-truth map and 1.25. Enterprise stage adds 1.25. Client codebases add 1.15.
 
-## Four views over one set of answers
+## Five views over one set of answers
 
-The delivery lifecycle is one function's internals, not the company. The four views separate them:
+The delivery lifecycle is one function's internals, not the company. The views separate them:
 
 - **Company.** Signals in, function loops, quality gates, action and record, learning. The loops
   cover product and delivery, support, demand, revenue, back office, hiring and leadership queries.
@@ -55,6 +55,13 @@ The delivery lifecycle is one function's internals, not the company. The four vi
   becomes canon on a schedule, canon becomes the context the next session loads, and failures become
   permanent test cases. The overnight self-repair agent sits at the end because it depends on every
   gate before it.
+- **Who does what.** The same plan drawn as the team that runs it rather than as a lifecycle. The
+  four views above answer what should happen; this one answers who does it and what they hand each
+  other, which is the question people ask once they have read the plan and are deciding whether they
+  can staff it. Five jobs are drawn as agent pods and three as people, each bound to whichever part
+  of this blueprint fills that job — so a company with nobody in house gets a visibly different team
+  from one with fifteen engineers, and the difference is the argument. Nothing is added to the
+  knowledge base for it: if a slot has no part at these answers, it is left out.
 
 ## Six lanes and a spine
 
