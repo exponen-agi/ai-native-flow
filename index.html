@@ -149,6 +149,7 @@
       <button role="tab" class="tab" id="tab-delivery" data-tab="delivery" data-view="delivery" aria-selected="false">Delivery</button>
       <button role="tab" class="tab" id="tab-stack" data-tab="stack" data-view="stack" aria-selected="false">Tool stack</button>
       <button role="tab" class="tab" id="tab-improve" data-tab="improve" data-view="improve" aria-selected="false">Learning loop</button>
+      <button role="tab" class="tab" id="tab-network" data-tab="network" aria-selected="false">Who does what</button>
       <span class="tab-sep" aria-hidden="true"></span>
       <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" aria-selected="false">Rollout</button>
       <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false">Measure</button>
@@ -171,9 +172,19 @@
           <li class="kind-system">A system or signal</li>
           <li class="kind-artifact">A document or tool</li>
         </ul>
-        <button type="button" class="btn ghost" id="zoom-toggle" aria-pressed="false">Show at full size</button>
       </div>
-      <p class="graph-hint">Click any box to read what it is, who owns it, and why it is there.<span class="swipe-note"> On a small screen, swipe the diagram sideways to see the rest.</span></p>
+      <p class="graph-hint">Point at any box to see what feeds it and what it feeds. Click to read what it is, who owns it, and why it is there.<span class="swipe-note"> On a small screen, swipe the diagram sideways to see the rest.</span></p>
+    </div>
+    <div class="canvas-bar">
+      <p class="canvas-status" id="graph-status">Nothing selected</p>
+      <div class="canvas-tools">
+        <div class="zoom-group">
+          <button type="button" class="zoom-btn" id="graph-zoom-out" aria-label="Zoom out">&minus;</button>
+          <button type="button" class="zoom-level" id="graph-zoom-level" title="Back to fitting the screen">Fit</button>
+          <button type="button" class="zoom-btn" id="graph-zoom-in" aria-label="Zoom in">+</button>
+        </div>
+        <button type="button" class="btn ghost" id="graph-fullscreen" aria-pressed="false">Full screen</button>
+      </div>
     </div>
     <div class="workbench">
       <div class="work-graph">
@@ -186,6 +197,32 @@
       <article class="detail" id="detail" aria-live="polite"></article>
     </div>
     <div class="stack-table" id="stack-table" hidden></div>
+  </section>
+
+  <section class="panel" id="panel-network" role="tabpanel" aria-labelledby="tab-network" hidden>
+    <div class="panel-head">
+      <h2>Who does what</h2>
+      <p class="panel-note">The same plan as a working team. The circles along the top are the
+        agents doing the repeated work. The circles below are the people who still decide.
+        Everything they send each other passes through one shared memory in the middle, and the
+        label on each line names what travels it.</p>
+      <p class="net-hint">Click any circle to read what it does and what it reads and writes.
+        Drag to move the picture, and hold Ctrl (or Cmd) while scrolling to zoom.</p>
+    </div>
+    <div class="canvas-bar">
+      <p class="canvas-status">Agents and people, drawn from your answers</p>
+      <div class="canvas-tools">
+        <div class="zoom-group">
+          <button type="button" class="zoom-btn" id="net-zoom-out" aria-label="Zoom out">&minus;</button>
+          <button type="button" class="zoom-level" id="net-zoom-level" title="Back to 100%">100%</button>
+          <button type="button" class="zoom-btn" id="net-zoom-in" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="net-frame">
+      <div class="net-canvas" id="network"></div>
+      <div class="net-panel" id="net-panel" aria-live="polite" hidden></div>
+    </div>
   </section>
 
   <section class="panel" id="panel-rollout" role="tabpanel" aria-labelledby="tab-rollout" hidden>
@@ -245,6 +282,7 @@
 <script src="assets/js/engine.js"></script>
 <script src="assets/js/engine-views.js"></script>
 <script src="assets/js/graph.js"></script>
+<script src="assets/js/network.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

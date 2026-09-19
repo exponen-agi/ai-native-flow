@@ -509,6 +509,49 @@ fieldset.field legend { margin-bottom: 6px; }
 .legend .kind-system::before { background: var(--system); }
 .legend .kind-artifact::before { background: var(--artifact); }
 
+/* ------------------------------------------------------------- canvas bar */
+/* One toolbar shape for both canvases: what is selected on the left, the controls
+   that change how much of it you can see on the right. */
+.canvas-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 8px; padding: 7px 10px;
+  border: 1px solid var(--rule-soft); border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.canvas-status { font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; }
+.canvas-status strong { color: var(--ink); font-weight: 600; }
+.canvas-tools { display: flex; align-items: center; gap: 6px; }
+.zoom-group {
+  display: flex; align-items: center; gap: 2px;
+  border: 1px solid var(--rule); border-radius: var(--r-sm);
+  background: var(--surface); padding: 2px;
+}
+.zoom-btn {
+  font: inherit; font-size: 15px; line-height: 1;
+  min-width: 26px; height: 24px;
+  border: 0; border-radius: 4px; background: none; color: var(--ink-2);
+  cursor: pointer;
+}
+.zoom-btn:hover { background: var(--surface-2); color: var(--ink); }
+.zoom-level {
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
+  min-width: 46px; text-align: center;
+  border: 0; background: none; cursor: pointer; padding: 0 2px;
+}
+.zoom-level:hover { color: var(--ink); }
+
+/* Fullscreen is a fixed overlay rather than the Fullscreen API: it needs no
+   permission, it exits on Escape like everything else, and it keeps the page's own
+   scroll position underneath. */
+.is-fullscreen {
+  position: fixed; inset: 0; z-index: 60;
+  margin: 0; padding: 16px;
+  background: var(--paper);
+  overflow: auto;
+}
+.is-fullscreen .workbench { border-radius: 0; }
+
 .graph-scroll {
   overflow-x: auto;
   overflow-y: hidden;
@@ -518,14 +561,8 @@ fieldset.field legend { margin-bottom: 6px; }
   background: var(--surface-2);
   padding: 10px;
 }
-.graph-scroll svg { display: block; }
-/* The escape hatch: natural size, and the box scrolls under it. */
-.graph-scroll.is-actual svg {
-  width: auto !important;
-  max-width: none !important;
-  min-width: 0 !important;
-  height: auto !important;
-}
+.graph-scroll svg { display: block; transition: width .18s ease; }
+@media (prefers-reduced-motion: reduce) { .graph-scroll svg { transition: none; } }
 
 .lane-rule { stroke: var(--rule-soft); stroke-width: 1; }
 .lane-index { font-family: var(--display); font-size: 11px; font-weight: 500; fill: var(--ink-3); }
@@ -562,6 +599,20 @@ fieldset.field legend { margin-bottom: 6px; }
 .node.kind-gate .node-kind { fill: var(--gate); }
 .node.kind-system .node-kind { fill: var(--system); }
 
+/* Tracing. Pointing at a box fades everything it does not touch, so "what feeds
+   this and what does it feed" is answered by looking rather than by reading. The
+   dimmed state stays well above invisible: these are still click targets. */
+.node, .edge { transition: opacity .18s ease, stroke .15s ease, stroke-width .15s ease; }
+.node.is-dimmed { opacity: .28; }
+.node.is-dimmed:hover { opacity: .85; }
+.edge.is-dimmed { opacity: .16; }
+.edge.is-linked { stroke: var(--ink); stroke-width: 2.2; opacity: 1; }
+.node.is-selected .node-box { stroke-width: 2.2; }
+
+@media (prefers-reduced-motion: reduce) {
+  .node, .edge { transition: none; }
+}
+
 /* ------------------------------------------------------------------ spine */
 .spine { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule-soft); }
 .spine-label {
@@ -581,6 +632,133 @@ fieldset.field legend { margin-bottom: 6px; }
 .spine-chip.is-selected { border-color: var(--ink); border-left-color: var(--ink); }
 .spine-name { font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--ink); }
 .spine-sub { font-size: 11.5px; color: var(--ink-3); }
+
+/* ---------------------------------------------------------------- network */
+/* The blueprint as a working team. Uses the same role hues as the diagram, so a
+   violet circle here and a violet stripe there mean the same thing. */
+.net-frame {
+  border: 1px solid var(--rule-soft); border-radius: var(--r-md);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.net-canvas { overflow: hidden; touch-action: pan-y; }
+.net-svg {
+  display: block; width: 100%; height: 440px;
+  cursor: grab;
+  /* The stage is transformed on every pointer move, so it gets its own layer. */
+  will-change: transform;
+}
+.net-svg.is-panning { cursor: grabbing; }
+@media (max-width: 720px) { .net-svg { height: 360px; } }
+
+.net-icon { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.net-label {
+  font-family: var(--display); font-size: 11.5px; font-weight: 600;
+  fill: var(--ink); text-anchor: middle;
+}
+
+.net-wire-line { fill: none; stroke: var(--rule); stroke-width: 1.4; }
+/* A long dash chased by a gap, pulled along the wire: it reads as something being
+   sent rather than as a shimmer. */
+.net-pulse {
+  fill: none; stroke-width: 2.2; stroke-linecap: round;
+  stroke-dasharray: 16 260; stroke-dashoffset: 276;
+  animation: net-travel 2.6s linear infinite;
+  opacity: .9;
+}
+.net-wire.kind-agent .net-pulse { stroke: var(--ai); }
+.net-wire.kind-human .net-pulse { stroke: var(--human); }
+.net-wire.is-cross .net-pulse { opacity: .55; }
+.net-wire.is-linked .net-wire-line { stroke: var(--ink-3); stroke-width: 2.2; }
+.net-svg.has-focus .net-wire:not(.is-linked) { opacity: .38; }
+.net-wire { transition: opacity .18s ease; }
+
+@keyframes net-travel { to { stroke-dashoffset: 0; } }
+
+/* What each wire carries, placed on the wire itself rather than at a fixed point,
+   so it stays on the line if the layout ever changes. */
+.net-flow-box { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
+.net-flow-text {
+  font-family: var(--body); font-size: 9.5px; font-weight: 500;
+  fill: var(--ink-2); text-anchor: middle;
+}
+.net-flow.kind-agent .net-flow-box { stroke: var(--ai); }
+.net-flow.kind-human .net-flow-box { stroke: var(--human); }
+.net-svg.has-focus .net-flow { opacity: .45; }
+.net-flow { transition: opacity .18s ease; }
+
+.net-node { cursor: pointer; }
+.net-disc { fill: var(--surface); stroke-width: 1.6; }
+.net-ring { fill: none; stroke-width: 1.5; opacity: 0; }
+.net-node.kind-agent .net-disc,
+.net-node.kind-agent .net-ring { stroke: var(--ai); }
+.net-node.kind-agent .net-icon { stroke: var(--ai); }
+.net-node.kind-human .net-disc,
+.net-node.kind-human .net-ring { stroke: var(--human); }
+.net-node.kind-human .net-icon { stroke: var(--human); }
+.net-node.kind-hub .net-disc,
+.net-node.kind-hub .net-ring { stroke: var(--system); }
+.net-node.kind-hub .net-icon { stroke: var(--system); }
+.net-node.kind-hub .net-glow { color: var(--system); }
+
+/* The ring is the selected state, and it pulses only while selected: a canvas where
+   every circle pulses at once tells you nothing about which one you picked. */
+.net-node.is-selected .net-ring {
+  opacity: 1;
+  transform-box: fill-box; transform-origin: center;
+  animation: net-ping 2.4s ease-out infinite;
+}
+.net-node.is-selected .net-disc { stroke-width: 2.4; }
+.net-node:hover .net-ring { opacity: .6; }
+/* A focused SVG group draws a hard rectangle around its whole bounding box, label
+   and all. The ring is the same information in the shape of the thing it marks. */
+.net-node:focus { outline: none; }
+.net-node:focus-visible .net-ring { opacity: 1; stroke-width: 2.4; }
+
+@keyframes net-ping {
+  0% { opacity: .55; transform: scale(1); }
+  80%, 100% { opacity: 0; transform: scale(1.7); }
+}
+
+.net-role-box { fill: var(--surface); stroke-width: 1; }
+.net-node.kind-agent .net-role-box { stroke: var(--ai); }
+.net-node.kind-human .net-role-box { stroke: var(--human); }
+.net-role-text {
+  font-family: var(--body); font-size: 10px; font-weight: 500;
+  fill: var(--ink-2); text-anchor: middle;
+}
+
+.net-hint { margin: 0 0 12px; font-size: 12.5px; color: var(--ink-3); }
+
+/* The panel under the canvas, sharing the detail panel's blocks and chips. */
+.net-panel {
+  display: grid; gap: 12px;
+  border-top: 1px solid var(--rule-soft);
+  padding: 16px 18px;
+  background: var(--surface);
+}
+.net-panel-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.net-panel-kind {
+  font-family: var(--display); font-size: 11.5px; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px;
+  background: var(--artifact-soft); color: var(--artifact);
+}
+.net-panel-kind.kind-agent { background: var(--ai-soft); color: var(--ai); }
+.net-panel-kind.kind-human { background: var(--human-soft); color: var(--human); }
+.net-panel-kind.kind-hub { background: var(--system-soft); color: var(--system); }
+.net-panel-head .mini-btn { margin-left: auto; }
+.net-panel-title { margin: 0; font-size: 19px; }
+.net-panel-sub { margin: 0; font-size: 13px; color: var(--ink-3); }
+.net-panel-purpose { margin: 0; max-width: var(--measure); font-size: 15px; }
+.net-panel-grid { display: grid; gap: 18px; }
+@media (min-width: 880px) { .net-panel-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.net-panel .btn { justify-self: start; }
+
+@media (prefers-reduced-motion: reduce) {
+  .net-pulse { animation: none; stroke-dasharray: none; opacity: .4; }
+  .net-node.is-selected .net-ring { animation: none; opacity: .5; }
+  .net-wire, .net-flow { transition: none; }
+}
 
 /* ----------------------------------------------------------------- detail */
 .detail {
