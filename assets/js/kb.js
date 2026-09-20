@@ -16,24 +16,24 @@ const LANES = [
 
 const TIERS = {
   1: {
-    name: 'Assisted artifact chain',
-    thesis: 'One person and an agent per task. Every step still starts by hand, but nothing lives only in a chat window.',
-    ceiling: 'Autonomy stops at the edit. You read every diff.'
+    name: 'Human-led, AI-assisted',
+    thesis: 'One person works with one AI helper per task. Every step still starts with a person, but nothing lives only in a chat message — it gets written down.',
+    ceiling: 'AI stops at making the edit. A person reads and approves every single change.'
   },
   2: {
-    name: 'Guardrailed build',
-    thesis: 'Policy becomes files the agent reads and hooks that stop it. Review becomes layered passes instead of one tired human.',
-    ceiling: 'Agents act freely inside the repo, never past the merge gate.'
+    name: 'AI builds inside guardrails',
+    thesis: 'Your rules become written instructions AI reads, plus automatic checks that stop it going too far. Review becomes several quick automatic and AI passes instead of one tired person catching everything.',
+    ceiling: 'AI can work freely on a task, but nothing goes live until it clears an approval step.'
   },
   3: {
-    name: 'Parallel and self-verifying',
-    thesis: 'Each session proves its own work, so one person steers several streams and reviews artifacts rather than keystrokes.',
-    ceiling: 'Production still needs a named human to authorize the release.'
+    name: 'Parallel AI, self-checked',
+    thesis: 'Each piece of AI work checks and proves itself before anyone looks, so one person can oversee several AI tasks at once and review the results instead of every keystroke.',
+    ceiling: 'AI can do almost everything up to release. A named person still approves anything that goes live.'
   },
   4: {
-    name: 'Governed autonomous loop',
-    thesis: 'Deterministic triggers invoke agents with no person in the path. Findings re-enter as intent and the loop feeds itself.',
-    ceiling: 'Humans hold judgment, risk acceptance and the production gate. Nothing else.'
+    name: 'AI runs the loop, people watch',
+    thesis: 'Set rules trigger AI to act on its own, moment to moment, with no person in the middle. What it learns feeds back in as new work, so the system keeps improving itself.',
+    ceiling: 'People still make the judgment calls, accept the risks, and approve anything customer-facing. Almost everything else can run by itself.'
   }
 };
 
@@ -76,11 +76,11 @@ const NODES = [
     in: ['intent.md']
   },
   {
-    id: 'product-owner', lane: 'intake', kind: 'human', title: 'Product owner (DRI)',
-    subtitle: 'accepts or closes. Named person, not a committee',
+    id: 'product-owner', lane: 'intake', kind: 'human', title: 'Product owner (final decision-maker)',
+    subtitle: 'accepts or closes. One named person, not a committee',
     after: ['triage-agent', 'intent-capture'],
-    purpose: 'Decides which intent enters the flow. The accept is the commit, and that commit is the trigger for the next stage.',
-    why: 'A single directly responsible individual is the thing most teams are missing. A committee turns a decision into a meeting series.',
+    purpose: 'Decides which requests move forward. Saying yes is what starts the next stage.',
+    why: 'One person clearly in charge is what most teams are missing. A committee turns a quick decision into a series of meetings.',
     responsibility: 'Accept, close, or send back with a reason. Own the outcome of what you accept. Never accept an intent whose open questions would change the design.',
     in: ['intent.md'], out: ['intent.md']
   },
@@ -245,8 +245,8 @@ const NODES = [
     in: ['tests']
   },
   {
-    id: 'eval-suite', lane: 'verify', kind: 'ai', title: 'Eval suite',
-    subtitle: '20 to 50 real tasks, run on config change',
+    id: 'eval-suite', lane: 'verify', kind: 'ai', title: 'Automated accuracy tests',
+    subtitle: '20 to 50 real tasks, re-run whenever AI settings change',
     after: ['verifier-subagent', 'feedback-loop'],
     when: (c, t) => t >= 3,
     purpose: 'Regression tests for the configuration that steers your agents. Runs when CLAUDE.md, a skill or a hook changes, and on a nightly schedule.',
@@ -271,7 +271,7 @@ const NODES = [
     subtitle: 'injection, auth gaps, data in logs',
     after: ['verifier-subagent', 'eval-suite', 'feedback-loop'],
     when: (c, t) => t >= 2 || has(c, 'regulated'),
-    purpose: 'A separate pass against your written security standard, so the security queue scales with agent output instead of with headcount.',
+    purpose: 'A separate pass against your written security standard, so security review keeps up with AI output without needing to hire more reviewers.',
     why: 'Security teams are sized for human output. When agents multiply the diff, either the queue grows or code ships under-reviewed, and a regulated business can accept neither.',
     prompt: 'Review this diff against REVIEW.md, security pass only: authentication and authorization gaps, injection paths, secrets or personal data reaching logs or error messages, unvalidated input crossing a trust boundary, and new external egress. For each finding cite the rule it breaks and give the smallest safe fix.',
     in: ['diff']
@@ -478,10 +478,10 @@ const NODES = [
     enforces: 'Linkage is the minimum bar. Declare one side authoritative per artifact type, and write the choice down.'
   },
   {
-    id: 'spend-limit', lane: 'spine', kind: 'gate', title: 'Spend envelope',
-    subtitle: 'budget as a control, not a surprise',
-    purpose: 'A hard per-workspace spend limit, per-seat visibility, and one review each month asking which loop earned its tokens.',
-    why: 'The advice to burn tokens rather than headcount only holds with a ceiling and a look at the bill. Autonomous loops are the line item that grows while nobody is watching.',
+    id: 'spend-limit', lane: 'spine', kind: 'gate', title: 'Spending limit',
+    subtitle: 'a set budget, not a surprise bill',
+    purpose: 'A hard monthly spend cap, visibility into who is spending what, and one review each month asking which automated task is actually earning its cost.',
+    why: 'It is cheaper to pay for more AI use than to hire more people, but only if someone sets a ceiling and checks the bill. Unwatched, always-on AI tasks are the line item that quietly grows.',
     enforces: 'Limit set centrally. Autonomous and scheduled jobs metered separately from interactive sessions, so a runaway loop is visible the next morning.'
   }
 ];

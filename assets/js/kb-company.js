@@ -152,36 +152,36 @@ const COMPANY_NODES = [
 
   /* ---------------------------------------------------------------- gates */
   {
-    id: 'gate-adversary', lane: 'gates', kind: 'gate', title: 'Adversarial model pass',
-    subtitle: 'a second model, not a person',
+    id: 'gate-adversary', lane: 'gates', kind: 'gate', title: 'Second AI double-check',
+    subtitle: 'a second AI reviews the first, not a person',
     after: ['loop-support', 'loop-demand', 'loop-revenue', 'loop-ops', 'loop-delivery', 'loop-leadership'],
-    purpose: 'A second model checks the first one\'s output against the written policy for that loop: unsupported claims, prompt injection from customer text, missing citations, tone, anything the policy forbids.',
-    why: 'Put a person in every quality gate and the loop stops whenever nobody is at a desk. The gate that scales is a second model with a written standard.',
+    purpose: 'A second AI checks the first one\'s work against a written standard for that task: unsupported claims, suspicious instructions hidden in customer text, missing sources, wrong tone, anything the standard rules out.',
+    why: 'Put a person on every approval and the work stops the moment nobody is at their desk. Using a second AI as the check is what lets this run around the clock.',
     enforces: 'Runs on every loop output before it leaves the building. Failures return to the loop with the rule cited, and repeat failures become a policy line rather than a reminder.'
   },
   {
-    id: 'gate-policy', lane: 'gates', kind: 'gate', title: 'Policy and compliance check',
-    subtitle: 'deterministic, where it must always hold',
+    id: 'gate-policy', lane: 'gates', kind: 'gate', title: 'Rules and compliance check',
+    subtitle: 'a fixed, automatic check for what must never happen',
     after: ['gate-adversary'],
     when: (c, t) => has(c, 'regulated') || has(c, 'client-code') || t >= 2,
-    purpose: 'Code-level checks for the rules that cannot be advisory: personal data leaving its boundary, a claim category you are not allowed to make, a commitment above a threshold, one client\'s context reaching another.',
-    why: 'A written policy makes a violation rare. Only a deterministic check makes it close to impossible, and that difference is what a regulator or a customer questionnaire asks about.',
+    purpose: 'Automatic checks for the rules that can never bend: personal data leaving where it should stay, a claim that is not allowed to be made, a promise above a set amount, one client\'s information reaching another client.',
+    why: 'A written rule makes a violation rare. Only a hard, automatic check makes it nearly impossible, and that is what a regulator or a customer\'s due-diligence questionnaire actually asks about.',
     enforces: 'Blocks rather than warns. Every allow and block logged with a timestamp and the rule that fired.'
   },
   {
-    id: 'gate-dri', lane: 'gates', kind: 'human', title: 'Directly responsible individual',
-    subtitle: 'one named person per outcome',
+    id: 'gate-dri', lane: 'gates', kind: 'human', title: 'One person in charge',
+    subtitle: 'one named person owns each result',
     after: ['gate-adversary', 'gate-policy'],
-    purpose: 'Each loop has exactly one person accountable for its outcome, who approves what the gates flagged and owns the loop\'s written policy.',
-    why: 'A committee turns a decision into a meeting series. One name on the block is the single highest-leverage structural change in this whole blueprint.',
+    purpose: 'Each repeating task has exactly one person accountable for its outcome, who approves what the checks flagged and owns that task\'s written rules.',
+    why: 'A committee turns a quick decision into a series of meetings. Naming one owner is the single most useful change in this entire plan.',
     responsibility: 'Own the outcome, not the keystrokes. Keep your loop\'s policy current, clear the flagged queue daily, and decide anything the gates could not.'
   },
   {
-    id: 'gate-spend', lane: 'gates', kind: 'gate', title: 'Spend and access envelope',
-    subtitle: 'per loop, metered and capped',
+    id: 'gate-spend', lane: 'gates', kind: 'gate', title: 'Spending and access limits',
+    subtitle: 'a set budget and a list of what each task may touch',
     after: ['gate-dri'],
-    purpose: 'A hard limit per workspace, autonomous jobs metered separately from interactive sessions, and tool access as an allowlist owned centrally rather than per person.',
-    why: 'Burn tokens rather than headcount only holds with a ceiling and a monthly look at which loop earned its spend. Unmetered scheduled jobs are the classic runaway.',
+    purpose: 'A hard monthly spending cap, always-on automated tasks tracked separately from work a person is actively watching, and a central list of exactly which tools each task is allowed to use.',
+    why: 'It is cheaper to pay for more AI use than to hire more people, but only with a ceiling and a monthly look at what each task is costing. An unwatched scheduled task is the classic way costs quietly run away.',
     enforces: 'Scheduled and event-triggered work cannot exceed its own budget line. Access changes leave an audit record.'
   },
 
@@ -233,11 +233,11 @@ const COMPANY_NODES = [
     out: ['outcome']
   },
   {
-    id: 'learn-distill', lane: 'learn', kind: 'ai', title: 'Distillation agent',
-    subtitle: 'raw record into canon',
+    id: 'learn-distill', lane: 'learn', kind: 'ai', title: 'Summary-writing agent',
+    subtitle: 'turns raw recordings into the playbook',
     after: ['learn-measure', 'act-comms'],
-    purpose: 'On a schedule, reads the period\'s transcripts, outcomes and decisions, and proposes edits to the written canon: the answer library, the objection list, the procedures, the context files.',
-    why: 'Recording everything produces a swamp. The distillation step is what turns volume into the small set of documents an agent can actually read at the start of a task.',
+    purpose: 'On a schedule, reads the period\'s transcripts, outcomes and decisions, and proposes edits to the written playbook: the answer library, the objection list, the procedures, the context files.',
+    why: 'Recording everything produces a pile nobody can use. This summarizing step is what turns that pile into the small set of documents an AI can actually read before starting a task.',
     prompt: 'Read this period\'s transcripts, decisions and outcome metrics. Propose edits to the canon as a diff, not prose: lines to add, lines to change, and lines now contradicted by evidence and due for deletion. Cite the source for every proposed line. Where two sources disagree, surface the disagreement instead of picking a winner.',
     in: ['transcripts', 'outcome'], out: ['canon-diff']
   },
@@ -257,7 +257,7 @@ const COMPANY_NODES = [
     after: ['learn-distill', 'learn-eval'],
     purpose: 'One short meeting per month: per loop, what it produced, what it cost, its eval pass rate, and the decision to widen it, tighten it or switch it off.',
     why: 'Loops rot silently. Without a scheduled look, you find out from the bill or from a customer, and by then the trust is spent.',
-    responsibility: 'Kill or fix a loop that is not earning. Approve the canon changes the distillation agent proposed. Adjust the spend envelope.'
+    responsibility: 'Stop or fix a task that is not earning its cost. Approve the playbook changes the summarizing agent proposed. Adjust the spending limit.'
   },
 
   /* ------------------------------------------------- company brain (spine) */
@@ -268,7 +268,7 @@ const COMPANY_NODES = [
     why: 'You cannot pump a hundred thousand hours of recording into a context window. The index plus the distilled canon is what makes recall possible at all.'
   },
   {
-    id: 'brain-canon', lane: 'spine', kind: 'artifact', title: 'The canon',
+    id: 'brain-canon', lane: 'spine', kind: 'artifact', title: 'The playbook ("canon")',
     subtitle: 'answers, positioning, procedures, policies',
     purpose: 'The small set of authoritative documents the loops read: answer library, positioning and proof, objection handling, written procedures, policies, metric definitions.',
     why: 'This is the company brain in practice. Not a model, a maintained set of documents that both a person and an agent can read and act on.'
@@ -438,8 +438,8 @@ const RSI_NODES = [
     out: ['diff']
   },
   {
-    id: 'imp-experiment', lane: 'improve', kind: 'ai', title: 'Hill-climbing experiments',
-    subtitle: 'propose, run, keep or discard',
+    id: 'imp-experiment', lane: 'improve', kind: 'ai', title: 'Small, tested experiments',
+    subtitle: 'propose a change, test it, keep it or drop it',
     after: ['gate-canon'],
     when: (c, t) => t >= 3,
     purpose: 'Against a written scope and one primary metric with guardrails, an agent proposes a change, implements it behind a flag, and the result decides whether it stays.',
@@ -614,14 +614,14 @@ const TOOL_CATEGORIES = [
   },
   {
     id: 'observability', label: 'Observability', lane: 'sources',
-    role: 'Errors, latency and deploy health. The metric the control bands watch.',
+    role: 'Errors, slow response times and release health. The signal that automatic safety thresholds watch.',
     emits: 'Error rates, traces, deploy markers, alerts.',
     collection: 'col-webhook',
     when: (c, t) => t >= 2,
     options: [
       { name: 'Sentry', note: 'Errors and releases, quick to wire up', fit: c => (['startup', 'growth', 'solo'].includes(c.stage) ? 3 : 1) },
       { name: 'Datadog', note: 'Broad coverage where operations is a funded function', fit: c => (c.stage === 'enterprise' ? 3 : 0) },
-      { name: 'Grafana with Prometheus', note: 'Self-hosted, and the metrics store the control bands query', fit: c => (has(c, 'regulated') ? 2 : 1) }
+      { name: 'Grafana with Prometheus', note: 'Self-hosted, and the metrics store the safety-threshold checks query', fit: c => (has(c, 'regulated') ? 2 : 1) }
     ]
   },
   {
@@ -735,7 +735,7 @@ const STORE_NODES = [
     why: 'Retrieval quality is mostly a metadata problem. Source and date are what let an agent tell current truth from last year\'s.'
   },
   {
-    id: 'store-canon', lane: 'store', kind: 'artifact', title: 'The canon',
+    id: 'store-canon', lane: 'store', kind: 'artifact', title: 'The playbook ("canon")',
     subtitle: 'the short documents every session reads',
     after: ['store-index'],
     purpose: 'Distilled from the index on a schedule: answers, procedures, positioning, policies, context files, the decision log.',

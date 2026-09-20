@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI-Native Flow Blueprint</title>
-<meta name="description" content="Answer six questions and get a prescriptive AI-native company blueprint: every function as a loop, the tool stack and how its data reaches your context layer, the delivery lifecycle, and the learning loop that feeds it all back.">
+<meta name="description" content="Answer six simple questions and get a step-by-step plan for using AI across your business: what to automate, which tools to use, where a person should still decide, and what order to do it in.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap">
@@ -20,10 +20,11 @@
     <div class="masthead-copy">
       <p class="eyebrow">AI-Native Flow Blueprint</p>
       <h1>See exactly how AI should run in your business.</h1>
-      <p class="lede">AI efforts stall on how the work flows, not on the technology. Answer six plain
-        questions and get the plan a company your size should run: what each team repeats as a loop,
-        which tools to use, where a person still decides, and the order to build it in.</p>
-      <p class="assure">Runs in your browser &middot; Nothing is sent anywhere &middot; Same answers, same plan</p>
+      <p class="lede">Most AI plans fail because of how work moves through the business, not because
+        of the technology. Answer six simple questions and get a plan sized for a business like yours:
+        which repeating tasks to hand to AI, which tools to use, where a person should still make the
+        call, and what order to do it in.</p>
+      <p class="assure">Works right in your browser &middot; Nothing you type is sent anywhere &middot; Same answers always give the same plan</p>
     </div>
     <ol class="steps">
       <li>
@@ -85,12 +86,12 @@
         <p class="field">
           <label for="domain">What you build or run</label>
           <select id="domain" name="domain">
-            <option value="saas" selected>Web product or SaaS</option>
+            <option value="saas" selected>Web product or SaaS (incl. fintech, healthtech, B2B tools)</option>
             <option value="mobile">Mobile app</option>
-            <option value="ecommerce">E-commerce or marketplace</option>
+            <option value="ecommerce">E-commerce, marketplace, or subscription store</option>
             <option value="data-ai">Data or AI product</option>
-            <option value="internal-ops">Internal systems and operations</option>
-            <option value="services">Client delivery or services</option>
+            <option value="internal-ops">Internal systems and operations (running the business itself)</option>
+            <option value="services">Agency, consultancy, or client delivery</option>
           </select>
         </p>
         <p class="field">
@@ -107,10 +108,10 @@
         <fieldset class="field">
           <legend>Constraints</legend>
           <div class="chips">
-            <label class="chip"><input type="checkbox" name="constraints" value="regulated"> Regulated or sensitive data</label>
-            <label class="chip"><input type="checkbox" name="constraints" value="legacy-systems"> Legacy systems stay</label>
-            <label class="chip"><input type="checkbox" name="constraints" value="no-ci"> No CI pipeline yet</label>
-            <label class="chip"><input type="checkbox" name="constraints" value="client-code"> Client codebases</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="regulated"> We handle regulated or sensitive data (health, finance, personal data)</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="legacy-systems"> We're keeping older systems we can't replace yet</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="no-ci"> We don't yet auto-test and auto-release code changes</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="client-code"> We build software for other companies (client codebases)</label>
           </div>
         </fieldset>
         <p class="field field-wide">
@@ -135,6 +136,7 @@
         <div><dt>Timeline</dt><dd id="stat-weeks">0<span class="unit">wk</span></dd></div>
       </dl>
       <button type="button" class="btn ghost" id="why-toggle" aria-expanded="false" aria-controls="why">Why this plan</button>
+      <button type="button" class="btn ghost" id="glossary-toggle" aria-expanded="false" aria-controls="glossary">What do these words mean?</button>
     </div>
     <div class="why" id="why" hidden>
       <p id="read-ceiling"></p>
@@ -142,6 +144,23 @@
       <p id="read-stage"></p>
       <p id="read-budget"></p>
       <p id="read-problem" class="echo" hidden></p>
+    </div>
+    <div class="why glossary" id="glossary" hidden>
+      <p class="panel-note">Plain meanings for words you'll see across this plan. No need to memorize them &mdash; come back here any time.</p>
+      <dl class="glossary-list">
+        <div><dt>Level (or "Tier")</dt><dd>How much AI is trusted to work on its own, from 1 (a person checks every step) to 4 (AI runs approved routines with no one watching in real time).</dd></div>
+        <div><dt>Approval point (or "gate")</dt><dd>A checkpoint where work must be signed off before it moves on &mdash; by a fixed rule, a second AI check, or a person.</dd></div>
+        <div><dt>One person in charge (or "DRI")</dt><dd>One named owner is accountable for a result, instead of a group deciding by committee.</dd></div>
+        <div><dt>Second AI check (or "adversarial pass")</dt><dd>A second, independent AI reviews the first AI's work before it reaches a customer.</dd></div>
+        <div><dt>Playbook (or "canon")</dt><dd>The small set of official documents &mdash; answers, rules, procedures &mdash; that AI reads before doing any task.</dd></div>
+        <div><dt>Shared memory (or "context layer")</dt><dd>One searchable place holding your records, documents and decisions, which every tool and AI step can read from.</dd></div>
+        <div><dt>Accuracy test (or "eval")</dt><dd>An automatic check that keeps confirming the AI is still getting things right, the way a test drive checks a car.</dd></div>
+        <div><dt>Summarizing agent (or "distillation")</dt><dd>An AI that turns a large pile of calls, tickets and notes into a short, useful summary.</dd></div>
+        <div><dt>Build-and-test pipeline (or "CI")</dt><dd>The automatic process that checks and assembles software every time it changes, before it goes live.</dd></div>
+        <div><dt>Direct tool connection (or "connector"/"MCP")</dt><dd>A link that lets an AI tool read from and update another app directly, such as your CRM or support desk.</dd></div>
+        <div><dt>Company-wide safety rules (or "managed settings")</dt><dd>Guardrails set once, centrally, that no individual AI session can turn off or bypass.</dd></div>
+        <div><dt>Spending limit (or "spend envelope")</dt><dd>A cap agreed in advance so AI costs never creep up unnoticed.</dd></div>
+      </dl>
     </div>
 
     <nav class="tabs" role="tablist" aria-label="Blueprint sections">
@@ -237,8 +256,9 @@
   <section class="panel" id="panel-measure" role="tabpanel" aria-labelledby="tab-measure" hidden>
     <div class="panel-head">
       <h2>How you know it worked</h2>
-      <p class="panel-note">Leading indicators move in weeks and say the change took. Lagging ones settle
-        over a quarter and say it was worth it. Each comes from a system you already own.</p>
+      <p class="panel-note">"Leading" numbers move within weeks and tell you the change is taking hold.
+        "Lagging" numbers take a quarter to settle and tell you it was worth doing. Each one comes from a
+        system you already use &mdash; nothing new to set up just to measure this.</p>
     </div>
     <div class="table-scroll">
       <table class="metrics">
@@ -259,18 +279,18 @@
   <section class="panel" id="panel-export" role="tabpanel" aria-labelledby="tab-export" hidden>
     <div class="panel-head">
       <h2>Take it with you</h2>
-      <p class="panel-note">Plain Markdown, ready to paste into a doc or commit as the first artifact in
-        the chain it describes.</p>
+      <p class="panel-note">Plain text with simple headings, ready to paste into a document, an email, or
+        a chat with your own AI assistant.</p>
     </div>
     <div class="actions">
-      <button type="button" class="btn primary" id="copy-brief">Copy the brief as Markdown</button>
-      <button type="button" class="btn" id="copy-prompt">Copy a prompt to refine it with your own AI</button>
+      <button type="button" class="btn primary" id="copy-brief">Copy the plan as text</button>
+      <button type="button" class="btn" id="copy-prompt">Copy a prompt to fine-tune it with your own AI</button>
       <button type="button" class="btn" id="print">Print or save as PDF</button>
     </div>
-    <p class="disclaimer"><strong>On the prompts.</strong> Every prompt here is indicative: a starting
-      shape that shows the altitude and the constraints worth naming. Rewrite each in your own
-      vocabulary, against your own systems, before you rely on it. A prompt that has never been run is
-      a hypothesis.</p>
+    <p class="disclaimer"><strong>About the sample prompts.</strong> Each prompt here is a starting point,
+      not a finished script: it shows the level of detail and the constraints worth mentioning. Rewrite
+      it in your own words, for your own tools, before you rely on it. A prompt you haven't actually
+      tried yet is only a guess.</p>
     <p class="disclaimer alt"><strong>On the tools.</strong> Named products are common choices at each
       stage, not endorsements, and the landscape moves faster than this page. The category, what it
       emits, and how that data reaches your context layer are the durable parts. Swap the product.</p>

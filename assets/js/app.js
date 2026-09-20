@@ -19,7 +19,7 @@ const ANSWER_LABEL = {
   budget: { under200: '<$200/mo', to2k: '$200–2k/mo', to10k: '$2–10k/mo', over10k: '$10k+/mo' },
   domain: { saas: 'SaaS', mobile: 'Mobile', ecommerce: 'E-commerce', 'data-ai': 'Data or AI', 'internal-ops': 'Internal ops', services: 'Services' },
   goal: { 'ship-faster': 'Ship faster', 'fewer-defects': 'Fewer defects', 'less-rework': 'Less rework', 'support-load': 'Support load', 'ops-cost': 'Ops cost', 'scale-without-hiring': 'Capacity' },
-  constraints: { regulated: 'Regulated', 'legacy-systems': 'Legacy systems', 'no-ci': 'No CI', 'client-code': 'Client code' }
+  constraints: { regulated: 'Regulated data', 'legacy-systems': 'Legacy systems', 'no-ci': 'No auto-build yet', 'client-code': 'Client codebases' }
 };
 
 function el(tag, cls, text) {
@@ -76,14 +76,14 @@ function renderChips(c) {
 }
 
 function renderStrip(b) {
-  document.getElementById('tier-n').textContent = `Tier ${b.tier} of 4`;
+  document.getElementById('tier-n').textContent = `Level ${b.tier} of 4`;
   document.getElementById('tier-name').textContent = b.tierInfo.name;
   document.getElementById('stat-ai').textContent = b.counts.ai;
   document.getElementById('stat-human').textContent = b.counts.human;
   document.getElementById('stat-gate').textContent = b.counts.gate;
   document.getElementById('stat-tool').textContent = b.counts.tool;
   document.getElementById('stat-weeks').innerHTML = `${b.horizon}<span class="unit">wk</span>`;
-  document.getElementById('read-ceiling').textContent = b.tierInfo.thesis + ' Autonomy ceiling: ' + b.tierInfo.ceiling;
+  document.getElementById('read-ceiling').textContent = b.tierInfo.thesis + ' How far AI can act alone: ' + b.tierInfo.ceiling;
   document.getElementById('read-goal').textContent = b.focus.line;
   document.getElementById('read-stage').textContent = b.stageNote;
   document.getElementById('read-budget').textContent = b.budgetNote;
@@ -412,13 +412,13 @@ function briefMarkdown(b) {
   const L = [];
   L.push('# AI-native flow blueprint');
   L.push('');
-  L.push(`**Tier ${b.tier} of 4 — ${b.tierInfo.name}.** ${b.tierInfo.thesis}`);
+  L.push(`**Level ${b.tier} of 4 — ${b.tierInfo.name}.** ${b.tierInfo.thesis}`);
   L.push('');
-  L.push(`Autonomy ceiling: ${b.tierInfo.ceiling}`);
+  L.push(`How far AI can act alone: ${b.tierInfo.ceiling}`);
   L.push('');
   L.push('## Inputs');
   L.push(`- Stage: ${ANSWER_LABEL.stage[c.stage]}`);
-  L.push(`- Code-facing people: ${ANSWER_LABEL.engineers[c.engineers]}`);
+  L.push(`- People writing or reviewing code: ${ANSWER_LABEL.engineers[c.engineers]}`);
   L.push(`- Monthly AI budget: ${ANSWER_LABEL.budget[c.budget]}`);
   L.push(`- What we build: ${ANSWER_LABEL.domain[c.domain]}`);
   L.push(`- Problem to solve: ${ANSWER_LABEL.goal[c.goal]}`);
@@ -587,6 +587,13 @@ document.getElementById('why-toggle').addEventListener('click', ev => {
   const why = document.getElementById('why');
   const open = why.hidden;
   why.hidden = !open;
+  ev.currentTarget.setAttribute('aria-expanded', String(open));
+});
+
+document.getElementById('glossary-toggle').addEventListener('click', ev => {
+  const glossary = document.getElementById('glossary');
+  const open = glossary.hidden;
+  glossary.hidden = !open;
   ev.currentTarget.setAttribute('aria-expanded', String(open));
 });
 
