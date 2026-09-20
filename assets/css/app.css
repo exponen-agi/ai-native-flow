@@ -423,6 +423,17 @@ fieldset.field legend { margin-bottom: 6px; }
   font-size: 14px; color: var(--ink-3); font-style: italic;
   border-left: 2px solid var(--rule); padding-left: 12px;
 }
+.glossary .panel-note { margin: 0; max-width: var(--measure); }
+.glossary-list {
+  margin: 4px 0 0; display: grid; gap: 10px 24px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.glossary-list > div {
+  background: var(--surface-2); border: 1px solid var(--rule-soft);
+  border-radius: var(--r-md); padding: 10px 12px;
+}
+.glossary-list dt { font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--ink); }
+.glossary-list dd { margin: 3px 0 0; font-size: 13.5px; color: var(--ink-2); }
 
 /* ------------------------------------------------------------------ tabs */
 .tabs {
