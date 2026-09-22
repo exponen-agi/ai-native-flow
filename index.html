@@ -135,8 +135,22 @@
         <div><dt>Tools</dt><dd id="stat-tool">0</dd></div>
         <div><dt>Timeline</dt><dd id="stat-weeks">0<span class="unit">wk</span></dd></div>
       </dl>
+      <button type="button" class="btn primary strip-go" id="activate-btn">Activate this plan</button>
       <button type="button" class="btn ghost" id="why-toggle" aria-expanded="false" aria-controls="why">Why this plan</button>
       <button type="button" class="btn ghost" id="glossary-toggle" aria-expanded="false" aria-controls="glossary">What do these words mean?</button>
+    </div>
+
+    <div class="tracker" id="tracker">
+      <button type="button" class="track-step is-done" id="track-edit">
+        <span class="track-n" aria-hidden="true">&check;</span>
+        <span class="track-t">1. Plan generated</span>
+        <span class="track-d">change your answers</span>
+      </button>
+      <span class="track-arrow" id="track-arrow" aria-hidden="true">&rarr;</span>
+      <button type="button" class="track-step track-go" id="track-activate">
+        <span class="track-n" aria-hidden="true">2</span>
+        <span class="track-t">Activate this plan</span>
+      </button>
     </div>
     <div class="why" id="why" hidden>
       <p id="read-ceiling"></p>
@@ -174,6 +188,7 @@
       <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false">Measure</button>
       <button role="tab" class="tab" id="tab-risks" data-tab="risks" aria-selected="false">Risks</button>
       <button role="tab" class="tab" id="tab-export" data-tab="export" aria-selected="false">Export</button>
+      <button role="tab" class="tab tab-activate" id="tab-activate" data-tab="activate" aria-selected="false">Activate</button>
     </nav>
   </div>
 </div>
@@ -291,9 +306,62 @@
       not a finished script: it shows the level of detail and the constraints worth mentioning. Rewrite
       it in your own words, for your own tools, before you rely on it. A prompt you haven't actually
       tried yet is only a guess.</p>
+    <div class="activate-card">
+      <h3>A plan is not a result</h3>
+      <p>Most of these plans die as a document somebody meant to come back to. Activating yours
+        turns it into a roster and a checklist: which parts run without you, where a person still
+        decides, and what to do in the first week.</p>
+      <button type="button" class="btn primary" id="activate-btn-export">Activate this plan</button>
+    </div>
     <p class="disclaimer alt"><strong>On the tools.</strong> Named products are common choices at each
       stage, not endorsements, and the landscape moves faster than this page. The category, what it
       emits, and how that data reaches your context layer are the durable parts. Swap the product.</p>
+  </section>
+
+  <section class="panel panel-activate" id="panel-activate" role="tabpanel" aria-labelledby="tab-activate" hidden>
+    <div class="panel-head activate-head">
+      <p class="activate-flag"><span class="live-dot" aria-hidden="true"></span>Plan activated</p>
+      <h2>Your business with the plan switched on</h2>
+      <p class="panel-note">The same blueprint, read as work rather than as a diagram: the parts that
+        run without you, the places a person still decides, and what to do in the first week. Nothing
+        here is new advice &mdash; it is your plan, sorted by who has to do something about it.</p>
+    </div>
+
+    <div class="activate-grid">
+      <section class="activate-block">
+        <h3>Run by AI</h3>
+        <p class="block-note" id="roster-agents-count"></p>
+        <ul class="roster" id="roster-agents"></ul>
+      </section>
+      <section class="activate-block">
+        <h3>Run by your people</h3>
+        <p class="block-note" id="roster-humans-count"></p>
+        <ul class="roster" id="roster-humans"></ul>
+      </section>
+    </div>
+
+    <div class="hub-row" id="roster-hub"></div>
+
+    <section class="activate-block">
+      <h3>Before you start</h3>
+      <p class="block-note">Four decisions a person has to make. None of them need a tool, and skipping
+        them is what turns the rest into shelfware.</p>
+      <ol class="first-week" id="first-week"></ol>
+    </section>
+
+    <section class="activate-block">
+      <h3>Switch-on checklist</h3>
+      <p class="block-note">The front of your rollout, small enough to finish. The Rollout section holds
+        the rest of the sequence. Ticking boxes here is just for this sitting &mdash; nothing is saved.</p>
+      <ol class="checklist" id="activate-checklist"></ol>
+      <p class="check-progress" id="check-progress"></p>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="btn" id="activate-map">See it as a team map</button>
+      <button type="button" class="btn" id="activate-copy">Copy the checklist</button>
+      <button type="button" class="btn" id="activate-print">Print or save as PDF</button>
+    </div>
   </section>
 </main>
 
@@ -303,6 +371,7 @@
 <script src="assets/js/engine-views.js"></script>
 <script src="assets/js/graph.js"></script>
 <script src="assets/js/network.js"></script>
+<script src="assets/js/activate.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

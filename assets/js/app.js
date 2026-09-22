@@ -59,7 +59,7 @@ function applyHash() {
   const cs = (p.get('c') || '').split(',').filter(Boolean);
   form.querySelectorAll('input[name="constraints"]').forEach(i => { i.checked = cs.includes(i.value); });
   const v = p.get('v');
-  if (v && (VIEW_META[v] || ['network', 'rollout', 'measure', 'risks', 'export'].includes(v))) currentView = v;
+  if (v && (VIEW_META[v] || ['network', 'rollout', 'measure', 'risks', 'export', 'activate'].includes(v))) currentView = v;
 }
 
 /* ------------------------------------------------------------------ header */
@@ -371,7 +371,8 @@ function renderRisks(b) {
 const PANELS = {
   company: 'panel-graph', delivery: 'panel-graph', stack: 'panel-graph', improve: 'panel-graph',
   network: 'panel-network',
-  rollout: 'panel-rollout', measure: 'panel-measure', risks: 'panel-risks', export: 'panel-export'
+  rollout: 'panel-rollout', measure: 'panel-measure', risks: 'panel-risks', export: 'panel-export',
+  activate: 'panel-activate'
 };
 
 /* Pan/zoom controls for the network canvas, handed back by renderNetwork. The view is
@@ -394,6 +395,44 @@ function renderNetworkView() {
   netDirty = false;
 }
 
+/* Activation is a state of this sitting, not a stored fact: opening the panel is what
+   activates the plan, exactly as the button does, so there is no way to arrive at the
+   panel and find it claiming otherwise. Generating a new plan clears it, because a plan
+   nobody has read again has not been activated. */
+let activated = false;
+let activateDirty = true;
+
+function renderActivateView() {
+  renderActivation(current, {
+    openPart: id => {
+      const entry = current.index.get(id);
+      if (!entry) return;
+      switchTab(entry.view);
+      select(id);
+    }
+  });
+  activateDirty = false;
+}
+
+function setActivated(on) {
+  activated = on;
+  const step = document.getElementById('track-activate');
+  const arrow = document.getElementById('track-arrow');
+  const label = step.querySelector('.track-t');
+  step.classList.toggle('is-live', on);
+  step.classList.toggle('is-done', on);
+  arrow.classList.toggle('is-waiting', !on);
+  step.querySelector('.track-n').innerHTML = on ? '&check;' : '2';
+  label.textContent = on ? '2. Activated' : 'Activate this plan';
+  document.getElementById('activate-btn').textContent = on ? 'Back to the activated plan' : 'Activate this plan';
+}
+
+function activate() {
+  setActivated(true);
+  switchTab('activate');
+  document.getElementById('panel-activate').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function switchTab(tab) {
   const panelId = PANELS[tab];
   Object.values(PANELS).forEach(id => { document.getElementById(id).hidden = true; });
@@ -402,6 +441,10 @@ function switchTab(tab) {
   document.getElementById(panelId).setAttribute('aria-labelledby', 'tab-' + tab);
   if (VIEW_META[tab]) renderView(tab);
   else if (tab === 'network' && netDirty) renderNetworkView();
+  else if (tab === 'activate') {
+    if (activateDirty) renderActivateView();
+    if (!activated) setActivated(true);
+  }
   writeHash(current.answers);
 }
 
@@ -506,6 +549,8 @@ function render() {
   renderRisks(current);
   netDirty = true;
   netControls = null;
+  activateDirty = true;
+  setActivated(false);
   const netPanel = document.getElementById('net-panel');
   if (netPanel) { netPanel.hidden = true; netPanel.innerHTML = ''; }
   switchTab(VIEW_META[currentView] || PANELS[currentView] ? currentView : 'company');
@@ -596,6 +641,18 @@ document.getElementById('glossary-toggle').addEventListener('click', ev => {
   glossary.hidden = !open;
   ev.currentTarget.setAttribute('aria-expanded', String(open));
 });
+
+document.getElementById('activate-btn').addEventListener('click', activate);
+document.getElementById('activate-btn-export').addEventListener('click', activate);
+document.getElementById('track-activate').addEventListener('click', activate);
+document.getElementById('track-edit').addEventListener('click', () => {
+  intakeWrap.open = true;
+  intakeWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+document.getElementById('activate-map').addEventListener('click', () => switchTab('network'));
+document.getElementById('activate-print').addEventListener('click', () => window.print());
+document.getElementById('activate-copy').addEventListener('click', ev =>
+  copyText(activationText(current), ev.currentTarget, 'Checklist copied'));
 
 document.getElementById('copy-brief').addEventListener('click', ev => copyText(briefMarkdown(current), ev.currentTarget, 'Brief copied'));
 document.getElementById('copy-prompt').addEventListener('click', ev => copyText(refinementPrompt(current), ev.currentTarget, 'Prompt copied'));

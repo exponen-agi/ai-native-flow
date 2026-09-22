@@ -32,6 +32,7 @@ Static by design. No server, no build step, no model call, no analytics, no cook
 | `assets/js/engine-views.js` | Builds the four lane views, picks tools, schedules the company-wide rollout |
 | `assets/js/graph.js` | Hand-rolled layered SVG renderer with path tracing, reused by all four lane views |
 | `assets/js/network.js` | The "who does what" view: pods, wires, and hand-rolled pan and zoom |
+| `assets/js/activate.js` | The activation step: the roster, the first week, and the switch-on checklist |
 | `assets/js/app.js` | Tabs, intake, detail panel, zoom and full screen, Markdown export, URL state |
 | `docs/METHOD.md` | The rules in prose, and the sources behind them |
 
@@ -60,6 +61,32 @@ the shared context in the middle. Each pod resolves to a real part of the genera
 opening one lands on that part in the view that owns it, and the label on each wire names what
 travels it. Drag to pan, and hold Ctrl or Cmd while scrolling to zoom — a plain wheel is left to
 the page, because a canvas that swallows the scroll wheel is a canvas you cannot scroll past.
+
+### Activate this plan
+
+Every other section ends with the visitor holding a document, and a document is where most of these
+plans stop. **Activate** is the step after that, reachable from the summary strip, the two-step
+tracker under it, the export panel and its own tab. It re-reads the same blueprint as work somebody
+has to start:
+
+- **The roster.** The agent and people pods the plan resolves to, each naming what it sends, and
+  each opening the part it stands for in the view that owns it. This is the network view's slot
+  resolution reused rather than copied, so the roster and the map can never disagree.
+- **Before you start.** Four decisions a person makes before any tool is bought: who owns the
+  rollout, which part to start at, who clears each approval point, and which number gets looked at
+  weekly. Each line is read off the tier, the goal focus, the gate count and the leading metric, so
+  it changes with the answers.
+- **The switch-on checklist.** The front of the rollout, cut at roughly six items so week one is a
+  list somebody can finish. Ticking a box is deliberately not saved: the page stores nothing, and a
+  checklist that half-remembers itself across reloads is worse than one that is honestly a working
+  surface for this sitting. Copy it out as plain text instead.
+
+Activation is a state of the sitting, not a stored fact. Opening the tab activates the plan exactly
+as the button does, so there is no way to arrive at the panel and find it claiming otherwise, and
+generating a new plan clears it — a plan nobody has read again has not been activated.
+
+There is no booking step, no lead capture and nothing to sign up for. The step ends where the
+visitor's own work begins.
 
 ### Why no LLM call
 
