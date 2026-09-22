@@ -62,6 +62,11 @@ The delivery lifecycle is one function's internals, not the company. The views s
   of this blueprint fills that job — so a company with nobody in house gets a visibly different team
   from one with fifteen engineers, and the difference is the argument. Nothing is added to the
   knowledge base for it: if a slot has no part at these answers, it is left out.
+- **Activate.** Not a sixth view but the step after all of them: the same blueprint read as work
+  rather than as a picture. The roster reuses the slot resolution above, the four "before you start"
+  lines are read off the tier, the goal focus, the count of real approval gates and the first leading
+  metric, and the checklist is the front of the rollout cut at roughly six items. No new rules and
+  no new content — the only thing it adds is the assumption that the visitor intends to start.
 
 ## Six lanes and a spine
 
