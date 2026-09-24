@@ -103,13 +103,14 @@ function rosterItem(pod, kind, onOpenPart) {
   const li = actEl('li', `roster-item kind-${kind}`);
   const btn = actEl('button', 'roster-btn');
   btn.type = 'button';
-  btn.title = 'Open this part of the plan';
+  btn.dataset.peekId = pod.nodeId;
+  btn.setAttribute('aria-haspopup', 'dialog');
   const head = actEl('span', 'roster-head');
   head.appendChild(actEl('span', 'roster-label', pod.label));
   head.appendChild(actEl('span', 'roster-title', pod.node.title));
   btn.appendChild(head);
   btn.appendChild(actEl('span', 'roster-caption', pod.caption));
-  btn.addEventListener('click', () => onOpenPart(pod.nodeId));
+  btn.addEventListener('click', () => onOpenPart(pod.nodeId, btn));
   li.appendChild(btn);
   if (pod.carries) {
     const carries = actEl('p', 'roster-carries');
@@ -120,8 +121,8 @@ function rosterItem(pod, kind, onOpenPart) {
   return li;
 }
 
-/* Renders the whole panel. `handlers` carries the two things only the page knows:
-   how to open a part in the view that owns it, and how to reach the full map. */
+/* Renders the whole panel. `handlers.openPart(id, button)` is the one thing only the
+   page knows: how to show a part. It opens over the plan rather than leaving it. */
 function renderActivation(blueprint, handlers) {
   const roster = activationRoster(blueprint);
   const agentMount = document.getElementById('roster-agents');
@@ -145,11 +146,13 @@ function renderActivation(blueprint, handlers) {
   if (roster.hub) {
     const btn = actEl('button', 'hub-btn');
     btn.type = 'button';
+    btn.dataset.peekId = roster.hub.nodeId;
+    btn.setAttribute('aria-haspopup', 'dialog');
     btn.appendChild(actEl('span', 'hub-label', 'Shared memory'));
     btn.appendChild(actEl('span', 'hub-title', roster.hub.node.title));
     btn.appendChild(actEl('span', 'hub-note', 'Everything above reads from here and writes back to it. ' +
       'Set this up first: the rest is worth little without it.'));
-    btn.addEventListener('click', () => handlers.openPart(roster.hub.nodeId));
+    btn.addEventListener('click', () => handlers.openPart(roster.hub.nodeId, btn));
     hubMount.appendChild(btn);
   }
 
@@ -190,9 +193,11 @@ function renderActivation(blueprint, handlers) {
       label.appendChild(actEl('span', 'check-view', item.view));
       row.appendChild(label);
       if (item.why) row.appendChild(actEl('p', 'check-why', item.why));
-      const open = actEl('button', 'mini-btn', 'Open in the plan');
+      const open = actEl('button', 'mini-btn', 'See details');
       open.type = 'button';
-      open.addEventListener('click', () => handlers.openPart(item.id));
+      open.dataset.peekId = item.id;
+      open.setAttribute('aria-haspopup', 'dialog');
+      open.addEventListener('click', () => handlers.openPart(item.id, open));
       row.appendChild(open);
       ul.appendChild(row);
     });
