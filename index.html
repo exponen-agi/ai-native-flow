@@ -325,6 +325,8 @@
       <p class="panel-note">The same blueprint, read as work rather than as a diagram: the parts that
         run without you, the places a person still decides, and what to do in the first week. Nothing
         here is new advice &mdash; it is your plan, sorted by who has to do something about it.</p>
+      <p class="graph-hint">Click any part to read it right here, see what comes before and after it,
+        and step through the rest with the arrow keys. You stay on this page.</p>
     </div>
 
     <div class="activate-grid">
@@ -365,6 +367,29 @@
   </section>
 </main>
 
+<div class="peek-backdrop" id="peek-backdrop" hidden></div>
+<aside class="peek" id="peek" role="dialog" aria-modal="true" aria-labelledby="peek-title" tabindex="-1" hidden>
+  <div class="peek-bar">
+    <button type="button" class="peek-icon" id="peek-back" aria-label="Back to the previous part" hidden>&larr;</button>
+    <p class="peek-crumb" id="peek-crumb"></p>
+    <div class="peek-steps" id="peek-steps">
+      <button type="button" class="peek-icon" id="peek-prev" aria-label="Previous part of the plan">&uarr;</button>
+      <span class="peek-count" id="peek-count" aria-live="polite"></span>
+      <button type="button" class="peek-icon" id="peek-next" aria-label="Next part of the plan">&darr;</button>
+    </div>
+    <button type="button" class="peek-icon" id="peek-close" aria-label="Close">&times;</button>
+  </div>
+  <div class="peek-body" id="peek-body"></div>
+  <div class="peek-foot">
+    <button type="button" class="btn" id="peek-map">See it on the full map</button>
+    <p class="peek-keys">Arrow keys step through the plan &middot; Esc closes</p>
+  </div>
+</aside>
+
+<div class="return-pill" id="return-pill" hidden>
+  <button type="button"><span aria-hidden="true">&larr;</span> <span class="return-label">Back</span></button>
+</div>
+
 <script src="assets/js/kb.js"></script>
 <script src="assets/js/kb-company.js"></script>
 <script src="assets/js/engine.js"></script>
@@ -372,6 +397,7 @@
 <script src="assets/js/graph.js"></script>
 <script src="assets/js/network.js"></script>
 <script src="assets/js/activate.js"></script>
+<script src="assets/js/peek.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

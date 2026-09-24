@@ -123,7 +123,15 @@ function copyText(text, btn, done) {
 }
 
 function renderDetail(id) {
-  const view = current.views[currentView];
+  renderNodeDetail(detailMount, current.views[currentView], id);
+}
+
+/* The reading of one part, into any mount. The diagram's side panel and the peek sheet
+   on the activated plan share it, so a part reads the same wherever it is opened.
+   `opts.afterPurpose` lets a caller add context under the summary, and `opts.onTool`
+   decides what a tool chip does (the diagram jumps to the stack view; the sheet stays). */
+function renderNodeDetail(mount, view, id, opts = {}) {
+  const detailMount = mount;
   const n = view.nodes.find(x => x.id === id);
   detailMount.innerHTML = '';
   if (!n) return;
@@ -135,6 +143,7 @@ function renderDetail(id) {
   detailMount.appendChild(head);
   detailMount.appendChild(el('h3', 'detail-title', n.title));
   detailMount.appendChild(el('p', 'detail-purpose', n.purpose));
+  if (opts.afterPurpose) opts.afterPurpose(detailMount, n);
 
   if (n.options) {
     const box = el('div', 'detail-block');
@@ -197,7 +206,10 @@ function renderDetail(id) {
       if (!pick) return;
       const btn = el('button', 'tool-chip', pick.category.label + ': ' + pick.best.name);
       btn.type = 'button';
-      btn.addEventListener('click', () => { switchTab('stack'); select('tool-' + id); });
+      btn.addEventListener('click', () => {
+        if (opts.onTool) opts.onTool('tool-' + id);
+        else { switchTab('stack'); select('tool-' + id); }
+      });
       row.appendChild(btn);
     });
     if (row.childElementCount) { t.appendChild(row); detailMount.appendChild(t); }
@@ -326,8 +338,8 @@ function renderPhases(b) {
       if (!entry) return;
       const btn = el('button', `part-chip kind-${entry.node.kind}`, entry.node.title);
       btn.type = 'button';
-      btn.title = VIEW_META[entry.view].label + ' view';
-      btn.addEventListener('click', () => { switchTab(entry.view); select(id); });
+      btn.title = 'Open on the ' + VIEW_META[entry.view].label + ' map';
+      btn.addEventListener('click', () => showOnMap(id, 'rollout', 'Back to the rollout'));
       parts.appendChild(btn);
     });
     li.appendChild(parts);
@@ -389,8 +401,7 @@ function renderNetworkView() {
   netControls = renderNetwork(current, mount, panel, id => {
     const entry = current.index.get(id);
     if (!entry) return;
-    switchTab(entry.view);
-    select(id);
+    showOnMap(id, 'network', 'Back to who does what');
   });
   netDirty = false;
 }
@@ -403,13 +414,13 @@ let activated = false;
 let activateDirty = true;
 
 function renderActivateView() {
+  const panel = document.getElementById('panel-activate');
   renderActivation(current, {
-    openPart: id => {
-      const entry = current.index.get(id);
-      if (!entry) return;
-      switchTab(entry.view);
-      select(id);
-    }
+    openPart: (id, opener) => openPeek(id, {
+      list: peekListIn(panel),
+      opener,
+      source: { tab: 'activate', label: 'Back to your activated plan' }
+    })
   });
   activateDirty = false;
 }
@@ -435,6 +446,9 @@ function activate() {
 
 function switchTab(tab) {
   const panelId = PANELS[tab];
+  /* The way back only makes sense while the visitor is still on the diagrams. */
+  if (!VIEW_META[tab]) dropReturn();
+  closePeek(false);
   Object.values(PANELS).forEach(id => { document.getElementById(id).hidden = true; });
   document.getElementById(panelId).hidden = false;
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === tab)));
@@ -550,6 +564,8 @@ function render() {
   netDirty = true;
   netControls = null;
   activateDirty = true;
+  closePeek(false);
+  dropReturn();
   setActivated(false);
   const netPanel = document.getElementById('net-panel');
   if (netPanel) { netPanel.hidden = true; netPanel.innerHTML = ''; }
