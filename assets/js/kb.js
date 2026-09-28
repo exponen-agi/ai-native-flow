@@ -72,7 +72,7 @@ const NODES = [
     when: (c, t) => t >= 2,
     purpose: 'Reads every open intent file, tags domain and size, flags duplicates, and proposes a ranked order for the product owner to accept or override.',
     why: 'Once anyone can file intent, volume rises. Triage is the work that used to consume refinement meetings.',
-    prompt: 'Read every file in intent/ with status: draft. For each one output a single row: slug, one-line summary, area (frontend / backend / data / ops), size (S/M/L), type (bug / feature / debt), and a duplicate-of reference where two intents describe the same problem. Then propose a ranked order with one sentence of reasoning per item. Rank on customer pain and blast radius, not on how easy it looks.',
+    prompt: 'Read every file in intent/ with status: draft. For each one output a single row: slug, one-line summary, area (frontend / backend / data / ops), size (S/M/L), type (bug / feature / debt), and a duplicate-of reference where two intents describe the same problem. Then propose a ranked order with one sentence of reasoning per item. Rank on customer pain and how much damage getting it wrong could do, not on how easy it looks.',
     in: ['intent.md']
   },
   {
@@ -240,7 +240,7 @@ const NODES = [
     after: ['feedback-loop'],
     when: (c, t) => t >= 2,
     purpose: 'A hook that blocks edits to test files while a fix task is running, so the agent cannot weaken the check on the code it is changing.',
-    why: 'An agent under pressure to go green will edit the test. This is the one guardrail that keeps your suite honest.',
+    why: 'An agent under pressure to make every check pass will edit the test instead of fixing the bug. This is the one guardrail that keeps your suite honest.',
     enforces: 'Blocks writes to test paths during fix tasks. Exit code 2 with the reason, so the agent is told why.',
     in: ['tests']
   },
@@ -330,7 +330,7 @@ const NODES = [
     when: (c, t) => t >= 3 || has(c, 'regulated'),
     purpose: 'The person who authorizes production. The agent prepares the release, rehearses the rollback and presents the evidence; this person says go.',
     why: 'Tier the autonomy by environment rather than by team. Development can be fully automatic while production stays a deliberate human act.',
-    responsibility: 'Confirm the rollback was exercised, the gates passed, and the blast radius is understood. Authorize, or say what is missing.'
+    responsibility: 'Confirm the rollback was exercised, the gates passed, and everyone understands how much damage this could do if it goes wrong. Authorize, or say what is missing.'
   },
   {
     id: 'rollback', lane: 'ship', kind: 'system', title: 'Rehearsed rollback',

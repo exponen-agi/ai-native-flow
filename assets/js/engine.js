@@ -184,7 +184,7 @@ const RISK_LIBRARY = [
   {
     id: 'test-weakening',
     title: 'Letting the fixer edit the test',
-    body: 'An agent pushed to go green will weaken the check on the code it just changed. Lock test files during fix tasks with a hook, or reject any diff that touches a test alongside its own fix.',
+    body: 'An agent under pressure to make every check pass will weaken the check on the code it just changed. Lock test files during fix tasks with a hook, or reject any diff that touches a test alongside its own fix.',
     when: (c, t) => t >= 2
   },
   {
@@ -234,7 +234,7 @@ function budgetNote(c) {
     under200: 'Under $200 a month buys one or two serious seats. Spend it on one person who goes deep rather than five who dabble, and keep the whole flow at the assisted tier until that person can show the artifact chain working.',
     to2k: 'A few thousand a month covers a small team with real headroom for review passes in CI. Meter it now, before a scheduled job exists to hide in the total.',
     to10k: 'This is the range where parallel sessions and continuous evals stop being theoretical. Expect scheduled jobs to become a visible share of the bill and split that line out from day one.',
-    over10k: 'At this level the autonomous loops dominate spend, not the people. Set a hard workspace limit, meter per loop, and review monthly which loop earned its tokens. An unmetered maintenance loop is the classic runaway.'
+    over10k: 'At this level the autonomous loops dominate spend, not the people. Set a hard workspace limit, meter per loop, and review monthly which loop earned its tokens. An unmetered maintenance loop is the classic way this goes wrong.'
   };
   return map[c.budget];
 }

@@ -17,7 +17,7 @@ const ANSWER_LABEL = {
   stage: { solo: 'Solo', startup: 'Early startup', growth: 'Growth stage', smb: 'SMB', enterprise: 'Enterprise' },
   engineers: { none: 'No in-house devs', solo: '1–3 devs', small: '4–15 devs', large: '15+ devs' },
   budget: { under200: '<$200/mo', to2k: '$200–2k/mo', to10k: '$2–10k/mo', over10k: '$10k+/mo' },
-  domain: { saas: 'SaaS', mobile: 'Mobile', ecommerce: 'E-commerce', 'data-ai': 'Data or AI', 'internal-ops': 'Internal ops', services: 'Services' },
+  domain: { saas: 'SaaS', mobile: 'Mobile', ecommerce: 'E-commerce', 'data-ai': 'Data or AI', hardware: 'Hardware or robotics', 'internal-ops': 'Internal ops', services: 'Services' },
   goal: { 'ship-faster': 'Ship faster', 'fewer-defects': 'Fewer defects', 'less-rework': 'Less rework', 'support-load': 'Support load', 'ops-cost': 'Ops cost', 'scale-without-hiring': 'Capacity' },
   constraints: { regulated: 'Regulated data', 'legacy-systems': 'Legacy systems', 'no-ci': 'No auto-build yet', 'client-code': 'Client codebases' }
 };

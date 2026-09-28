@@ -109,11 +109,11 @@ const COMPANY_NODES = [
   {
     id: 'loop-revenue', lane: 'loops', kind: 'ai', title: 'Revenue loop',
     subtitle: 'research, prep, follow-up, hygiene',
-    when: c => ['saas', 'data-ai', 'services', 'ecommerce'].includes(c.domain),
+    when: c => ['saas', 'data-ai', 'services', 'ecommerce', 'hardware'].includes(c.domain),
     after: ['sig-revenue'],
     tools: ['crm', 'meetings'],
     purpose: 'Account research before the call, a brief built from the transcript history, follow-up drafted within the hour, and the record updated from the recording rather than from memory.',
-    why: 'Sales data rots because updating it is unpaid work. When the agent writes the record from the transcript, the pipeline becomes trustworthy enough to reason over.',
+    why: 'Sales data goes stale because updating it is unpaid work. When the agent writes the record from the transcript, the pipeline becomes trustworthy enough to reason over.',
     prompt: 'Read the transcript of this call and our CRM record for the account. Write three things: a follow-up email in our voice that addresses the objections actually raised, the fields to update on the record with the evidence line for each, and the single reason this deal will be won or lost. Do not update anything the transcript does not support.',
     out: ['crm-records', 'brief']
   },
@@ -256,7 +256,7 @@ const COMPANY_NODES = [
     subtitle: 'which loop earned its tokens',
     after: ['learn-distill', 'learn-eval'],
     purpose: 'One short meeting per month: per loop, what it produced, what it cost, its eval pass rate, and the decision to widen it, tighten it or switch it off.',
-    why: 'Loops rot silently. Without a scheduled look, you find out from the bill or from a customer, and by then the trust is spent.',
+    why: 'Loops quietly get worse over time. Without a scheduled look, you find out from the bill or from a customer, and by then people have already stopped trusting the loop.',
     responsibility: 'Stop or fix a task that is not earning its cost. Approve the playbook changes the summarizing agent proposed. Adjust the spending limit.'
   },
 
@@ -336,7 +336,7 @@ const RSI_NODES = [
     subtitle: 'product, delivery, agent sessions',
     tools: ['analytics', 'observability', 'ai-eval'],
     purpose: 'Product events, pipeline outcomes and agent session traces exported to somewhere you can query, not just viewed in each vendor\'s dashboard.',
-    why: 'Agent traces are the input for improving the agents themselves. Without them you are tuning prompts on vibes.',
+    why: 'Agent traces are the input for improving the agents themselves. Without them you are tuning prompts by guesswork.',
     out: ['events', 'session-traces']
   },
   {
@@ -380,7 +380,7 @@ const RSI_NODES = [
     after: ['dis-nightly'],
     when: (c, t) => t >= 3,
     purpose: 'Regenerates the long-form guides from the accumulated record: the internal handbook, the answer library, the onboarding guide, each rewritten rather than patched.',
-    why: 'Patched documents drift into contradiction. A periodic regeneration from the source record is how the handbook stays current instead of becoming folklore.',
+    why: 'Patched documents drift into contradiction. A periodic regeneration from the source record is how the handbook stays current instead of turning into an unwritten habit that only long-standing staff remember correctly.',
     prompt: 'Regenerate this guide from the indexed record of the last quarter rather than editing the current text. Keep the structure. Where current practice contradicts the existing guide, follow the practice and list every such change separately so a human can confirm it was intended.',
     out: ['canon']
   },
@@ -415,7 +415,7 @@ const RSI_NODES = [
     subtitle: 'a diff, reviewed like code',
     after: ['dis-nightly', 'dis-monthly', 'srv-context'],
     purpose: 'Proposed canon changes arrive as a reviewable diff with citations, and a named owner per document accepts, edits or rejects.',
-    why: 'A self-writing handbook with no reviewer converges on confident nonsense. The citation requirement is what makes the review fast enough to actually happen.',
+    why: 'A self-writing handbook with no reviewer drifts toward answers that sound sure of themselves but are wrong. The citation requirement is what makes the review fast enough to actually happen.',
     responsibility: 'Review the diff, not the corpus. Reject any line without a source. Keep your document under the length someone will actually read.'
   },
   {

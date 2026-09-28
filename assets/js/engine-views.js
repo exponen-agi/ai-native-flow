@@ -199,7 +199,7 @@ const COMPANY_RISKS = [
   {
     id: 'canon-unowned',
     title: 'A canon nobody owns',
-    body: 'A self-writing handbook with no named reviewer converges on confident nonsense, and people quietly stop trusting it. One owner per document, edits arriving as a diff with a citation per line, and a length somebody will actually read.',
+    body: 'A self-writing handbook with no named reviewer drifts toward answers that sound sure of themselves but are wrong, and people quietly stop trusting it. One owner per document, edits arriving as a diff with a citation per line, and a length somebody will actually read.',
     when: (c, t) => t >= 2
   },
   {
