@@ -120,81 +120,86 @@
           <input type="text" id="problem" name="problem" placeholder="Handlers spend a third of call time on status-only queries, and every fix waits two weeks for a spec.">
         </p>
         <div class="actions">
-          <button type="submit" class="btn primary">Generate the blueprint</button>
+          <button type="submit" class="btn primary" id="generate-btn">Generate the blueprint</button>
+          <button type="button" class="btn primary" id="done-btn" hidden>Done editing</button>
           <button type="button" class="btn" id="share">Copy link</button>
         </div>
       </form>
     </details>
 
-    <div class="strip">
-      <p class="strip-tier"><span class="strip-tier-n" id="tier-n">Tier 2 of 4</span>
-        <strong id="tier-name">Guardrailed build</strong></p>
-      <dl class="strip-stats">
-        <div><dt>AI steps</dt><dd id="stat-ai">0</dd></div>
-        <div><dt>People</dt><dd id="stat-human">0</dd></div>
-        <div><dt>Approvals</dt><dd id="stat-gate">0</dd></div>
-        <div><dt>Tools</dt><dd id="stat-tool">0</dd></div>
-        <div><dt>Timeline</dt><dd id="stat-weeks">0<span class="unit">wk</span></dd></div>
-      </dl>
-      <button type="button" class="btn primary strip-go" id="activate-btn">Activate this plan</button>
-      <button type="button" class="btn ghost" id="why-toggle" aria-expanded="false" aria-controls="why">Why this plan</button>
-      <button type="button" class="btn ghost" id="glossary-toggle" aria-expanded="false" aria-controls="glossary">What do these words mean?</button>
-    </div>
+    <div id="blueprint-area" hidden>
+      <div class="strip">
+        <p class="strip-tier"><span class="strip-tier-n" id="tier-n">Tier 2 of 4</span>
+          <strong id="tier-name">Guardrailed build</strong></p>
+        <dl class="strip-stats">
+          <div><dt>AI steps</dt><dd id="stat-ai">0</dd></div>
+          <div><dt>People</dt><dd id="stat-human">0</dd></div>
+          <div><dt>Approvals</dt><dd id="stat-gate">0</dd></div>
+          <div><dt>Tools</dt><dd id="stat-tool">0</dd></div>
+          <div><dt>Timeline</dt><dd id="stat-weeks">0<span class="unit">wk</span></dd></div>
+        </dl>
+        <div class="strip-actions">
+          <button type="button" class="btn ghost" id="why-toggle" aria-expanded="false" aria-controls="why">Why this plan</button>
+          <button type="button" class="btn ghost" id="glossary-toggle" aria-expanded="false" aria-controls="glossary">What do these words mean?</button>
+        </div>
+      </div>
 
-    <div class="tracker" id="tracker">
-      <button type="button" class="track-step is-done" id="track-edit">
-        <span class="track-n" aria-hidden="true">&check;</span>
-        <span class="track-t">1. Plan generated</span>
-        <span class="track-d">change your answers</span>
-      </button>
-      <span class="track-arrow" id="track-arrow" aria-hidden="true">&rarr;</span>
-      <button type="button" class="track-step track-go" id="track-activate">
-        <span class="track-n" aria-hidden="true">2</span>
-        <span class="track-t">Activate this plan</span>
-      </button>
-    </div>
-    <div class="why" id="why" hidden>
-      <p id="read-ceiling"></p>
-      <p id="read-goal"></p>
-      <p id="read-stage"></p>
-      <p id="read-budget"></p>
-      <p id="read-problem" class="echo" hidden></p>
-    </div>
-    <div class="why glossary" id="glossary" hidden>
-      <p class="panel-note">Plain meanings for words you'll see across this plan. No need to memorize them &mdash; come back here any time.</p>
-      <dl class="glossary-list">
-        <div><dt>Level (or "Tier")</dt><dd>How much AI is trusted to work on its own, from 1 (a person checks every step) to 4 (AI runs approved routines with no one watching in real time).</dd></div>
-        <div><dt>Approval point (or "gate")</dt><dd>A checkpoint where work must be signed off before it moves on &mdash; by a fixed rule, a second AI check, or a person.</dd></div>
-        <div><dt>One person in charge (or "DRI")</dt><dd>One named owner is accountable for a result, instead of a group deciding by committee.</dd></div>
-        <div><dt>Second AI check (or "adversarial pass")</dt><dd>A second, independent AI reviews the first AI's work before it reaches a customer.</dd></div>
-        <div><dt>Playbook (or "canon")</dt><dd>The small set of official documents &mdash; answers, rules, procedures &mdash; that AI reads before doing any task.</dd></div>
-        <div><dt>Shared memory (or "context layer")</dt><dd>One searchable place holding your records, documents and decisions, which every tool and AI step can read from.</dd></div>
-        <div><dt>Accuracy test (or "eval")</dt><dd>An automatic check that keeps confirming the AI is still getting things right, the way a test drive checks a car.</dd></div>
-        <div><dt>Summarizing agent (or "distillation")</dt><dd>An AI that turns a large pile of calls, tickets and notes into a short, useful summary.</dd></div>
-        <div><dt>Build-and-test pipeline (or "CI")</dt><dd>The automatic process that checks and assembles software every time it changes, before it goes live.</dd></div>
-        <div><dt>Direct tool connection (or "connector"/"MCP")</dt><dd>A link that lets an AI tool read from and update another app directly, such as your CRM or support desk.</dd></div>
-        <div><dt>Company-wide safety rules (or "managed settings")</dt><dd>Guardrails set once, centrally, that no individual AI session can turn off or bypass.</dd></div>
-        <div><dt>Spending limit (or "spend envelope")</dt><dd>A cap agreed in advance so AI costs never creep up unnoticed.</dd></div>
-      </dl>
-    </div>
+      <div class="why" id="why" hidden>
+        <p id="read-ceiling"></p>
+        <p id="read-goal"></p>
+        <p id="read-stage"></p>
+        <p id="read-budget"></p>
+        <p id="read-problem" class="echo" hidden></p>
+      </div>
+      <div class="why glossary" id="glossary" hidden>
+        <p class="panel-note">Plain meanings for words you'll see across this plan. No need to memorize them &mdash; come back here any time.</p>
+        <dl class="glossary-list">
+          <div><dt>Level (or "Tier")</dt><dd>How much AI is trusted to work on its own, from 1 (a person checks every step) to 4 (AI runs approved routines with no one watching in real time).</dd></div>
+          <div><dt>Approval point (or "gate")</dt><dd>A checkpoint where work must be signed off before it moves on &mdash; by a fixed rule, a second AI check, or a person.</dd></div>
+          <div><dt>One person in charge (or "DRI")</dt><dd>One named owner is accountable for a result, instead of a group deciding by committee.</dd></div>
+          <div><dt>Second AI check (or "adversarial pass")</dt><dd>A second, independent AI reviews the first AI's work before it reaches a customer.</dd></div>
+          <div><dt>Playbook (or "canon")</dt><dd>The small set of official documents &mdash; answers, rules, procedures &mdash; that AI reads before doing any task.</dd></div>
+          <div><dt>Shared memory (or "context layer")</dt><dd>One searchable place holding your records, documents and decisions, which every tool and AI step can read from.</dd></div>
+          <div><dt>Accuracy test (or "eval")</dt><dd>An automatic check that keeps confirming the AI is still getting things right, the way a test drive checks a car.</dd></div>
+          <div><dt>Summarizing agent (or "distillation")</dt><dd>An AI that turns a large pile of calls, tickets and notes into a short, useful summary.</dd></div>
+          <div><dt>Build-and-test pipeline (or "CI")</dt><dd>The automatic process that checks and assembles software every time it changes, before it goes live.</dd></div>
+          <div><dt>Direct tool connection (or "connector"/"MCP")</dt><dd>A link that lets an AI tool read from and update another app directly, such as your CRM or support desk.</dd></div>
+          <div><dt>Company-wide safety rules (or "managed settings")</dt><dd>Guardrails set once, centrally, that no individual AI session can turn off or bypass.</dd></div>
+          <div><dt>Spending limit (or "spend envelope")</dt><dd>A cap agreed in advance so AI costs never creep up unnoticed.</dd></div>
+        </dl>
+      </div>
 
-    <nav class="tabs" role="tablist" aria-label="Blueprint sections">
-      <button role="tab" class="tab" id="tab-company" data-tab="company" data-view="company" aria-selected="true">Company</button>
-      <button role="tab" class="tab" id="tab-delivery" data-tab="delivery" data-view="delivery" aria-selected="false">Delivery</button>
-      <button role="tab" class="tab" id="tab-stack" data-tab="stack" data-view="stack" aria-selected="false">Tool stack</button>
-      <button role="tab" class="tab" id="tab-improve" data-tab="improve" data-view="improve" aria-selected="false">Learning loop</button>
-      <button role="tab" class="tab" id="tab-network" data-tab="network" aria-selected="false">Who does what</button>
-      <span class="tab-sep" aria-hidden="true"></span>
-      <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" aria-selected="false">Rollout</button>
-      <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false">Measure</button>
-      <button role="tab" class="tab" id="tab-risks" data-tab="risks" aria-selected="false">Risks</button>
-      <button role="tab" class="tab" id="tab-export" data-tab="export" aria-selected="false">Export</button>
-      <button role="tab" class="tab tab-activate" id="tab-activate" data-tab="activate" aria-selected="false">Activate</button>
-    </nav>
+      <div class="tracker" id="tracker">
+        <button type="button" class="track-step is-done" id="track-edit">
+          <span class="track-n" aria-hidden="true">&check;</span>
+          <span class="track-t">1. Plan generated</span>
+          <span class="track-d">change your answers</span>
+        </button>
+        <span class="track-arrow" id="track-arrow" aria-hidden="true">&rarr;</span>
+        <button type="button" class="track-step track-go" id="track-activate">
+          <span class="track-n" aria-hidden="true">2</span>
+          <span class="track-t">Activate this plan</span>
+        </button>
+      </div>
+
+      <nav class="tabs" role="tablist" aria-label="Blueprint sections">
+        <button role="tab" class="tab" id="tab-company" data-tab="company" data-view="company" aria-selected="true">Company</button>
+        <button role="tab" class="tab" id="tab-delivery" data-tab="delivery" data-view="delivery" aria-selected="false">Delivery</button>
+        <button role="tab" class="tab" id="tab-stack" data-tab="stack" data-view="stack" aria-selected="false">Tool stack</button>
+        <button role="tab" class="tab" id="tab-improve" data-tab="improve" data-view="improve" aria-selected="false">Learning loop</button>
+        <button role="tab" class="tab" id="tab-network" data-tab="network" aria-selected="false">Who does what</button>
+        <span class="tab-sep" aria-hidden="true"></span>
+        <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" aria-selected="false">Rollout</button>
+        <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false">Measure</button>
+        <button role="tab" class="tab" id="tab-risks" data-tab="risks" aria-selected="false">Risks</button>
+        <button role="tab" class="tab" id="tab-export" data-tab="export" aria-selected="false">Export</button>
+        <button role="tab" class="tab tab-activate" id="tab-activate" data-tab="activate" aria-selected="false">Activate</button>
+      </nav>
+    </div>
   </div>
 </div>
 
-<main>
+<main id="blueprint-main" hidden>
   <section class="panel panel-graph" id="panel-graph" role="tabpanel" aria-labelledby="tab-company">
     <div class="panel-head">
       <h2 id="view-title">Company</h2>

@@ -110,10 +110,10 @@ function copyText(text, btn, done) {
     navigator.clipboard.writeText(text).then(() => finish(true)).catch(() => finish(false));
   } else {
     const ta = document.createElement('textarea');
-    ta.value = text;
     ta.setAttribute('readonly', '');
     ta.style.cssText = 'position:fixed;opacity:0';
     document.body.appendChild(ta);
+    ta.value = text;
     ta.select();
     let ok = false;
     try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
@@ -435,7 +435,8 @@ function setActivated(on) {
   arrow.classList.toggle('is-waiting', !on);
   step.querySelector('.track-n').innerHTML = on ? '&check;' : '2';
   label.textContent = on ? '2. Activated' : 'Activate this plan';
-  document.getElementById('activate-btn').textContent = on ? 'Back to the activated plan' : 'Activate this plan';
+  const actBtn = document.getElementById('activate-btn');
+  if (actBtn) actBtn.textContent = on ? 'Back to the activated plan' : 'Activate this plan';
 }
 
 function activate() {
@@ -572,12 +573,71 @@ function render() {
   switchTab(VIEW_META[currentView] || PANELS[currentView] ? currentView : 'company');
 }
 
+let blueprintShown = false;
+
+function showBlueprint() {
+  blueprintShown = true;
+  const area = document.getElementById('blueprint-area');
+  const main = document.getElementById('blueprint-main');
+  const genBtn = document.getElementById('generate-btn');
+  const doneBtn = document.getElementById('done-btn');
+  if (area) area.hidden = false;
+  if (main) main.hidden = false;
+  if (genBtn) genBtn.hidden = true;
+  if (doneBtn) doneBtn.hidden = false;
+  render();
+}
+
+function hideBlueprint() {
+  blueprintShown = false;
+  const area = document.getElementById('blueprint-area');
+  const main = document.getElementById('blueprint-main');
+  const genBtn = document.getElementById('generate-btn');
+  const doneBtn = document.getElementById('done-btn');
+  if (area) area.hidden = true;
+  if (main) main.hidden = true;
+  if (genBtn) genBtn.hidden = false;
+  if (doneBtn) doneBtn.hidden = true;
+  const answers = readForm();
+  renderChips(answers);
+  intakeWrap.open = true;
+}
+
 form.addEventListener('submit', ev => {
   ev.preventDefault();
   selected = {};
-  render();
+  showBlueprint();
   intakeWrap.open = false;
 });
+
+form.addEventListener('change', () => {
+  if (blueprintShown) {
+    render();
+  } else {
+    renderChips(readForm());
+  }
+});
+
+const problemInput = document.getElementById('problem');
+if (problemInput) {
+  problemInput.addEventListener('input', () => {
+    if (blueprintShown) {
+      const echo = document.getElementById('read-problem');
+      const val = problemInput.value.trim();
+      if (echo) {
+        echo.hidden = !val;
+        echo.textContent = val ? 'You wrote: ' + val : '';
+      }
+    }
+  });
+}
+
+const doneBtn = document.getElementById('done-btn');
+if (doneBtn) {
+  doneBtn.addEventListener('click', () => {
+    intakeWrap.open = false;
+  });
+}
 
 document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => switchTab(t.dataset.tab));
@@ -646,19 +706,40 @@ document.getElementById('net-zoom-level').addEventListener('click', () => netCon
 
 document.getElementById('why-toggle').addEventListener('click', ev => {
   const why = document.getElementById('why');
-  const open = why.hidden;
-  why.hidden = !open;
-  ev.currentTarget.setAttribute('aria-expanded', String(open));
+  const glossary = document.getElementById('glossary');
+  const glossaryToggle = document.getElementById('glossary-toggle');
+  const willOpen = why.hidden;
+  why.hidden = !willOpen;
+  ev.currentTarget.setAttribute('aria-expanded', String(willOpen));
+  ev.currentTarget.classList.toggle('is-active', willOpen);
+  if (willOpen && glossary && !glossary.hidden) {
+    glossary.hidden = true;
+    if (glossaryToggle) {
+      glossaryToggle.setAttribute('aria-expanded', 'false');
+      glossaryToggle.classList.remove('is-active');
+    }
+  }
 });
 
 document.getElementById('glossary-toggle').addEventListener('click', ev => {
   const glossary = document.getElementById('glossary');
-  const open = glossary.hidden;
-  glossary.hidden = !open;
-  ev.currentTarget.setAttribute('aria-expanded', String(open));
+  const why = document.getElementById('why');
+  const whyToggle = document.getElementById('why-toggle');
+  const willOpen = glossary.hidden;
+  glossary.hidden = !willOpen;
+  ev.currentTarget.setAttribute('aria-expanded', String(willOpen));
+  ev.currentTarget.classList.toggle('is-active', willOpen);
+  if (willOpen && why && !why.hidden) {
+    why.hidden = true;
+    if (whyToggle) {
+      whyToggle.setAttribute('aria-expanded', 'false');
+      whyToggle.classList.remove('is-active');
+    }
+  }
 });
 
-document.getElementById('activate-btn').addEventListener('click', activate);
+const actBtn = document.getElementById('activate-btn');
+if (actBtn) actBtn.addEventListener('click', activate);
 document.getElementById('activate-btn-export').addEventListener('click', activate);
 document.getElementById('track-activate').addEventListener('click', activate);
 document.getElementById('track-edit').addEventListener('click', () => {
@@ -676,4 +757,10 @@ document.getElementById('share').addEventListener('click', ev => copyText(locati
 document.getElementById('print').addEventListener('click', () => window.print());
 
 applyHash();
-render();
+if (location.hash.length > 1) {
+  showBlueprint();
+  intakeWrap.open = false;
+} else {
+  hideBlueprint();
+}
+
