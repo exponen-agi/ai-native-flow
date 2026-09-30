@@ -58,7 +58,7 @@ const COMPANY_NODES = [
   {
     id: 'sig-market', lane: 'signals', kind: 'ai', title: 'Market and competitor watch',
     subtitle: 'scheduled, summarised, filed',
-    when: (c, t) => t >= 2,
+    when: (c, t) => t >= 2 || c.goal === 'validate' || preProduct(c),
     tools: ['automation', 'knowledge'],
     purpose: 'A scheduled agent reads the sources you would read if you had the time, and files a short weekly digest with what changed and what it implies for the roadmap.',
     why: 'Competitor and category movement is the one signal class that never arrives by itself. A schedule beats intention.',
@@ -98,7 +98,7 @@ const COMPANY_NODES = [
   {
     id: 'loop-demand', lane: 'loops', kind: 'ai', title: 'Demand loop',
     subtitle: 'content, campaigns, site, measured',
-    when: c => c.domain !== 'internal-ops',
+    when: c => c.domain !== 'internal-ops' || c.goal === 'grow-revenue',
     after: ['sig-market', 'sig-revenue'],
     tools: ['crm', 'analytics', 'knowledge'],
     purpose: 'Positioning and proof turn into content and campaigns from one written source, and every asset carries the tracking that says whether it worked.',
@@ -109,7 +109,7 @@ const COMPANY_NODES = [
   {
     id: 'loop-revenue', lane: 'loops', kind: 'ai', title: 'Revenue loop',
     subtitle: 'research, prep, follow-up, hygiene',
-    when: c => ['saas', 'data-ai', 'services', 'ecommerce', 'hardware'].includes(c.domain),
+    when: c => ['saas', 'data-ai', 'services', 'ecommerce', 'hardware'].includes(c.domain) || c.goal === 'grow-revenue',
     after: ['sig-revenue'],
     tools: ['crm', 'meetings'],
     purpose: 'Account research before the call, a brief built from the transcript history, follow-up drafted within the hour, and the record updated from the recording rather than from memory.',
@@ -141,7 +141,7 @@ const COMPANY_NODES = [
   {
     id: 'loop-leadership', lane: 'loops', kind: 'ai', title: 'Leadership query loop',
     subtitle: 'ask the company a question',
-    when: (c, t) => t >= 2,
+    when: (c, t) => t >= 2 || c.goal === 'decisions',
     after: ['sig-product', 'sig-revenue', 'sig-delivery', 'sig-internal'],
     tools: ['warehouse', 'knowledge'],
     purpose: 'One agent with read access across the indexed record answers the questions that used to need a status roll-up: what shipped, what customers asked for, where the pipeline stalls, what we decided and why.',
@@ -163,7 +163,7 @@ const COMPANY_NODES = [
     id: 'gate-policy', lane: 'gates', kind: 'gate', title: 'Rules and compliance check',
     subtitle: 'a fixed, automatic check for what must never happen',
     after: ['gate-adversary'],
-    when: (c, t) => has(c, 'regulated') || has(c, 'client-code') || t >= 2,
+    when: (c, t) => has(c, 'regulated') || has(c, 'client-code') || t >= 2 || c.goal === 'compliance',
     purpose: 'Automatic checks for the rules that can never bend: personal data leaving where it should stay, a claim that is not allowed to be made, a promise above a set amount, one client\'s information reaching another client.',
     why: 'A written rule makes a violation rare. Only a hard, automatic check makes it nearly impossible, and that is what a regulator or a customer\'s due-diligence questionnaire actually asks about.',
     enforces: 'Blocks rather than warns. Every allow and block logged with a timestamp and the rule that fired.'
@@ -288,7 +288,7 @@ const COMPANY_NODES = [
   {
     id: 'brain-retention', lane: 'spine', kind: 'gate', title: 'Retention and redaction',
     subtitle: 'what is kept, for how long, visible to whom',
-    when: c => has(c, 'regulated') || has(c, 'client-code') || c.stage === 'enterprise',
+    when: c => has(c, 'regulated') || has(c, 'client-code') || c.stage === 'enterprise' || c.goal === 'compliance' || industryRegulated(c),
     purpose: 'Recording everything collides with data protection unless retention windows, redaction of sensitive fields and per-source access rules are decided up front.',
     why: 'This is the one place where record everything needs a lawyer in the room. Decide it before the corpus exists, because retrofitting redaction across a year of transcripts is brutal.',
     enforces: 'Retention window per source, personal and payment data redacted at ingest, consent captured where required, access inherited from the source system.'
@@ -528,10 +528,10 @@ const TOOL_CATEGORIES = [
     role: 'Where intent becomes something visible before it becomes something built.',
     emits: 'Mocks and prototypes that the build stage verifies against.',
     collection: 'col-mcp',
-    when: c => uiHeavy(c) || c.domain === 'data-ai',
+    when: c => uiHeavy(c) || c.domain === 'data-ai' || c.goal === 'validate' || !inMarket(c),
     options: [
       { name: 'Figma', note: 'Design system of record, with agent access to files and components', fit: c => 3 },
-      { name: 'Lovable', note: 'Prompt to working web prototype, good for testing a flow with users', fit: c => (['solo', 'startup'].includes(c.stage) ? 2 : 1) },
+      { name: 'Lovable', note: 'Prompt to working web prototype, good for testing a flow with users', fit: c => (!inMarket(c) ? 3 : ['solo', 'startup'].includes(c.stage) ? 2 : 1) },
       { name: 'Claude artifacts or Claude Design', note: 'Mock straight from the intent file, iterated in the same session', fit: c => 2 },
       { name: 'v0', note: 'Component-level generation against a design system', fit: c => 1 },
       { name: 'Google AI Studio', note: 'Fast multimodal prototyping and model comparison', fit: c => (c.domain === 'data-ai' ? 2 : 0) }
@@ -542,7 +542,7 @@ const TOOL_CATEGORIES = [
     role: 'Accounts, deals, and the reasons things are won and lost. Agent-updated from transcripts rather than by hand.',
     emits: 'Deal stages, win and loss reasons, activity history, revenue signals.',
     collection: 'col-mcp',
-    when: c => c.domain !== 'internal-ops',
+    when: c => c.domain !== 'internal-ops' || c.goal === 'grow-revenue',
     options: [
       { name: 'HubSpot', note: 'Common where marketing and sales share one system', fit: c => (['startup', 'growth', 'smb'].includes(c.stage) ? 3 : 1) },
       { name: 'Salesforce', note: 'Where the sales process is already codified there', fit: c => (c.stage === 'enterprise' ? 3 : 0) },

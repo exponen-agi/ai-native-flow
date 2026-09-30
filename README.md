@@ -1,7 +1,9 @@
 # ai-native-flow
 
-A self-service blueprint generator for AI-native operations. A business answers six questions about
-its stage, team, budget, domain, goal and constraints, and gets back a prescriptive operating model
+A self-service blueprint generator for AI-native operations. A business answers eight questions in
+plain business language: its type and size, industry, what it sells or delivers, where it is on the
+product journey (idea through scale, or an established business reinventing itself), the main
+problem, its technical headcount, budget and constraints. It gets back a prescriptive operating model
 across five views: the company as interacting loops, the delivery lifecycle inside it, the tool
 ecosystem with the path each tool's data travels into the context layer, the learning loop that
 turns recorded work back into context, and the same plan drawn as the working team that runs it.
@@ -26,6 +28,7 @@ Static by design. No server, no build step, no model call, no analytics, no cook
 | --- | --- |
 | `index.html` | Page structure and the intake form |
 | `assets/css/app.css` | Design tokens and every style, both themes |
+| `assets/js/profile.js` | Business types and sizes, product journey stages and industries, with how each maps onto the rules |
 | `assets/js/kb.js` | Delivery knowledge base: lanes, tiers, and every node with its inclusion rule |
 | `assets/js/kb-company.js` | Company loops, the tool catalogue with fit rules, and the learning-loop stages |
 | `assets/js/engine.js` | Tier derivation, node selection, edge bridging, delivery metrics and risks |
@@ -46,7 +49,7 @@ Static by design. No server, no build step, no model call, no analytics, no cook
 | Learning loop | Record, index, distill, serve, gate, improve: how work becomes context for the next session |
 | Who does what | The same plan as a team: which pods are agents, which are people, and what travels between them |
 
-All five are generated from the same six answers and share one cross-view index, so a rollout phase
+All five are generated from the same answers and share one cross-view index, so a rollout phase
 can name a part from any view and clicking it opens that view with the part selected.
 
 The first four are lane diagrams drawn by `graph.js`. Pointing at any box fades everything it does

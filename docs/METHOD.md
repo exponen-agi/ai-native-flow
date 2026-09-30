@@ -32,11 +32,27 @@ much autonomy the flow can carry, not how good the company is.
 
 Caps: no CI pipeline holds the flow at tier 2, because tiers 3 and 4 both run agents inside a
 pipeline. A small business with nobody in house is held at tier 1 regardless of budget, because
-autonomy without a technical reviewer produces software nobody can operate.
+autonomy without a technical reviewer produces software nobody can operate. The product journey
+caps it too: before a product exists (idea, discovery, problem–solution fit) the flow is held at
+tier 2, and while the first version is being built (prototype, MVP) at tier 3, because loops that
+run with no person in the path need live traffic to act on and learn from.
 
 Regulated data does not lower the tier. It adds governance nodes (managed settings, approval gates,
 scheduled scans, a policy owner in the spec loop) and multiplies the calendar by 1.5. Legacy systems
-add a source-of-truth map and 1.25. Enterprise stage adds 1.25. Client codebases add 1.15.
+add a source-of-truth map and 1.25. Enterprise stage adds 1.25. Client codebases add 1.15. A large
+enterprise (10,000+ people) adds a further 0.15, and so does a sector where regulated data is the
+norm (healthcare, financial services, legal, public sector and similar) when the regulated-data box
+is not ticked, since sector rules still apply to work done by AI.
+
+## Who the business is, in business terms
+
+The intake asks for type and size of business, industry, what the business mainly sells or
+delivers, product journey stage, the main problem, technical headcount, budget and constraints. The
+rules still reason over five segments (solo, startup, growth, SMB, enterprise); each type-and-size
+answer maps down to one of them in `assets/js/profile.js`, so the wording can serve business users
+without forking every rule. Industry drives the sector reading in "Why this plan", the regulated-
+sector flag and the retention gate; journey drives the tier cap, the journey reading, the
+prototyping slot, the market watch before a product exists, and the journey-specific risks.
 
 ## Five views over one set of answers
 
