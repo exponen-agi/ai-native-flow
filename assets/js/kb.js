@@ -42,6 +42,13 @@ const eng = c => ({ none: 0, solo: 1, small: 4, large: 15 })[c.engineers];
 const budget = c => ({ under200: 1, to2k: 2, to10k: 3, over10k: 4 })[c.budget];
 const has = (c, k) => (c.constraints || []).includes(k);
 const uiHeavy = c => ['saas', 'mobile', 'ecommerce'].includes(c.domain);
+/* An operations-led business with nobody technical does not need a repository, a coding
+   agent or a build pipeline; its AI work runs through connectors and written procedures. */
+const writesSoftware = c => eng(c) > 0 || c.domain !== 'internal-ops';
+/* Which kind of plan this is, for wording that has to change with it: exploring before a
+   product exists, running the business itself, or building and shipping a product. */
+const planTrack = c => (preProduct(c) ? 'explore'
+  : c.domain === 'internal-ops' || (eng(c) === 0 && c.stage === 'smb') ? 'ops' : 'product');
 
 /* kind: ai | human | gate | system | artifact
    after: upstream node ids. Dropped nodes are bridged, so the chain never breaks.
@@ -188,10 +195,10 @@ const NODES = [
     subtitle: 'second mistake becomes a rule',
     after: ['implementer'],
     when: (c, t) => t >= 2,
-    purpose: 'Watches for the corrections you keep repeating and turns each into a line in CLAUDE.md, keeping the file under a page.',
+    purpose: 'Watches for the corrections you keep repeating and turns each into a line in the agent instructions file, keeping the file under a page.',
     why: 'Institutional knowledge stops living in people\'s heads and starts being read at the beginning of every session. This is the cheapest compounding asset in the flow.',
-    prompt: 'Review the corrections I made in this session. For any mistake you have now made twice, propose the exact line to add to CLAUDE.md under "Things to get right", and propose one stale line to delete so the file stays under a page. Show the diff, do not apply it.',
-    out: ['CLAUDE.md']
+    prompt: 'Review the corrections I made in this session. For any mistake you have now made twice, propose the exact line to add to our agent instructions file (AGENTS.md, CLAUDE.md or equivalent) under "Things to get right", and propose one stale line to delete so the file stays under a page. Show the diff, do not apply it.',
+    out: ['AGENTS.md']
   },
   {
     id: 'ops-agent', lane: 'build', kind: 'ai', title: 'Operations automation agent',
@@ -209,13 +216,13 @@ const NODES = [
     id: 'feedback-loop', lane: 'verify', kind: 'system', title: 'Self-check harness',
     subtitle: 'one command to build, test, lint',
     after: ['implementer', 'test-first', 'parallel-fleet', 'ops-agent'],
-    purpose: 'One command each for build, test and lint, with a healthy output example in CLAUDE.md, so a session can verify itself and fix its own mistakes before you see them.',
+    purpose: 'One command each for build, test and lint, with a healthy output example in the agent instructions file, so a session can verify itself and fix its own mistakes before you see them.',
     why: 'This is the highest-leverage thing on the whole board and the cheapest to build. Without it, every agent output lands on a human, and that human is the bottleneck.',
-    prompt: 'Wrap our verification into single commands (make build, make test, make lint) that exit non-zero on failure. Then add a Verifying your work section to CLAUDE.md listing each command with an example of healthy output, and the rule: run all three before reporting any task complete, paste the output, and if a test fails fix the code and never the test.',
-    out: ['CLAUDE.md']
+    prompt: 'Wrap our verification into single commands (make build, make test, make lint) that exit non-zero on failure. Then add a Verifying your work section to our agent instructions file (AGENTS.md, CLAUDE.md or equivalent) listing each command with an example of healthy output, and the rule: run all three before reporting any task complete, paste the output, and if a test fails fix the code and never the test.',
+    out: ['AGENTS.md']
   },
   {
-    id: 'verifier-subagent', lane: 'verify', kind: 'ai', title: 'Verifier subagent',
+    id: 'verifier-agent', lane: 'verify', kind: 'ai', title: 'Verifier agent',
     subtitle: 'fresh context, reports only',
     after: ['feedback-loop'],
     when: (c, t) => t >= 2,
@@ -247,11 +254,11 @@ const NODES = [
   {
     id: 'eval-suite', lane: 'verify', kind: 'ai', title: 'Automated accuracy tests',
     subtitle: '20 to 50 real tasks, re-run whenever AI settings change',
-    after: ['verifier-subagent', 'feedback-loop'],
+    after: ['verifier-agent', 'feedback-loop'],
     when: (c, t) => t >= 3,
-    purpose: 'Regression tests for the configuration that steers your agents. Runs when CLAUDE.md, a skill or a hook changes, and on a nightly schedule.',
+    purpose: 'Regression tests for the configuration that steers your agents. Runs when the agent instructions file, a skill or a hook changes, and on a nightly schedule.',
     why: 'Your prompt and policy files are now production configuration. A model swap or a skill edit can quietly halve your quality, and nothing else will tell you.',
-    prompt: 'Take these 20 recent tasks and their accepted outcomes. For each, write an eval: the prompt, plus the checks that define acceptable (tests pass, lint clean, behaviour unchanged, policy followed). Wire them to run non-interactively in CI on any change under .claude/ or to CLAUDE.md, and nightly. Fail the check if the pass rate drops below the current baseline.',
+    prompt: 'Take these 20 recent tasks and their accepted outcomes. For each, write an eval: the prompt, plus the checks that define acceptable (tests pass, lint clean, behaviour unchanged, policy followed). Wire them to run non-interactively in CI on any change to the agent configuration (AGENTS.md or CLAUDE.md, skills, hooks, rules), and nightly. Fail the check if the pass rate drops below the current baseline.',
     out: ['evals/']
   },
 
@@ -259,7 +266,7 @@ const NODES = [
   {
     id: 'review-bugs', lane: 'ship', kind: 'ai', title: 'Review pass: defects',
     subtitle: 'logic, edge cases, regressions',
-    after: ['verifier-subagent', 'visual-check', 'eval-suite', 'feedback-loop'],
+    after: ['verifier-agent', 'visual-check', 'eval-suite', 'feedback-loop'],
     when: (c, t) => t >= 2,
     purpose: 'Reads the diff hunting for logic errors, broken edge cases and subtle regressions, and ranks each finding by severity.',
     why: 'Every pull request now gets an identical review, instead of a review whose quality depends on which human had capacity that afternoon.',
@@ -269,7 +276,7 @@ const NODES = [
   {
     id: 'review-security', lane: 'ship', kind: 'ai', title: 'Review pass: security',
     subtitle: 'injection, auth gaps, data in logs',
-    after: ['verifier-subagent', 'eval-suite', 'feedback-loop'],
+    after: ['verifier-agent', 'eval-suite', 'feedback-loop'],
     when: (c, t) => t >= 2 || has(c, 'regulated'),
     purpose: 'A separate pass against your written security standard, so security review keeps up with AI output without needing to hire more reviewers.',
     why: 'Security teams are sized for human output. When agents multiply the diff, either the queue grows or code ships under-reviewed, and a regulated business can accept neither.',
@@ -279,7 +286,7 @@ const NODES = [
   {
     id: 'review-compliance', lane: 'ship', kind: 'ai', title: 'Review pass: intent match',
     subtitle: 'diff against spec.md and plan.md',
-    after: ['verifier-subagent', 'feedback-loop'],
+    after: ['verifier-agent', 'feedback-loop'],
     when: (c, t) => t >= 2,
     purpose: 'Checks the merged diff against what was actually asked for, and flags scope the plan never authorised.',
     why: 'This is the pass only an artifact chain makes possible, and it is the one that catches quiet scope creep.',
@@ -431,11 +438,11 @@ const NODES = [
     enforces: 'One named source of truth per artifact. Non-technical contributors commit through a connector, never through git.'
   },
   {
-    id: 'claude-md', lane: 'spine', kind: 'artifact', title: 'CLAUDE.md',
-    subtitle: 'what a new joiner needs on day one',
-    purpose: 'Commands, conventions, architecture, and the mistakes your team sees most often. Under a page, at the repo root, reviewed like code.',
+    id: 'agents-md', lane: 'spine', kind: 'artifact', title: 'Agent instructions file',
+    subtitle: 'AGENTS.md, CLAUDE.md or your tool\'s equivalent',
+    purpose: 'Commands, conventions, architecture, and the mistakes your team sees most often. Under a page, at the repo root, reviewed like code. Most coding agents read AGENTS.md; some use their own name for it (CLAUDE.md, GEMINI.md, .cursor/rules, copilot-instructions.md). Keep one file and point the others at it.',
     why: 'Knowledge that used to sit in heads and wikis becomes a file read at the start of every session. Stale lines are worse than missing ones: they consume context and mislead.',
-    prompt: 'Generate a starting CLAUDE.md from this repository, then cut it down to only what a new joiner needs on day one: build, test and lint commands with healthy output, the conventions that actually matter, the architecture in five lines, and a "Things to get right" list. Keep it under one page and tell me what you dropped.'
+    prompt: 'Generate a starting AGENTS.md from this repository (or CLAUDE.md, or whatever file our coding agent reads), then cut it down to only what a new joiner needs on day one: build, test and lint commands with healthy output, the conventions that actually matter, the architecture in five lines, and a "Things to get right" list. Keep it under one page and tell me what you dropped.'
   },
   {
     id: 'skills', lane: 'spine', kind: 'artifact', title: 'Skills as policy',
@@ -443,7 +450,7 @@ const NODES = [
     when: (c, t) => t >= 2,
     purpose: 'Each policy that must be applied consistently, written once with a named owner, versioned, distributed centrally, and updated when the policy changes rather than when someone remembers it.',
     why: 'A skill is an advisory control: it makes the policy likely to be applied while the code is written. Findings that cite a policy should fall towards zero once it exists.',
-    prompt: 'Take this policy document and write it as a skill: a SKILL.md whose frontmatter says exactly when it triggers and whose body says what to do, as numbered checks an agent can follow. Name the owner. Then test it: ask for the relevant task three different ways and confirm the skill loads each time.'
+    prompt: 'Take this policy document and write it as a skill: a skill file (SKILL.md, a rules file, or your tool\'s equivalent) that says exactly when it applies and whose body says what to do, as numbered checks an agent can follow. Name the owner. Then test it: ask for the relevant task three different ways and confirm the skill loads each time.'
   },
   {
     id: 'hooks', lane: 'spine', kind: 'gate', title: 'Hooks',
@@ -490,7 +497,7 @@ const ARTIFACT_LABELS = {
   'intent.md': 'intent.md',
   'spec.md': 'spec.md',
   'plan.md': 'plan.md',
-  'CLAUDE.md': 'CLAUDE.md',
+  'AGENTS.md': 'AGENTS.md or CLAUDE.md',
   'REVIEW.md': 'REVIEW.md',
   'skills/': 'skills/',
   'evals/': 'evals/',

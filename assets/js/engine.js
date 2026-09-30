@@ -81,7 +81,7 @@ const PHASE_LIBRARY = [
     title: 'Ground the artifact chain',
     weeks: [1, 2],
     goal: 'Intent stops living in chat windows and the agent stops guessing your conventions.',
-    nodeIds: ['artifact-home', 'claude-md', 'originator', 'intent-capture', 'product-owner', 'feedback-loop', 'spend-limit'],
+    nodeIds: ['artifact-home', 'agents-md', 'originator', 'intent-capture', 'product-owner', 'feedback-loop', 'spend-limit'],
     proof: 'An idea from a non-engineer reaches a committed intent.md the same day, and one command builds, tests and lints the project.'
   },
   {
@@ -97,7 +97,7 @@ const PHASE_LIBRARY = [
     title: 'Encode policy, then enforce it',
     weeks: [3, 6],
     goal: 'Your standards become files the agent reads and hooks it cannot talk past.',
-    nodeIds: ['skills', 'hooks', 'review-md', 'test-lock', 'verifier-subagent', 'visual-check', 'legacy-bridge', 'policy-owner'],
+    nodeIds: ['skills', 'hooks', 'review-md', 'test-lock', 'verifier-agent', 'visual-check', 'legacy-bridge', 'policy-owner'],
     proof: 'Review findings that cite a written policy fall towards zero, because the policy is applied while the code is written.'
   },
   {
@@ -149,25 +149,47 @@ function buildPhases(c, tier, nodes) {
 }
 
 const METRIC_LIBRARY = [
-  { stage: 'Intake', lead: 'Hours from first conversation to a committed intent.md', lag: 'Share of intent files accepted rather than closed', source: 'git history of the intent home', minTier: 1 },
-  { stage: 'Shape', lead: 'Elapsed time between the intent and spec commits', lag: 'Spec commits dated after the first plan commit, meaning requirements churned mid-build', source: 'two git timestamps', minTier: 1 },
-  { stage: 'Build', lead: 'Share of changes that merge from the first implementation pass', lag: 'How often the merged diff still matches its plan.md', source: 'pull request metadata', minTier: 1 },
-  { stage: 'Verify', lead: 'First-pass CI success rate on agent-written changes', lag: 'Change failure rate', source: 'CI system', minTier: 2 },
-  { stage: 'Ship', lead: 'Time to first review, and review comments resolved without a human touching the branch', lag: 'Defects caught before merge versus escaping to production', source: 'pull request history and incident tracker', minTier: 2 },
-  { stage: 'Scale', lead: 'Concurrent sessions per engineer while rework holds flat', lag: 'Changes merged per engineer per week, read alongside rework rate', source: 'session telemetry and pull request history', minTier: 3 },
-  { stage: 'Operate', lead: 'Minutes from a threshold breach to a triaged finding', lag: 'Share of findings that become merged fixes, and repeat incidents of the same class', source: 'detection log and incident tracker', minTier: 3 },
-  { stage: 'Cost', lead: 'Token spend per merged change, split interactive versus scheduled', lag: 'Delivery cost per change against the same quarter last year', source: 'workspace usage export', minTier: 1 }
+  { track: ['product'], stage: 'Intake', lead: 'Hours from first conversation to a committed intent.md', lag: 'Share of intent files accepted rather than closed', source: 'git history of the intent home', minTier: 1 },
+  { track: ['product'], stage: 'Shape', lead: 'Elapsed time between the intent and spec commits', lag: 'Spec commits dated after the first plan commit, meaning requirements churned mid-build', source: 'two git timestamps', minTier: 1 },
+  { track: ['product'], stage: 'Build', lead: 'Share of changes that merge from the first implementation pass', lag: 'How often the merged diff still matches its plan.md', source: 'pull request metadata', minTier: 1 },
+  { track: ['product'], stage: 'Verify', lead: 'First-pass CI success rate on agent-written changes', lag: 'Change failure rate', source: 'CI system', minTier: 2 },
+  { track: ['product'], stage: 'Ship', lead: 'Time to first review, and review comments resolved without a human touching the branch', lag: 'Defects caught before merge versus escaping to production', source: 'pull request history and incident tracker', minTier: 2 },
+  { track: ['product'], stage: 'Scale', lead: 'Concurrent sessions per engineer while rework holds flat', lag: 'Changes merged per engineer per week, read alongside rework rate', source: 'session telemetry and pull request history', minTier: 3 },
+  { track: ['product'], stage: 'Operate', lead: 'Minutes from a threshold breach to a triaged finding', lag: 'Share of findings that become merged fixes, and repeat incidents of the same class', source: 'detection log and incident tracker', minTier: 3 },
+  { track: ['product'], stage: 'Cost', lead: 'Token spend per merged change, split interactive versus scheduled', lag: 'Delivery cost per change against the same quarter last year', source: 'workspace usage export', minTier: 1 },
+  { track: ['ops', 'explore'], stage: 'Cost', lead: 'AI spend per completed task, split interactive versus scheduled', lag: 'Cost per task against doing it by hand', source: 'the AI tools\' usage and billing exports', minTier: 1 },
+  { track: ['ops'], stage: 'Procedures', lead: 'Share of recurring tasks with a written, step-by-step procedure', lag: 'Exceptions per run that still needed a person', source: 'procedure library and run logs', minTier: 1 },
+  { track: ['explore'], stage: 'Learning', lead: 'Days from an idea to a test in front of real users', lag: 'Share of tests that ended in a written decision', source: 'test briefs and the decision log', minTier: 1 }
 ];
 
-function buildMetrics(tier) {
-  return METRIC_LIBRARY.filter(m => m.minTier <= tier);
+/* The number the stated goal is judged by. It leads the measurement table and is the
+   one the activation step asks somebody to look at weekly. */
+const GOAL_METRICS = {
+  'validate': { stage: 'Evidence', lead: 'Customer conversations recorded and summarised each week', lag: 'Assumptions confirmed or killed per month', source: 'interview notes and the decision log' },
+  'less-rework': { stage: 'Fit', lead: 'Share of work items that trace to a written customer request', lag: 'Features reworked or removed within 90 days of release', source: 'work tracker and release notes' },
+  'ship-faster': { stage: 'Speed', lead: 'Days from an accepted request to a written plan', lag: 'Days from an accepted request to release', source: 'work tracker and release history' },
+  'fewer-defects': { stage: 'Quality', lead: 'Share of changes that pass every automatic check first time', lag: 'Customer-reported defects per month', source: 'pipeline results and support tickets' },
+  'grow-revenue': { stage: 'Revenue', lead: 'Hours from a sales call to a sent follow-up', lag: 'Win rate and length of the sales cycle', source: 'CRM and call recordings' },
+  'support-load': { stage: 'Support', lead: 'Share of customer questions answered from documented answers without escalation', lag: 'Support hours per customer, and customer satisfaction', source: 'support desk' },
+  'ops-cost': { stage: 'Operations', lead: 'Hours spent per run of each recurring procedure', lag: 'Cost per run against the manual baseline', source: 'procedure run logs and timesheets' },
+  'decisions': { stage: 'Answers', lead: 'Questions answered from the record, with sources, without asking a person', lag: 'Time from question to decision in recurring reviews', source: 'the query agent\'s log' },
+  'compliance': { stage: 'Compliance', lead: 'Rule breaches blocked automatically before they happened', lag: 'Audit findings, and days to produce evidence when asked', source: 'policy check logs and audit records' },
+  'scale-without-hiring': { stage: 'Capacity', lead: 'Work completed per person per week, read alongside rework', lag: 'Output or revenue per head against last year', source: 'work tracker and finance' }
+};
+
+function buildMetrics(c, tier) {
+  const track = planTrack(c);
+  return [
+    { ...GOAL_METRICS[c.goal], goal: true },
+    ...METRIC_LIBRARY.filter(m => m.minTier <= tier && (!m.track || m.track.includes(track)))
+  ];
 }
 
 const RISK_LIBRARY = [
   {
     id: 'subscription',
     title: 'Buying seats and calling it adoption',
-    body: 'A subscription handed to the tech team changes the build step and nothing else. The build step was never your constraint: the stages either side of it were. Spend the first month on the artifact home, CLAUDE.md and a one-command self-check, none of which need a bigger plan.',
+    body: 'A subscription handed to the tech team changes the build step and nothing else. The build step was never your constraint: the stages either side of it were. Spend the first month on the artifact home, the agent instructions file (AGENTS.md or CLAUDE.md) and a one-command self-check, none of which need a bigger plan.',
     when: () => true
   },
   {
@@ -179,7 +201,7 @@ const RISK_LIBRARY = [
   {
     id: 'no-verify',
     title: 'Autonomy without a self-check',
-    body: 'Turning on auto mode before the agent can run your tests just moves the mess downstream and makes a person read all of it. The self-check harness is the prerequisite for every tier above the first, and it is an afternoon of work.',
+    body: 'Letting the agent act without asking before the agent can run your tests just moves the mess downstream and makes a person read all of it. The self-check harness is the prerequisite for every tier above the first, and it is an afternoon of work.',
     when: () => true
   },
   {
@@ -305,8 +327,8 @@ const GOAL_FOCUS = {
   'fewer-defects': { node: 'feedback-loop', line: 'Defects fall when the agent can prove its own work. Build the self-check harness, then the failing-test-first rule, then the test-file lock. Review passes are third, not first.' },
   'less-rework': { node: 'intent-capture', line: 'Rework is almost always a requirements failure wearing an engineering costume. The intent interview and the flagged-conflict spec are where you fix it, weeks before any code exists.' },
   'support-load': { node: 'support-signal', line: 'Support load is intent that never reached the repository. Cluster the tickets into intent files with volume evidence, and let the ranking argue for itself.' },
-  'ops-cost': { node: 'ops-agent', line: 'The cost is in the recurring procedure, not the product. Write the procedure down, run it with an agent under human review, and only then consider automating the review.' },
-  'scale-without-hiring': { node: 'parallel-fleet', line: 'Capacity comes from parallel streams that verify themselves, not from faster typing. The honest ceiling is how many streams one person can review properly: add one only while rework holds flat.' }
+  'ops-cost': { node: 'ops-agent', alt: ['loop-ops'], line: 'The cost is in the recurring procedure, not the product. Write the procedure down, run it with an agent under human review, and only then consider automating the review.' },
+  'scale-without-hiring': { node: 'parallel-fleet', alt: ['feedback-loop'], line: 'Capacity comes from parallel streams that verify themselves, not from faster typing. The honest ceiling is how many streams one person can review properly: add one only while rework holds flat.' }
 };
 
 function buildBlueprint(c) {
@@ -320,7 +342,7 @@ function buildBlueprint(c) {
     nodes,
     edges,
     phases: buildPhases(c, tier, nodes),
-    metrics: buildMetrics(tier),
+    metrics: buildMetrics(c, tier),
     risks: buildRisks(c, tier),
     budgetNote: budgetNote(c),
     stageNote: stageNote(c),

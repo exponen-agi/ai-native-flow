@@ -145,7 +145,7 @@ Every element of the flow is one object in `assets/js/kb.js`:
 {
   id: 'review-security', lane: 'ship', kind: 'ai', title: 'Review pass: security',
   subtitle: 'injection, auth gaps, data in logs',
-  after: ['verifier-subagent'],
+  after: ['verifier-agent'],
   when: (c, t) => t >= 2 || has(c, 'regulated'),
   purpose: '...', why: '...', prompt: '...', in: ['diff']
 }

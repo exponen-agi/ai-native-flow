@@ -44,14 +44,17 @@ const NET_ICONS = {
    best first. A slot with no match at these answers is simply left out. */
 const AGENT_SLOTS = [
   { ids: ['intent-capture', 'support-signal', 'originator'], label: 'Listens',
+    prefer: c => (c.goal === 'support-load' ? ['support-signal'] : planTrack(c) === 'explore' || c.goal === 'validate' ? ['sig-market'] : []),
     caption: 'turns a problem into a written brief', carries: 'the brief', icon: 'listens' },
   { ids: ['spec-agent', 'plan-agent', 'triage-agent'], label: 'Plans',
     caption: 'writes the plan before anything is built', carries: 'the plan', icon: 'plans' },
   { ids: ['implementer', 'ops-agent', 'parallel-fleet'], label: 'Builds',
+    prefer: c => (planTrack(c) === 'ops' || c.goal === 'ops-cost' ? ['ops-agent'] : c.goal === 'scale-without-hiring' ? ['parallel-fleet'] : []),
     caption: 'does the work the plan describes', carries: 'the work', icon: 'builds' },
-  { ids: ['verifier-subagent', 'feedback-loop', 'visual-check'], label: 'Checks',
+  { ids: ['verifier-agent', 'feedback-loop', 'visual-check'], label: 'Checks',
     caption: 'proves it works before you look', carries: 'proof it works', icon: 'checks' },
   { ids: ['review-security', 'review-bugs', 'diagnosis-agent', 'learning-agent'], label: 'Watches',
+    prefer: c => (c.goal === 'compliance' ? ['review-compliance', 'security-scan', 'review-security'] : c.goal === 'grow-revenue' ? ['loop-revenue'] : c.goal === 'decisions' ? ['loop-leadership'] : []),
     caption: 'catches problems and reports back', carries: 'what went wrong', icon: 'watches' }
 ];
 
@@ -61,10 +64,11 @@ const HUMAN_SLOTS = [
   { ids: ['orchestrator', 'delivery-partner', 'knowledge-curator'], label: 'Team',
     caption: 'steers the agents, checks the result', carries: 'steering', icon: 'team' },
   { ids: ['policy-owner', 'code-owner', 'prod-gate', 'service-owner', 'release-auth'], label: 'Final say',
+    prefer: c => (planTrack(c) === 'product' ? [] : ['gate-dri']),
     caption: 'nothing ships without a person', carries: 'approval', icon: 'approves' }
 ];
 
-const HUB_IDS = ['store-canon', 'store-index', 'artifact-home', 'claude-md', 'brain-context'];
+const HUB_IDS = ['store-canon', 'store-index', 'artifact-home', 'agents-md', 'brain-context'];
 
 /* Cuts on a word boundary, because a label that ends mid-word ("Spec and design
    age…") costs more in confusion than the two characters it saved. */
@@ -90,11 +94,13 @@ function netEl(tag, cls, text) {
 
 /* First slot id that this blueprint actually contains, so the picture is always the
    visitor's own plan and never a stock illustration. */
-function resolveSlots(slots, index, limit) {
+function resolveSlots(slots, index, limit, answers) {
   const out = [];
   const used = new Set();
   for (const slot of slots) {
-    const id = slot.ids.find(i => index.has(i) && !used.has(i));
+    /* The answers can move a better-fitting part to the front of a slot's list. */
+    const ids = [...(answers && slot.prefer ? slot.prefer(answers) : []), ...slot.ids];
+    const id = ids.find(i => index.has(i) && !used.has(i));
     if (!id) continue;
     used.add(id);
     out.push({ ...slot, nodeId: id, node: index.get(id).node });
@@ -239,8 +245,8 @@ function attachPanZoom(svg, inner, onChange) {
    controls so the toolbar buttons can drive them. */
 function renderNetwork(blueprint, mount, panel, onOpenPart) {
   const index = blueprint.index;
-  const agents = resolveSlots(AGENT_SLOTS, index, 5);
-  const humans = resolveSlots(HUMAN_SLOTS, index, 3);
+  const agents = resolveSlots(AGENT_SLOTS, index, 5, blueprint.answers);
+  const humans = resolveSlots(HUMAN_SLOTS, index, 3, blueprint.answers);
   const hubId = HUB_IDS.find(id => index.has(id)) || null;
   const hubNode = hubId ? index.get(hubId).node : null;
 

@@ -54,6 +54,34 @@ without forking every rule. Industry drives the sector reading in "Why this plan
 sector flag and the retention gate; journey drives the tier cap, the journey reading, the
 prototyping slot, the market watch before a product exists, and the journey-specific risks.
 
+## Three kinds of plan
+
+The same parts read differently depending on what the business is doing, so the rules sort every
+set of answers into one of three tracks (`planTrack` in `assets/js/kb.js`):
+
+- **Explore** — no product yet (idea, discovery, problem–solution fit). The rollout talks about
+  capturing conversations and testing assumptions, the measures are evidence and learning speed,
+  and tools that need a live product (support desk, product analytics, billing, monitoring, a
+  build pipeline) are held back.
+- **Operations** — the business runs operations rather than selling software, or is a small
+  business with nobody technical. The rollout talks about written procedures and exceptions, the
+  measures are hours and cost per procedure, and the repository, coding agents and pipeline drop
+  out of the stack.
+- **Product** — everything else: the delivery lifecycle as drawn.
+
+On top of the track, the goal picks the measure that leads the table and the number the activation
+step asks someone to review weekly, and it moves the best-fitting part to the front of the "who
+does what" roster. Business type decides who owns the rollout in the activation step. A regulated
+sector adds a retention step to the first phase.
+
+## Vendor neutrality
+
+Nothing in the plan assumes one AI vendor. The agent instructions file is named as `AGENTS.md`
+first, the open convention most coding agents read, with `CLAUDE.md` and other tool-specific names
+as equivalents. Tool slots score every option against the answers, so the starting recommendation
+changes with the business rather than defaulting to one product, and the everyday assistant slot
+follows the office suite the business already runs.
+
 ## Five views over one set of answers
 
 The delivery lifecycle is one function's internals, not the company. The views separate them:
@@ -87,7 +115,8 @@ The delivery lifecycle is one function's internals, not the company. The views s
 ## Six lanes and a spine
 
 Lanes are the stages of work: Intake, Shape, Build, Verify, Ship, Operate. The spine holds what every
-lane reads: the artifact home, `CLAUDE.md`, skills as policy, hooks, managed settings, `REVIEW.md`,
+lane reads: the artifact home, the agent instructions file (`AGENTS.md`, or `CLAUDE.md` and its
+equivalents), skills as policy, hooks, managed settings, `REVIEW.md`,
 the source-of-truth map, and the spend envelope.
 
 Each node declares `after` for its upstream links. Nodes excluded by the rules are bridged, so the
