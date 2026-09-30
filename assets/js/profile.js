@@ -116,3 +116,80 @@ const journeyPhase = c => (JOURNEYS[c.journey] || JOURNEYS['product-fit']).phase
 const preProduct = c => journeyPhase(c) === 'pre';
 const inMarket = c => ['market', 'established'].includes(journeyPhase(c));
 const industryRegulated = c => !!(INDUSTRIES[c.industry] || {}).regulated;
+
+/* The vocabulary each sector uses for the same parts. `who` replaces "customer" in
+   every part's text and prompt, `work` names the recurring back-office procedures an
+   operations agent takes on first, and `guard` is the data line a prompt must never
+   cross. Deterministic on purpose: the same answers still give the same words. */
+const DEFAULT_WORK = 'reconciliation, invoice chasing, the monthly pack and exception handling';
+const INDUSTRY_TERMS = {
+  'software':      { who: ['customer', 'customers'], work: 'subscription billing checks, usage reports, renewal chasing and access requests' },
+  'ai-data':       { who: ['customer', 'customers'], work: 'data-quality checks, usage and cost reports, dataset access requests and model evaluation runs' },
+  'it-services':   { who: ['client', 'clients'], work: 'ticket triage, patch and licence reports, client status reports and runbook steps',
+    guard: 'client credentials and one client\'s systems data never reach another client\'s work' },
+  'cybersecurity': { who: ['client', 'clients'], work: 'alert triage summaries, compliance evidence collection, vulnerability reports and access reviews',
+    guard: 'client security findings and credentials stay inside the approved case system' },
+  'retail':        { who: ['shopper', 'shoppers'], work: 'product listings, stock reconciliation, returns and refunds, and supplier invoices' },
+  'consumer':      { who: ['customer', 'customers'], work: 'product content, review responses, retailer and distributor reports, and order exceptions' },
+  'hospitality':   { who: ['guest', 'guests'], work: 'booking changes, guest messages, review responses, rota planning and supplier invoices' },
+  'media':         { who: ['subscriber', 'subscribers'], work: 'metadata and tagging, rights and licensing checks, localisation and performance reports' },
+  'marketing':     { who: ['client', 'clients'], work: 'campaign reports, briefs, asset variations, timesheets and client invoices',
+    guard: 'one client\'s briefs, data and results never reach another client\'s work' },
+  'fintech':       { who: ['customer', 'customers'], work: 'onboarding and identity checks, transaction review queues, reconciliations and regulatory reports',
+    guard: 'account and payment data stay in approved systems, and no decision about a customer\'s money is made without a named person' },
+  'insurance':     { who: ['policyholder', 'policyholders'], work: 'claims intake, document extraction, policy renewals and broker and bordereaux reports',
+    guard: 'no claim or cover decision is made without a named person, and personal and health details stay in approved systems' },
+  'accounting':    { who: ['client', 'clients'], work: 'bank reconciliations, receipt and invoice capture, month-end close checklists and tax return preparation',
+    guard: 'client financial records stay in the practice systems, and every filing is signed off by a qualified person' },
+  'legal':         { who: ['client', 'clients'], work: 'contract first review, matter summaries, time recording, conflict checks and court and filing deadlines',
+    guard: 'privileged and confidential client material never leaves approved systems, and no advice goes out unreviewed' },
+  'consulting':    { who: ['client', 'clients'], work: 'proposals, research packs, meeting notes, timesheets and client status reports',
+    guard: 'one client\'s material never reaches another client\'s work' },
+  'real-estate':   { who: ['client', 'clients'], work: 'listing copy, viewing and lead follow-up, tenant requests, lease review and rent reconciliation' },
+  'healthcare':    { who: ['patient', 'patients'], work: 'referral letters, appointment scheduling, prior authorisations, clinical coding and billing',
+    guard: 'patient health information stays in approved systems, and no clinical decision is made without a clinician' },
+  'life-sciences': { who: ['customer', 'customers'], work: 'literature screening, regulatory document drafts, trial site paperwork and quality records',
+    guard: 'patient and trial data stay in validated systems, and every regulated document is approved by a named person' },
+  'manufacturing': { who: ['customer', 'customers'], work: 'purchase orders, supplier certificates, quality and inspection records, and maintenance logs' },
+  'logistics':     { who: ['customer', 'customers'], work: 'proof-of-delivery checks, carrier invoice reconciliation, customs paperwork and delay notices' },
+  'energy':        { who: ['customer', 'customers'], work: 'meter and billing exceptions, field-service reports, asset inspection records and regulatory returns',
+    guard: 'customer account data and operational network data stay in approved systems' },
+  'construction':  { who: ['client', 'clients'], work: 'tender documents, site diaries, variation and change orders, and safety records' },
+  'agriculture':   { who: ['buyer', 'buyers'], work: 'traceability records, supplier and certification paperwork, yield reports and order confirmations' },
+  'automotive':    { who: ['customer', 'customers'], work: 'service bookings, warranty claims, parts orders and dealer reports' },
+  'telecom':       { who: ['subscriber', 'subscribers'], work: 'billing disputes, number porting, network incident summaries and regulatory reports',
+    guard: 'subscriber data and call records stay in approved systems' },
+  'education':     { who: ['learner', 'learners'], work: 'course materials, marking support, enrolment and admissions queries, and attendance reports',
+    guard: 'learner records stay in approved systems, and grades are confirmed by a teacher' },
+  'hr':            { who: ['candidate', 'candidates'], work: 'job descriptions, screening summaries, interview scheduling, onboarding packs and payroll queries',
+    guard: 'candidate and employee data stay in approved systems, and no hiring decision is made without a person' },
+  'public':        { who: ['citizen', 'citizens'], work: 'casework summaries, correspondence drafts, freedom-of-information requests and service reports',
+    guard: 'personal data stays in approved systems, and no decision about a person is made without a named official' },
+  'nonprofit':     { who: ['supporter', 'supporters'], work: 'grant applications, donor thank-yous, gift reconciliation and impact reports' },
+  'other':         { who: ['customer', 'customers'] }
+};
+
+const industryTerms = c => INDUSTRY_TERMS[c.industry] || INDUSTRY_TERMS.other;
+
+/* Rewrites one piece of generic text in this business's vocabulary. */
+function localize(text, c) {
+  if (typeof text !== 'string') return text;
+  const t = industryTerms(c);
+  const [one, many] = t.who;
+  const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+  return text
+    .replace(/\{work\}/g, t.work || DEFAULT_WORK)
+    .replace(/\bCustomers\b/g, cap(many)).replace(/\bcustomers\b/g, many)
+    .replace(/\bCustomer\b/g, cap(one)).replace(/\bcustomer\b/g, one);
+}
+
+/* One line of context that leads every indicative prompt, so a pasted prompt already
+   knows what kind of business it is working for and what it must never do. */
+function promptContext(c) {
+  const t = industryTerms(c);
+  const lower = w => w.charAt(0).toLowerCase() + w.slice(1);
+  const org = c.org === 'solo' ? 'solo business' : lower(orgOf(c).short);
+  const who = `We are ${/^[aeiou]/.test(org) ? 'an' : 'a'} ${org} in ${lower(INDUSTRIES[c.industry].short)}.`;
+  const guard = t.guard || (has(c, 'regulated') ? 'regulated and personal data stays in approved systems' : '');
+  return guard ? `${who} Hard limit: ${guard}.` : who;
+}

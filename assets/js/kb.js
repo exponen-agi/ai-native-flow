@@ -205,7 +205,7 @@ const NODES = [
     subtitle: 'connector work, not repository work',
     after: ['plan-agent'],
     when: c => c.domain === 'internal-ops' || eng(c) === 0,
-    purpose: 'Does the work that never needed a codebase: reconciling spreadsheets, drafting the weekly pack, chasing exceptions, filing structured records into the systems you already own.',
+    purpose: 'Does the work that never needed a codebase, starting with the procedures your sector repeats most: {work}. Output is filed as structured records into the systems you already own.',
     why: 'For a business whose bottleneck is back office rather than product, this is where the first real money is. It needs connectors and a written procedure, not a repository.',
     prompt: 'Here is the written procedure for this recurring task, and access to the systems it touches. Execute it for this period. Produce the output in the same format as last period, list every row where you had to make a judgment call, and stop and ask rather than guessing on anything involving money, a customer commitment, or personal data.',
     out: ['record']

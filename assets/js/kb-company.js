@@ -122,7 +122,7 @@ const COMPANY_NODES = [
     subtitle: 'reconcile, chase, report, file',
     after: ['sig-revenue'],
     tools: ['finance', 'automation', 'knowledge'],
-    purpose: 'The recurring procedures nobody wants to own: reconciliation, invoice chasing, the monthly pack, exception handling, each run against a written procedure with a human on the exceptions only.',
+    purpose: 'The recurring procedures nobody wants to own, such as {work}, each run against a written procedure with a human on the exceptions only.',
     why: 'For a business whose product is not software, this is where the first real money is, and it needs connectors and a written procedure rather than a repository.',
     prompt: 'Run this documented procedure for the current period. Produce the output in the same format as last period. List every row where you made a judgment call, with the rule you applied. Stop and ask rather than guessing on anything involving money moving, a customer commitment, or personal data.',
     out: ['records', 'pack']

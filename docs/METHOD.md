@@ -74,6 +74,17 @@ step asks someone to review weekly, and it moves the best-fitting part to the fr
 does what" roster. Business type decides who owns the rollout in the activation step. A regulated
 sector adds a retention step to the first phase.
 
+## The sector's own words
+
+The knowledge base is written once, in generic terms. When a plan is built, every part's text, the
+rollout, the measures, the risks and the readings are rewritten in the vocabulary of the chosen
+industry (`INDUSTRY_TERMS` and `localize` in `assets/js/profile.js`): "customer" becomes patient,
+client, guest, policyholder, learner, citizen and so on, and the operations agent and back-office
+loop name the procedures that sector repeats most (claims intake for an insurer, proof-of-delivery
+checks for a logistics firm). Every indicative prompt opens with one line saying what kind of
+business it works for and, where the sector has one, the data line it must never cross. This stays
+deterministic: a lookup table, not a model, so the same answers still give the same words.
+
 ## Vendor neutrality
 
 Nothing in the plan assumes one AI vendor. The agent instructions file is named as `AGENTS.md`

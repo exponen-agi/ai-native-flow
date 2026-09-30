@@ -285,7 +285,18 @@ function phaseWording(p, c, track, focus, position) {
   if (position === 0 && c.org === 'solo') {
     goal += ' Working alone, keep this to what you can set up in a few evenings.';
   }
-  return { title: t.title || p.title, goal, proof: t.proof || p.proof };
+  return { title: localize(t.title || p.title, c), goal: localize(goal, c), proof: localize(t.proof || p.proof, c) };
+}
+
+/* A part in this business's words: the sector's name for its customers and its own
+   routine work, and a prompt that opens with who it is working for. The knowledge base
+   stays generic; only the copy handed to the views is rewritten. */
+const LOCAL_FIELDS = ['title', 'subtitle', 'purpose', 'why', 'responsibility', 'enforces', 'role', 'emits'];
+function localizeNode(n, c) {
+  const out = { ...n };
+  LOCAL_FIELDS.forEach(f => { if (typeof n[f] === 'string') out[f] = localize(n[f], c); });
+  if (typeof n.prompt === 'string') out.prompt = promptContext(c) + ' ' + localize(n.prompt, c);
+  return out;
 }
 
 /* Wraps the delivery-only blueprint with the company-level views and content. */
@@ -298,6 +309,7 @@ function buildFullBlueprint(c) {
     stack: buildStackView(c, tier),
     improve: buildImproveView(c, tier)
   };
+  Object.values(views).forEach(v => { v.nodes = v.nodes.map(n => localizeNode(n, c)); });
   const index = indexViews(views);
   /* The goal's starting part, or the nearest stand-in these answers actually include. */
   const want = GOAL_FOCUS[c.goal];
@@ -328,9 +340,12 @@ function buildFullBlueprint(c) {
   return {
     ...base,
     views, index, phases, counts,
-    focus: { ...want, node: focusId },
-    metrics: [...base.metrics, ...COMPANY_METRICS.filter(m => m.minTier <= tier)],
-    risks: [...COMPANY_RISKS.filter(r => r.when(c, tier)), ...base.risks],
+    focus: { ...want, node: focusId, line: localize(want.line, c) },
+    metrics: [...base.metrics, ...COMPANY_METRICS.filter(m => m.minTier <= tier)]
+      .map(m => ({ ...m, lead: localize(m.lead, c), lag: localize(m.lag, c) })),
+    risks: [...COMPANY_RISKS.filter(r => r.when(c, tier)), ...base.risks]
+      .map(r => ({ ...r, title: localize(r.title, c), body: localize(r.body, c) })),
+    stageNote: localize(base.stageNote, c),
     horizon: phases.length ? Math.max(...phases.map(p => p.end)) : 0
   };
 }
