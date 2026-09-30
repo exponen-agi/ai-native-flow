@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI-Native Flow Blueprint</title>
-<meta name="description" content="Answer six simple questions and get a step-by-step plan for using AI across your business: what to automate, which tools to use, where a person should still decide, and what order to do it in.">
+<meta name="description" content="Answer eight short questions about your business and get a step-by-step plan for using AI across your business: what to automate, which tools to use, where a person should still decide, and what order to do it in.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap">
@@ -21,16 +21,16 @@
       <p class="eyebrow">AI-Native Flow Blueprint</p>
       <h1>See exactly how AI should run in your business.</h1>
       <p class="lede">Most AI plans fail because of how work moves through the business, not because
-        of the technology. Answer six simple questions and get a plan sized for a business like yours:
-        which repeating tasks to hand to AI, which tools to use, where a person should still make the
-        call, and what order to do it in.</p>
+        of the technology. Answer eight short questions and get a plan sized for a business like yours
+        and where it is on its journey: which repeating tasks to hand to AI, which tools to use, where
+        a person should still make the call, and what order to do it in.</p>
       <p class="assure">Works right in your browser &middot; Nothing you type is sent anywhere &middot; Same answers always give the same plan</p>
     </div>
     <ol class="steps">
       <li>
         <span class="step-n">1</span>
-        <span class="step-t">Answer six questions</span>
-        <span class="step-d">Your stage, team, budget and goal. About two minutes.</span>
+        <span class="step-t">Answer eight questions</span>
+        <span class="step-d">Your business, where you are now, your team and budget. About three minutes.</span>
       </li>
       <li>
         <span class="step-n">2</span>
@@ -55,27 +55,148 @@
         <span class="intake-toggle" aria-hidden="true"></span>
       </summary>
       <form id="intake-form" class="grid-form">
+        <p class="form-section">About your business</p>
         <p class="field">
-          <label for="stage">Stage</label>
-          <select id="stage" name="stage">
-            <option value="solo">Solo founder or one-person product</option>
-            <option value="startup" selected>Early startup, pre or post seed</option>
-            <option value="growth">Growth stage, product in market</option>
-            <option value="smb">Small or medium business, software is not the product</option>
-            <option value="enterprise">Mid-market or enterprise, established process</option>
+          <label for="org">Type and size of business</label>
+          <select id="org" name="org" aria-describedby="org-hint">
+            <optgroup label="Startups">
+              <option value="solo">Solo founder or freelancer (just me)</option>
+              <option value="startup-early">Early-stage startup (2–10 people)</option>
+              <option value="startup-seed" selected>Seed to Series A startup (11–50 people)</option>
+              <option value="startup-growth">Growth-stage startup (51–200 people)</option>
+              <option value="scaleup">Scale-up (201–1,000 people)</option>
+            </optgroup>
+            <optgroup label="Small and medium businesses">
+              <option value="smb-small">Small business (up to 50 people)</option>
+              <option value="smb-medium">Medium-sized business (51–250 people)</option>
+            </optgroup>
+            <optgroup label="Larger organisations">
+              <option value="midmarket">Mid-market company (251–1,000 people)</option>
+              <option value="enterprise">Enterprise (1,001–10,000 people)</option>
+              <option value="enterprise-large">Large enterprise (10,000+ people)</option>
+            </optgroup>
+          </select>
+          <span class="hint" id="org-hint">Size means total people on the payroll, not just the tech team.</span>
+        </p>
+        <p class="field">
+          <label for="industry">Your industry</label>
+          <select id="industry" name="industry">
+            <optgroup label="Technology">
+              <option value="software" selected>Software and SaaS</option>
+              <option value="ai-data">AI and data products</option>
+              <option value="it-services">IT and managed services</option>
+              <option value="cybersecurity">Cybersecurity</option>
+            </optgroup>
+            <optgroup label="Consumer and commerce">
+              <option value="retail">Retail and e-commerce</option>
+              <option value="consumer">Consumer brands and direct-to-consumer</option>
+              <option value="hospitality">Food, hospitality and travel</option>
+              <option value="media">Media, entertainment and gaming</option>
+              <option value="marketing">Marketing, advertising and creative agencies</option>
+            </optgroup>
+            <optgroup label="Financial and professional services">
+              <option value="fintech">Banking, payments and fintech</option>
+              <option value="insurance">Insurance</option>
+              <option value="accounting">Accounting, tax and audit</option>
+              <option value="legal">Legal services</option>
+              <option value="consulting">Consulting and professional services</option>
+              <option value="real-estate">Real estate and property</option>
+            </optgroup>
+            <optgroup label="Health and life sciences">
+              <option value="healthcare">Healthcare and digital health</option>
+              <option value="life-sciences">Pharma, biotech and life sciences</option>
+            </optgroup>
+            <optgroup label="Industry and infrastructure">
+              <option value="manufacturing">Manufacturing and industrial</option>
+              <option value="logistics">Logistics, supply chain and transport</option>
+              <option value="energy">Energy, utilities and climate tech</option>
+              <option value="construction">Construction and engineering</option>
+              <option value="agriculture">Agriculture and food production</option>
+              <option value="automotive">Automotive and mobility</option>
+              <option value="telecom">Telecommunications</option>
+            </optgroup>
+            <optgroup label="People and public">
+              <option value="education">Education and e-learning</option>
+              <option value="hr">HR, recruiting and staffing</option>
+              <option value="public">Public sector and government</option>
+              <option value="nonprofit">Non-profit and social impact</option>
+            </optgroup>
+            <option value="other">Something else</option>
           </select>
         </p>
         <p class="field">
-          <label for="engineers">People writing or reviewing code</label>
-          <select id="engineers" name="engineers">
-            <option value="none">Nobody in house</option>
+          <label for="domain">What you mainly sell or deliver</label>
+          <select id="domain" name="domain">
+            <option value="saas" selected>Software people use online (web app or SaaS)</option>
+            <option value="mobile">A mobile app</option>
+            <option value="ecommerce">Products sold online (store, marketplace or subscription)</option>
+            <option value="data-ai">An AI or data product</option>
+            <option value="hardware">Physical products or devices (incl. hardware, IoT, robotics)</option>
+            <option value="services">Services delivered by people (agency, consulting, client projects)</option>
+            <option value="internal-ops">Running operations — software supports the business but isn't what we sell</option>
+          </select>
+        </p>
+
+        <p class="form-section">Where you are now</p>
+        <p class="field">
+          <label for="journey">Product journey stage</label>
+          <select id="journey" name="journey" aria-describedby="journey-hint">
+            <optgroup label="Before a product">
+              <option value="idea">Idea: exploring an opportunity</option>
+              <option value="discovery">Discovery: talking to customers about the problem</option>
+              <option value="problem-fit">Problem–solution fit: the problem is real, testing our answer</option>
+            </optgroup>
+            <optgroup label="Building the first version">
+              <option value="prototype">Prototype: a rough version to test with users</option>
+              <option value="mvp">MVP: first version live with early users</option>
+            </optgroup>
+            <optgroup label="In the market">
+              <option value="post-mvp">Post-MVP: improving it with early paying customers</option>
+              <option value="product-fit" selected>Product–market fit: steady demand, repeatable sales</option>
+              <option value="scale">Scaling: growing customers, teams or markets</option>
+            </optgroup>
+            <optgroup label="Established business">
+              <option value="established">Established: mature offering, improving efficiency</option>
+              <option value="reinventing">Reinventing: launching a new product or AI-led offering</option>
+            </optgroup>
+          </select>
+          <span class="hint" id="journey-hint">For the product or offering this plan is for.</span>
+        </p>
+        <p class="field">
+          <label for="goal">The main problem to solve</label>
+          <select id="goal" name="goal">
+            <optgroup label="Building the right thing">
+              <option value="validate">Find out if an idea is worth building</option>
+              <option value="less-rework">Stop building things customers don't want</option>
+              <option value="ship-faster" selected>Launch new products and features faster</option>
+              <option value="fewer-defects">Fewer mistakes and bugs reaching customers</option>
+            </optgroup>
+            <optgroup label="Customers and revenue">
+              <option value="grow-revenue">Win more customers and grow revenue</option>
+              <option value="support-load">Answer customers faster with less effort</option>
+            </optgroup>
+            <optgroup label="Running the business">
+              <option value="ops-cost">Cut the cost of routine, back-office work</option>
+              <option value="decisions">Get answers from our own data and documents</option>
+              <option value="compliance">Stay compliant and lower risk</option>
+              <option value="scale-without-hiring">Grow without hiring at the same pace</option>
+            </optgroup>
+          </select>
+        </p>
+
+        <p class="form-section">Your team and budget</p>
+        <p class="field">
+          <label for="engineers">Technical people in house</label>
+          <select id="engineers" name="engineers" aria-describedby="engineers-hint">
+            <option value="none">None: we use ready-made tools or outside help</option>
             <option value="solo">One to three</option>
             <option value="small" selected>Four to fifteen</option>
             <option value="large">More than fifteen</option>
           </select>
+          <span class="hint" id="engineers-hint">Developers, engineers or IT staff who can build or check software.</span>
         </p>
         <p class="field">
-          <label for="budget">Monthly AI budget</label>
+          <label for="budget">Monthly budget for AI tools</label>
           <select id="budget" name="budget">
             <option value="under200">Under $200</option>
             <option value="to2k" selected>$200 to $2,000</option>
@@ -83,41 +204,18 @@
             <option value="over10k">Over $10,000</option>
           </select>
         </p>
-        <p class="field">
-          <label for="domain">What you build or run</label>
-          <select id="domain" name="domain">
-            <option value="saas" selected>Web product or SaaS (incl. fintech, healthtech, B2B tools)</option>
-            <option value="mobile">Mobile app</option>
-            <option value="ecommerce">E-commerce, marketplace, or subscription store</option>
-            <option value="data-ai">Data or AI product</option>
-            <option value="hardware">Hardware, robotics, or a physical product (incl. IoT, devices)</option>
-            <option value="internal-ops">Internal systems and operations (running the business itself)</option>
-            <option value="services">Agency, consultancy, or client delivery</option>
-          </select>
-        </p>
-        <p class="field">
-          <label for="goal">The problem to solve</label>
-          <select id="goal" name="goal">
-            <option value="ship-faster" selected>Ship the roadmap faster</option>
-            <option value="fewer-defects">Fewer defects reaching customers</option>
-            <option value="less-rework">Stop building the wrong thing</option>
-            <option value="support-load">Reduce support load</option>
-            <option value="ops-cost">Cut operational cost</option>
-            <option value="scale-without-hiring">Add capacity without hiring</option>
-          </select>
-        </p>
         <fieldset class="field">
-          <legend>Constraints</legend>
+          <legend>Anything that applies to you</legend>
           <div class="chips">
             <label class="chip"><input type="checkbox" name="constraints" value="regulated"> We handle regulated or sensitive data (health, finance, personal data)</label>
             <label class="chip"><input type="checkbox" name="constraints" value="legacy-systems"> We're keeping older systems we can't replace yet</label>
-            <label class="chip"><input type="checkbox" name="constraints" value="no-ci"> We don't yet auto-test and auto-release code changes</label>
+            <label class="chip"><input type="checkbox" name="constraints" value="no-ci"> Software changes are still tested and released by hand</label>
             <label class="chip"><input type="checkbox" name="constraints" value="client-code"> We build software for other companies (client codebases)</label>
           </div>
         </fieldset>
         <p class="field field-wide">
-          <label for="problem">The problem in your own words <span class="optional">optional, stays in your browser</span></label>
-          <input type="text" id="problem" name="problem" placeholder="Handlers spend a third of call time on status-only queries, and every fix waits two weeks for a spec.">
+          <label for="problem">Describe the problem in your own words <span class="optional">optional, stays in your browser</span></label>
+          <input type="text" id="problem" name="problem" placeholder="Our team spends a third of every call answering “where is my order?”, and every fix waits two weeks for IT.">
         </p>
         <div class="actions">
           <button type="submit" class="btn primary" id="generate-btn">Generate the blueprint</button>
@@ -147,6 +245,8 @@
       <div class="why" id="why" hidden>
         <p id="read-ceiling"></p>
         <p id="read-goal"></p>
+        <p id="read-journey"></p>
+        <p id="read-industry"></p>
         <p id="read-stage"></p>
         <p id="read-budget"></p>
         <p id="read-problem" class="echo" hidden></p>
@@ -396,6 +496,7 @@
   <button type="button"><span aria-hidden="true">&larr;</span> <span class="return-label">Back</span></button>
 </div>
 
+<script src="assets/js/profile.js"></script>
 <script src="assets/js/kb.js"></script>
 <script src="assets/js/kb-company.js"></script>
 <script src="assets/js/engine.js"></script>

@@ -14,12 +14,11 @@ const KIND_LABEL = {
   system: 'A system or signal', artifact: 'A document or tool'
 };
 const ANSWER_LABEL = {
-  stage: { solo: 'Solo', startup: 'Early startup', growth: 'Growth stage', smb: 'SMB', enterprise: 'Enterprise' },
-  engineers: { none: 'No in-house devs', solo: '1–3 devs', small: '4–15 devs', large: '15+ devs' },
+  engineers: { none: 'No tech staff', solo: '1–3 tech staff', small: '4–15 tech staff', large: '15+ tech staff' },
   budget: { under200: '<$200/mo', to2k: '$200–2k/mo', to10k: '$2–10k/mo', over10k: '$10k+/mo' },
-  domain: { saas: 'SaaS', mobile: 'Mobile', ecommerce: 'E-commerce', 'data-ai': 'Data or AI', hardware: 'Hardware or robotics', 'internal-ops': 'Internal ops', services: 'Services' },
-  goal: { 'ship-faster': 'Ship faster', 'fewer-defects': 'Fewer defects', 'less-rework': 'Less rework', 'support-load': 'Support load', 'ops-cost': 'Ops cost', 'scale-without-hiring': 'Capacity' },
-  constraints: { regulated: 'Regulated data', 'legacy-systems': 'Legacy systems', 'no-ci': 'No auto-build yet', 'client-code': 'Client codebases' }
+  domain: { saas: 'Web software', mobile: 'Mobile app', ecommerce: 'Sells online', 'data-ai': 'AI or data product', hardware: 'Physical products', 'internal-ops': 'Runs operations', services: 'People-delivered services' },
+  goal: { validate: 'Validate an idea', 'less-rework': 'Build the right thing', 'ship-faster': 'Launch faster', 'fewer-defects': 'Fewer mistakes', 'grow-revenue': 'Grow revenue', 'support-load': 'Easier support', 'ops-cost': 'Cheaper back office', decisions: 'Answers from our data', compliance: 'Compliance and risk', 'scale-without-hiring': 'Grow without hiring' },
+  constraints: { regulated: 'Regulated data', 'legacy-systems': 'Legacy systems', 'no-ci': 'Manual releases', 'client-code': 'Client codebases' }
 };
 
 function el(tag, cls, text) {
@@ -31,8 +30,11 @@ function el(tag, cls, text) {
 
 function readForm() {
   const fd = new FormData(form);
+  const org = fd.get('org');
   return {
-    stage: fd.get('stage'), engineers: fd.get('engineers'), budget: fd.get('budget'),
+    /* stage is the segment the rules reason over, derived from the type and size. */
+    org, stage: ORG_TYPES[org].segment, journey: fd.get('journey'), industry: fd.get('industry'),
+    engineers: fd.get('engineers'), budget: fd.get('budget'),
     domain: fd.get('domain'), goal: fd.get('goal'),
     constraints: fd.getAll('constraints'),
     problem: (fd.get('problem') || '').trim()
@@ -41,7 +43,8 @@ function readForm() {
 
 function writeHash(c) {
   const p = new URLSearchParams({
-    stage: c.stage, eng: c.engineers, budget: c.budget, domain: c.domain, goal: c.goal, v: currentView
+    org: c.org, journey: c.journey, ind: c.industry,
+    eng: c.engineers, budget: c.budget, domain: c.domain, goal: c.goal, v: currentView
   });
   if (c.constraints.length) p.set('c', c.constraints.join(','));
   history.replaceState(null, '', '#' + p.toString());
@@ -54,7 +57,10 @@ function applyHash() {
     const v = p.get(key), e = document.getElementById(id);
     if (v && e && [...e.options].some(o => o.value === v)) e.value = v;
   };
-  set('stage', 'stage'); set('engineers', 'eng'); set('budget', 'budget');
+  /* Older links carry only the segment; map it to the closest type and size. */
+  if (!p.get('org') && SEGMENT_TO_ORG[p.get('stage')]) p.set('org', SEGMENT_TO_ORG[p.get('stage')]);
+  set('org', 'org'); set('journey', 'journey'); set('industry', 'ind');
+  set('engineers', 'eng'); set('budget', 'budget');
   set('domain', 'domain'); set('goal', 'goal');
   const cs = (p.get('c') || '').split(',').filter(Boolean);
   form.querySelectorAll('input[name="constraints"]').forEach(i => { i.checked = cs.includes(i.value); });
@@ -68,11 +74,16 @@ function renderChips(c) {
   const mount = document.getElementById('answer-chips');
   mount.innerHTML = '';
   const parts = [
-    ANSWER_LABEL.stage[c.stage], ANSWER_LABEL.engineers[c.engineers], ANSWER_LABEL.budget[c.budget],
-    ANSWER_LABEL.domain[c.domain], ANSWER_LABEL.goal[c.goal],
+    orgLabel(c), INDUSTRIES[c.industry].short, JOURNEYS[c.journey].short,
+    ANSWER_LABEL.goal[c.goal], ANSWER_LABEL.engineers[c.engineers], ANSWER_LABEL.budget[c.budget],
     ...c.constraints.map(k => ANSWER_LABEL.constraints[k])
   ];
   parts.forEach(p => mount.appendChild(el('span', 'answer-chip', p)));
+}
+
+function orgLabel(c) {
+  const o = ORG_TYPES[c.org];
+  return `${o.short} (${o.people})`;
 }
 
 function renderStrip(b) {
@@ -85,6 +96,8 @@ function renderStrip(b) {
   document.getElementById('stat-weeks').innerHTML = `${b.horizon}<span class="unit">wk</span>`;
   document.getElementById('read-ceiling').textContent = b.tierInfo.thesis + ' How far AI can act alone: ' + b.tierInfo.ceiling;
   document.getElementById('read-goal').textContent = b.focus.line;
+  document.getElementById('read-journey').textContent = b.journeyNote;
+  document.getElementById('read-industry').textContent = b.industryNote;
   document.getElementById('read-stage').textContent = b.stageNote;
   document.getElementById('read-budget').textContent = b.budgetNote;
   const echo = document.getElementById('read-problem');
@@ -475,16 +488,18 @@ function briefMarkdown(b) {
   L.push(`How far AI can act alone: ${b.tierInfo.ceiling}`);
   L.push('');
   L.push('## Inputs');
-  L.push(`- Stage: ${ANSWER_LABEL.stage[c.stage]}`);
-  L.push(`- People writing or reviewing code: ${ANSWER_LABEL.engineers[c.engineers]}`);
-  L.push(`- Monthly AI budget: ${ANSWER_LABEL.budget[c.budget]}`);
-  L.push(`- What we build: ${ANSWER_LABEL.domain[c.domain]}`);
-  L.push(`- Problem to solve: ${ANSWER_LABEL.goal[c.goal]}`);
+  L.push(`- Type and size of business: ${orgLabel(c)}`);
+  L.push(`- Industry: ${INDUSTRIES[c.industry].short}`);
+  L.push(`- What we mainly sell or deliver: ${ANSWER_LABEL.domain[c.domain]}`);
+  L.push(`- Product journey stage: ${JOURNEYS[c.journey].short}`);
+  L.push(`- Main problem to solve: ${ANSWER_LABEL.goal[c.goal]}`);
+  L.push(`- Technical people in house: ${ANSWER_LABEL.engineers[c.engineers]}`);
+  L.push(`- Monthly budget for AI tools: ${ANSWER_LABEL.budget[c.budget]}`);
   L.push(`- Constraints: ${c.constraints.length ? c.constraints.map(k => ANSWER_LABEL.constraints[k]).join(', ') : 'none stated'}`);
   if (c.problem) L.push(`- In their words: ${c.problem}`);
   L.push('');
   L.push('## Reading');
-  [b.focus.line, b.stageNote, b.budgetNote].forEach(t => { L.push(t); L.push(''); });
+  [b.focus.line, b.journeyNote, b.industryNote, b.stageNote, b.budgetNote].forEach(t => { L.push(t); L.push(''); });
 
   Object.entries(b.views).forEach(([id, view]) => {
     L.push(`## ${VIEW_META[id].label} view`);

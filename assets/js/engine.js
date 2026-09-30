@@ -8,6 +8,11 @@ function computeTier(c) {
   if ((e >= 15 || c.stage === 'enterprise') && b >= 3) tier = 4;
   if (c.stage === 'smb' && e === 0) tier = Math.min(tier, 1);
   if (has(c, 'no-ci')) tier = Math.min(tier, 2);
+  /* Autonomy needs something live to act on. Before a product there is nothing to
+     automate but learning; while building the first version, loops that run with no
+     person in the path have no real traffic to learn from. */
+  if (preProduct(c)) tier = Math.min(tier, 2);
+  else if (journeyPhase(c) === 'build') tier = Math.min(tier, 3);
   return tier;
 }
 
@@ -17,6 +22,8 @@ function governanceWeight(c) {
   if (has(c, 'regulated')) w += 0.5;
   if (has(c, 'legacy-systems')) w += 0.25;
   if (c.stage === 'enterprise') w += 0.25;
+  if (c.org === 'enterprise-large') w += 0.15;
+  if (industryRegulated(c) && !has(c, 'regulated')) w += 0.15;
   if (has(c, 'client-code')) w += 0.15;
   return w;
 }
@@ -225,6 +232,33 @@ const RISK_LIBRARY = [
   }
 ];
 
+RISK_LIBRARY.push(
+  {
+    id: 'premature-automation',
+    title: 'Automating a product nobody has asked for yet',
+    body: 'Before customers have confirmed the problem, a polished pipeline makes it cheaper to build the wrong thing, faster. Spend AI on research, interview summaries and throwaway prototypes, and keep the delivery machinery to the self-check and a written record of what each test proved.',
+    when: c => preProduct(c) || c.journey === 'prototype'
+  },
+  {
+    id: 'scale-unwritten',
+    title: 'Hiring into a process nobody wrote down',
+    body: 'Scaling multiplies whatever you already do. If the way work gets done lives in a few people\'s heads, every new hire and every new agent learns a different version of it. Write the playbook first and make onboarding read from it.',
+    when: c => c.journey === 'scale' || c.journey === 'product-fit'
+  },
+  {
+    id: 'two-speed',
+    title: 'Holding the new venture to the old approval chain',
+    body: 'A new product line inside an established business dies of approvals meant for the core. Give it its own owner and a lighter flow, and carry over only the data and compliance rules that genuinely cannot be waived.',
+    when: c => c.journey === 'reinventing'
+  },
+  {
+    id: 'sector-rules',
+    title: 'Assuming your sector\'s rules stop at people',
+    body: 'Rules on privacy, record keeping and fair treatment in your sector apply to work done by AI exactly as they apply to staff. Confirm what data each tool may see, keep a record of what the AI did and who approved it, and check sector guidance on automated decisions before any customer-facing use.',
+    when: c => industryRegulated(c) && !has(c, 'regulated')
+  }
+);
+
 function buildRisks(c, tier) {
   return RISK_LIBRARY.filter(r => r.when(c, tier));
 }
@@ -250,7 +284,23 @@ function stageNote(c) {
   return map[c.stage];
 }
 
+function journeyNote(c) {
+  return JOURNEYS[c.journey].note;
+}
+
+function industryNote(c) {
+  const ind = INDUSTRIES[c.industry];
+  const flag = ind.regulated && !has(c, 'regulated')
+    ? ' Most businesses in this sector handle regulated or sensitive data. If yours does, tick that box so the plan adds the checks and records it needs.'
+    : '';
+  return ind.note + flag;
+}
+
 const GOAL_FOCUS = {
+  'validate': { node: 'sig-market', line: 'Validation is an evidence problem, not a building problem. Record every customer conversation, let an agent cluster what people actually said, and write down what would have to be true for the idea to work. Build only what the next test needs.' },
+  'grow-revenue': { node: 'loop-revenue', line: 'Revenue leaks where records go stale and follow-up waits. Let an agent prepare every call, draft the follow-up and update the CRM from the recording, then point the demand loop at the objections you hear most.' },
+  'decisions': { node: 'loop-leadership', line: 'Good answers come from a record, not from asking around. Capture meetings and decisions first, put them in one searchable store, then give one agent read access and a rule to cite its sources.' },
+  'compliance': { node: 'gate-policy', line: 'Compliance holds when a rule is enforced by a check rather than remembered by a person. Write the rules down, turn the ones that must never bend into automatic blocks, and make every step leave a record an auditor can follow.' },
   'ship-faster': { node: 'plan-agent', line: 'Cycle time is mostly waiting, not typing. Attack the plan and review gates first: a written plan cuts the rework that eats a sprint, and layered review passes cut the days a pull request sits.' },
   'fewer-defects': { node: 'feedback-loop', line: 'Defects fall when the agent can prove its own work. Build the self-check harness, then the failing-test-first rule, then the test-file lock. Review passes are third, not first.' },
   'less-rework': { node: 'intent-capture', line: 'Rework is almost always a requirements failure wearing an engineering costume. The intent interview and the flagged-conflict spec are where you fix it, weeks before any code exists.' },
@@ -274,6 +324,8 @@ function buildBlueprint(c) {
     risks: buildRisks(c, tier),
     budgetNote: budgetNote(c),
     stageNote: stageNote(c),
+    journeyNote: journeyNote(c),
+    industryNote: industryNote(c),
     focus: GOAL_FOCUS[c.goal],
     counts: {
       ai: nodes.filter(n => n.kind === 'ai').length,
