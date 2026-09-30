@@ -369,7 +369,8 @@ function renderMetrics(b) {
   mount.innerHTML = '';
   b.metrics.forEach(m => {
     const tr = document.createElement('tr');
-    [m.stage, m.lead, m.lag, m.source].forEach((v, i) => {
+    if (m.goal) tr.className = 'is-goal';
+    [m.goal ? `${m.stage} · your goal` : m.stage, m.lead, m.lag, m.source].forEach((v, i) => {
       const cell = document.createElement(i === 0 ? 'th' : 'td');
       if (i === 0) cell.scope = 'row';
       if (i === 3) cell.className = 'source';
@@ -538,7 +539,7 @@ function briefMarkdown(b) {
   L.push('');
   L.push('| Stage | Leading | Lagging | Source |');
   L.push('| --- | --- | --- | --- |');
-  b.metrics.forEach(m => L.push(`| ${m.stage} | ${m.lead} | ${m.lag} | ${m.source} |`));
+  b.metrics.forEach(m => L.push(`| ${m.goal ? m.stage + ' (your goal)' : m.stage} | ${m.lead} | ${m.lag} | ${m.source} |`));
   L.push('');
   L.push('## Failure patterns to watch');
   b.risks.forEach(r => { L.push(''); L.push(`**${r.title}.** ${r.body}`); });

@@ -111,9 +111,15 @@ const COMPANY_PHASES = [
     title: 'Make the work legible',
     weeks: [1, 3],
     goal: 'Stop losing the raw material. Nothing else here works until the record exists.',
-    nodeIds: ['rec-artifacts', 'rec-meetings', 'rec-channels', 'artifact-home', 'claude-md',
+    nodeIds: ['rec-artifacts', 'rec-meetings', 'rec-channels', 'artifact-home', 'agents-md',
               'brain-decisions', 'gate-spend', 'brain-retention', 'tool-meetings', 'tool-knowledge'],
-    proof: 'Every recurring meeting is transcribed and filed, decisions leave a written record, and an idea from a non-engineer reaches a committed intent file the same day.'
+    proof: 'Every recurring meeting is transcribed and filed, decisions leave a written record, and an idea from a non-engineer reaches a committed intent file the same day.',
+    track: {
+      ops: { proof: 'Every recurring meeting is transcribed and filed, decisions leave a written record, and each recurring task you want to hand to AI is written down step by step.' },
+      explore: { title: 'Capture every conversation',
+        goal: 'Before building anything, stop losing what customers tell you. Every interview and call is recorded, summarised and filed.',
+        proof: 'Every customer conversation leaves a written summary, and you can count how many people described the same problem.' }
+    }
   },
   {
     id: 'first-loop',
@@ -122,7 +128,13 @@ const COMPANY_PHASES = [
     goal: 'One function, one named owner, one written policy, one measured outcome. Depth beats breadth here.',
     nodeIds: ['gate-dri', 'loop-support', 'loop-ops', 'loop-delivery', 'originator', 'intent-capture',
               'product-owner', 'feedback-loop', 'gate-adversary', 'spend-limit'],
-    proof: 'One loop produces real output daily, a second model checks it before it leaves, and you can name the metric it moved.'
+    proof: 'One loop produces real output daily, a second model checks it before it leaves, and you can name the metric it moved.',
+    track: {
+      ops: { proof: 'One recurring procedure runs with AI every day or week, a second check reviews the output before it leaves, and you can name the hours or cost it saved.' },
+      explore: { title: 'Run one learning loop end to end',
+        goal: 'One question, one owner, one test, one measured answer. Depth beats breadth here.',
+        proof: 'You have a written assumption, the evidence for and against it, and a decision on what to test next.' }
+    }
   },
   {
     id: 'shape',
@@ -131,16 +143,30 @@ const COMPANY_PHASES = [
     goal: 'Nothing gets implemented without a written plan a stranger could execute.',
     nodeIds: ['spec-agent', 'plan-agent', 'orchestrator', 'delivery-partner', 'implementer',
               'test-first', 'ops-agent', 'branch-protection', 'tool-source-control', 'tool-agent-ide', 'tool-pm'],
-    proof: 'Every merged change has a plan that matches it, and first-pass merge rate is climbing.'
+    proof: 'Every merged change has a plan that matches it, and first-pass merge rate is climbing.',
+    track: {
+      ops: { title: 'Write the procedure before automating it',
+        goal: 'No task is handed to AI until a written procedure says what good output looks like and when to stop and ask.',
+        proof: 'Each automated task has a procedure a new hire could follow, and the share of outputs accepted without rework is climbing.' },
+      explore: { title: 'Write the brief before the prototype',
+        goal: 'Nothing gets built, not even a throwaway prototype, without a short written brief of what it must prove.',
+        proof: 'Every prototype has a brief saying what it tests, and each round of testing ends with a written result.' }
+    }
   },
   {
     id: 'policy',
     title: 'Encode policy, then enforce it',
     weeks: [5, 9],
     goal: 'Standards become files the agents read and checks they cannot talk past.',
-    nodeIds: ['skills', 'hooks', 'review-md', 'test-lock', 'verifier-subagent', 'visual-check',
+    nodeIds: ['skills', 'hooks', 'review-md', 'test-lock', 'verifier-agent', 'visual-check',
               'gate-policy', 'legacy-bridge', 'policy-owner', 'idx-permissions'],
-    proof: 'Review findings that cite a written policy fall towards zero, because the policy is applied while the work is done.'
+    proof: 'Review findings that cite a written policy fall towards zero, because the policy is applied while the work is done.',
+    track: {
+      ops: { title: 'Turn the rules into checks',
+        goal: 'Spending limits, data rules and approval thresholds become automatic checks the AI cannot skip.',
+        proof: 'More exceptions are caught by a rule than by a person reading the output, and the share keeps rising.' },
+      explore: { goal: 'The few rules that matter from day one, such as what data you keep and what you may promise, become files the AI reads.' }
+    }
   },
   {
     id: 'canon',
@@ -149,7 +175,12 @@ const COMPANY_PHASES = [
     goal: 'Turn the growing pile of transcripts and artifacts into the short documents every session reads.',
     nodeIds: ['idx-store', 'store-index', 'store-canon', 'brain-index', 'brain-canon', 'brain-context',
               'dis-nightly', 'dis-weekly', 'gate-canon', 'srv-context', 'srv-connectors', 'tool-warehouse'],
-    proof: 'An agent answers a question from the indexed record with sources, and the canon is edited by diff rather than rewritten from memory.'
+    proof: 'An agent answers a question from the indexed record with sources, and the canon is edited by diff rather than rewritten from memory.',
+    track: {
+      explore: { title: 'Turn the evidence into a playbook',
+        goal: 'Distill interviews and test results into the short documents every session reads: the problem, the customer, and what you have learned.',
+        proof: 'An agent answers "what have customers told us about this?" from the record, with sources.' }
+    }
   },
   {
     id: 'review',
@@ -158,7 +189,12 @@ const COMPANY_PHASES = [
     goal: 'Identical review passes on everything, with human attention on intent and risk.',
     nodeIds: ['review-bugs', 'review-security', 'review-compliance', 'code-owner', 'prod-gate',
               'chat-responder', 'postmortem', 'learn-eval', 'act-comms', 'tool-support'],
-    proof: 'Time to first review is minutes, and defects caught before merge exceed those escaping to customers.'
+    proof: 'Time to first review is minutes, and defects caught before merge exceed those escaping to customers.',
+    track: {
+      ops: { title: 'Keep one human sign-off',
+        goal: 'Automatic checks on every output, with human attention on exceptions, money and customers.',
+        proof: 'Signing off an AI output takes minutes, and errors caught before they reach a customer or the books exceed those that escape.' }
+    }
   },
   {
     id: 'scale',
@@ -168,7 +204,10 @@ const COMPANY_PHASES = [
     nodeIds: ['loop-demand', 'loop-revenue', 'loop-leadership', 'loop-hiring', 'sig-market',
               'parallel-fleet', 'knowledge-curator', 'eval-suite', 'ci-judgment', 'permissions',
               'release-auth', 'rollback', 'use-gtm', 'use-support', 'tool-crm', 'tool-analytics'],
-    proof: 'More than one function runs a measured loop, and concurrent delivery streams rise while rework holds flat.'
+    proof: 'More than one function runs a measured loop, and concurrent delivery streams rise while rework holds flat.',
+    track: {
+      ops: { proof: 'More than one function runs a measured loop, and hours spent on routine work keep falling without quality slipping.' }
+    }
   },
   {
     id: 'autonomy',
@@ -178,7 +217,11 @@ const COMPANY_PHASES = [
     nodeIds: ['control-bands', 'diagnosis-agent', 'service-owner', 'security-scan', 'telemetry-loop',
               'support-signal', 'learning-agent', 'learn-distill', 'learn-measure', 'learn-review',
               'gate-canon-eval', 'imp-selffix', 'imp-experiment', 'imp-feed', 'dis-monthly', 'srv-retrieval'],
-    proof: 'A threshold breach becomes a triaged finding in minutes without anyone starting it, and the monthly review can say which loop earned its tokens.'
+    proof: 'A threshold breach becomes a triaged finding in minutes without anyone starting it, and the monthly review can say which loop earned its tokens.',
+    track: {
+      ops: { goal: 'Set triggers start AI tasks with no person in the path, and exceptions come back as fixes to the procedure.',
+        proof: 'A missed threshold or failed task becomes a flagged exception within minutes without anyone starting it, and the monthly review can say which loop earned its cost.' }
+    }
   }
 ];
 
@@ -228,6 +271,34 @@ const COMPANY_RISKS = [
   }
 ];
 
+/* The wording of a phase changes with the kind of plan, the goal and the sector, so two
+   businesses that share a phase do not read the same sentence for different work. */
+function phaseWording(p, c, track, focus, position) {
+  const t = (p.track && p.track[track]) || {};
+  let goal = t.goal || p.goal;
+  if (p.id === 'record' && (has(c, 'regulated') || industryRegulated(c))) {
+    goal += ' In your sector, agree what is kept, for how long and who may see it before recording starts.';
+  }
+  if (p.id === 'first-loop' && focus) {
+    goal += ` For your goal, the loop to start with is "${focus.node.title}".`;
+  }
+  if (position === 0 && c.org === 'solo') {
+    goal += ' Working alone, keep this to what you can set up in a few evenings.';
+  }
+  return { title: localize(t.title || p.title, c), goal: localize(goal, c), proof: localize(t.proof || p.proof, c) };
+}
+
+/* A part in this business's words: the sector's name for its customers and its own
+   routine work, and a prompt that opens with who it is working for. The knowledge base
+   stays generic; only the copy handed to the views is rewritten. */
+const LOCAL_FIELDS = ['title', 'subtitle', 'purpose', 'why', 'responsibility', 'enforces', 'role', 'emits'];
+function localizeNode(n, c) {
+  const out = { ...n };
+  LOCAL_FIELDS.forEach(f => { if (typeof n[f] === 'string') out[f] = localize(n[f], c); });
+  if (typeof n.prompt === 'string') out.prompt = promptContext(c) + ' ' + localize(n.prompt, c);
+  return out;
+}
+
 /* Wraps the delivery-only blueprint with the company-level views and content. */
 function buildFullBlueprint(c) {
   const base = buildBlueprint(c);
@@ -238,17 +309,23 @@ function buildFullBlueprint(c) {
     stack: buildStackView(c, tier),
     improve: buildImproveView(c, tier)
   };
+  Object.values(views).forEach(v => { v.nodes = v.nodes.map(n => localizeNode(n, c)); });
   const index = indexViews(views);
+  /* The goal's starting part, or the nearest stand-in these answers actually include. */
+  const want = GOAL_FOCUS[c.goal];
+  const focusId = [want.node, ...(want.alt || [])].find(id => index.has(id)) || want.node;
 
   const w = governanceWeight(c);
   const teamDrag = eng(c) >= 15 ? 1.2 : eng(c) === 0 ? 1.15 : 1;
   let cursor = 1;
   const phases = [];
+  const track = planTrack(c);
+  const focus = index.get(focusId);
   for (const p of COMPANY_PHASES) {
     const items = p.nodeIds.filter(id => index.has(id));
     if (!items.length) continue;
     const span = Math.max(1, Math.round((p.weeks[1] - p.weeks[0] + 1) * w * teamDrag));
-    phases.push({ ...p, items, start: cursor, end: cursor + span - 1 });
+    phases.push({ ...p, ...phaseWording(p, c, track, focus, phases.length), items, start: cursor, end: cursor + span - 1 });
     cursor += Math.max(1, Math.round(span * 0.6));
   }
 
@@ -263,8 +340,12 @@ function buildFullBlueprint(c) {
   return {
     ...base,
     views, index, phases, counts,
-    metrics: [...base.metrics, ...COMPANY_METRICS.filter(m => m.minTier <= tier)],
-    risks: [...COMPANY_RISKS.filter(r => r.when(c, tier)), ...base.risks],
+    focus: { ...want, node: focusId, line: localize(want.line, c) },
+    metrics: [...base.metrics, ...COMPANY_METRICS.filter(m => m.minTier <= tier)]
+      .map(m => ({ ...m, lead: localize(m.lead, c), lag: localize(m.lag, c) })),
+    risks: [...COMPANY_RISKS.filter(r => r.when(c, tier)), ...base.risks]
+      .map(r => ({ ...r, title: localize(r.title, c), body: localize(r.body, c) })),
+    stageNote: localize(base.stageNote, c),
     horizon: phases.length ? Math.max(...phases.map(p => p.end)) : 0
   };
 }

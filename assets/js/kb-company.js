@@ -122,7 +122,7 @@ const COMPANY_NODES = [
     subtitle: 'reconcile, chase, report, file',
     after: ['sig-revenue'],
     tools: ['finance', 'automation', 'knowledge'],
-    purpose: 'The recurring procedures nobody wants to own: reconciliation, invoice chasing, the monthly pack, exception handling, each run against a written procedure with a human on the exceptions only.',
+    purpose: 'The recurring procedures nobody wants to own, such as {work}, each run against a written procedure with a human on the exceptions only.',
     why: 'For a business whose product is not software, this is where the first real money is, and it needs connectors and a written procedure rather than a repository.',
     prompt: 'Run this documented procedure for the current period. Produce the output in the same format as last period. List every row where you made a judgment call, with the rule you applied. Stop and ask rather than guessing on anything involving money moving, a customer commitment, or personal data.',
     out: ['records', 'pack']
@@ -281,7 +281,7 @@ const COMPANY_NODES = [
   },
   {
     id: 'brain-context', lane: 'spine', kind: 'artifact', title: 'Agent context files',
-    subtitle: 'CLAUDE.md, skills, role briefs',
+    subtitle: 'AGENTS.md or CLAUDE.md, skills, role briefs',
     purpose: 'The per-repository and per-function instructions the agents load at the start of every session, versioned and reviewed like code.',
     why: 'This is where the canon becomes operational. A policy nobody loads is a policy nobody follows.'
   },
@@ -475,6 +475,7 @@ const TOOL_CATEGORIES = [
     role: 'Holds the code and, in this blueprint, the artifact chain and the agent context files beside it.',
     emits: 'Commits, pull requests, review threads, timestamps. The audit trail of who asked for what and who approved it.',
     collection: 'col-api',
+    when: c => writesSoftware(c),
     options: [
       { name: 'GitHub', note: 'Largest agent and action ecosystem', fit: c => 3 },
       { name: 'GitLab', note: 'Self-managed option when the repository cannot leave your network', fit: c => (has(c, 'regulated') ? 3 : 1) },
@@ -484,16 +485,31 @@ const TOOL_CATEGORIES = [
   },
   {
     id: 'agent-ide', label: 'Coding agents', lane: 'sources',
-    role: 'Where engineers and agents do the delivery work. Expect to run more than one and to change your mind.',
+    role: 'Where engineers and agents do the delivery work. No single vendor is the answer: most teams run two, keep one shared instructions file (AGENTS.md) that every agent reads, and expect to change their mind.',
     emits: 'Session traces, token spend, tool calls. The raw material for improving the agents themselves.',
     collection: 'col-api',
+    when: c => writesSoftware(c),
     options: [
-      { name: 'Claude Code', note: 'Terminal and CI agent, hooks and skills for policy as code', fit: c => 3 },
-      { name: 'Cursor', note: 'Editor-first, strong for engineers who want an IDE loop', fit: c => 2 },
-      { name: 'Codex CLI', note: 'Terminal agent, alternative model family', fit: c => 1 },
-      { name: 'Antigravity', note: 'Agent-first IDE, newer and moving fast', fit: c => 1 },
-      { name: 'OpenCode', note: 'Open source, model-agnostic, self-hostable', fit: c => (has(c, 'regulated') ? 2 : 0) },
-      { name: 'GitHub Copilot', note: 'Where procurement is already through GitHub', fit: c => (c.stage === 'enterprise' ? 1 : 0) }
+      { name: 'Cursor', note: 'Editor-first, strong for small teams who want an IDE loop', fit: c => (['solo', 'startup'].includes(c.stage) ? 3 : 1) },
+      { name: 'Claude Code', note: 'Terminal and CI agent, hooks and skills for policy as code', fit: c => (['growth', 'smb'].includes(c.stage) ? 3 : 2) },
+      { name: 'GitHub Copilot', note: 'Where procurement and code already live with GitHub or Microsoft', fit: c => (c.stage === 'enterprise' ? 3 : 1) },
+      { name: 'OpenAI Codex', note: 'Terminal and cloud agent from another model family', fit: c => 2 },
+      { name: 'Gemini CLI', note: 'Terminal agent, a natural fit where the company runs on Google Cloud', fit: c => 1 },
+      { name: 'OpenCode', note: 'Open source, model-agnostic, self-hostable', fit: c => (has(c, 'regulated') ? 3 : 0) },
+      { name: 'Antigravity', note: 'Agent-first IDE, newer and moving fast', fit: c => 1 }
+    ]
+  },
+  {
+    id: 'assistant', label: 'AI assistant for everyone', lane: 'sources',
+    role: 'The everyday assistant every person in the business uses for writing, research and analysis. Pick the one that sits inside the office suite you already run, and connect it to the shared record.',
+    emits: 'Conversations, drafts and the questions people actually ask. A signal of where the written context is missing.',
+    collection: 'col-mcp',
+    options: [
+      { name: 'Microsoft 365 Copilot', note: 'Where email, documents and chat already live in Microsoft 365', fit: c => (c.stage === 'enterprise' ? 3 : c.stage === 'smb' ? 2 : 0) },
+      { name: 'Gemini in Google Workspace', note: 'Where email, documents and chat already live in Google Workspace', fit: c => (['solo', 'smb'].includes(c.stage) ? 3 : 1) },
+      { name: 'ChatGPT Business or Enterprise', note: 'Broad general assistant with admin controls and connectors', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 2) },
+      { name: 'Claude for Work', note: 'Strong on long documents and writing, with connectors to your tools', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 2) },
+      { name: 'A self-hosted open model', note: 'Where data may not leave your own infrastructure', fit: c => (has(c, 'regulated') && c.stage === 'enterprise' ? 3 : 0) }
     ]
   },
   {
@@ -532,7 +548,7 @@ const TOOL_CATEGORIES = [
     options: [
       { name: 'Figma', note: 'Design system of record, with agent access to files and components', fit: c => 3 },
       { name: 'Lovable', note: 'Prompt to working web prototype, good for testing a flow with users', fit: c => (!inMarket(c) ? 3 : ['solo', 'startup'].includes(c.stage) ? 2 : 1) },
-      { name: 'Claude artifacts or Claude Design', note: 'Mock straight from the intent file, iterated in the same session', fit: c => 2 },
+      { name: 'A general AI assistant (ChatGPT, Claude, Gemini)', note: 'Mock straight from the brief in a chat, iterated in the same conversation', fit: c => 2 },
       { name: 'v0', note: 'Component-level generation against a design system', fit: c => 1 },
       { name: 'Google AI Studio', note: 'Fast multimodal prototyping and model comparison', fit: c => (c.domain === 'data-ai' ? 2 : 0) }
     ]
@@ -556,7 +572,7 @@ const TOOL_CATEGORIES = [
     role: 'Every customer conversation in one queryable place, tagged by underlying cause.',
     emits: 'Conversations, resolution time, cause tags. The richest product signal you own.',
     collection: 'col-webhook',
-    when: c => c.domain !== 'internal-ops',
+    when: c => !preProduct(c) && c.domain !== 'internal-ops',
     options: [
       { name: 'Intercom', note: 'Conversations plus help centre, strong API', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 1) },
       { name: 'Zendesk', note: 'Where support is a larger organised function', fit: c => (c.stage === 'enterprise' || c.stage === 'smb' ? 2 : 1) },
@@ -593,7 +609,7 @@ const TOOL_CATEGORIES = [
     role: 'Behavioural events and funnels. The outcome signal for anything customer-facing.',
     emits: 'Events, funnels, retention, session replays.',
     collection: 'col-warehouse',
-    when: c => c.domain !== 'services',
+    when: c => !preProduct(c) && !['services', 'internal-ops'].includes(c.domain),
     options: [
       { name: 'PostHog', note: 'Events, replay and flags together, self-hostable', fit: c => (['startup', 'growth', 'solo'].includes(c.stage) ? 3 : 1) },
       { name: 'Amplitude or Mixpanel', note: 'Deeper behavioural analysis for a larger product org', fit: c => (c.stage === 'enterprise' || c.stage === 'growth' ? 2 : 0) },
@@ -617,7 +633,7 @@ const TOOL_CATEGORIES = [
     role: 'Errors, slow response times and release health. The signal that automatic safety thresholds watch.',
     emits: 'Error rates, traces, deploy markers, alerts.',
     collection: 'col-webhook',
-    when: (c, t) => t >= 2,
+    when: (c, t) => !preProduct(c) && t >= 2,
     options: [
       { name: 'Sentry', note: 'Errors and releases, quick to wire up', fit: c => (['startup', 'growth', 'solo'].includes(c.stage) ? 3 : 1) },
       { name: 'Datadog', note: 'Broad coverage where operations is a funded function', fit: c => (c.stage === 'enterprise' ? 3 : 0) },
@@ -629,7 +645,7 @@ const TOOL_CATEGORIES = [
     role: 'Where non-interactive agents run: review passes, evals, scheduled loops, deploys.',
     emits: 'Run outcomes, durations, failure logs, deployment records.',
     collection: 'col-api',
-    when: c => !has(c, 'no-ci'),
+    when: c => !preProduct(c) && (!has(c, 'no-ci') && writesSoftware(c)),
     options: [
       { name: 'GitHub Actions', note: 'Same place as the code, simplest path to scheduled agent jobs', fit: c => 3 },
       { name: 'GitLab CI', note: 'Where the repository is GitLab', fit: c => (has(c, 'regulated') ? 2 : 0) },
@@ -676,7 +692,7 @@ const TOOL_CATEGORIES = [
     role: 'Revenue events and the ledger. The outcome signal that is hardest to argue with.',
     emits: 'Charges, churn, margin, spend including your own AI spend.',
     collection: 'col-api',
-    when: c => c.domain !== 'internal-ops' || c.stage === 'smb',
+    when: c => !preProduct(c) && (c.domain !== 'internal-ops' || c.stage === 'smb'),
     options: [
       { name: 'Stripe', note: 'Billing events as a first-class data source', fit: c => (c.domain === 'saas' || c.domain === 'ecommerce' ? 3 : 1) },
       { name: 'QuickBooks or Xero', note: 'The ledger most small and medium businesses already run', fit: c => (c.stage === 'smb' ? 3 : 1) },

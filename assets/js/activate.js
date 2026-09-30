@@ -16,8 +16,8 @@ function activationRoster(blueprint) {
   const index = blueprint.index;
   const hubId = HUB_IDS.find(id => index.has(id)) || null;
   return {
-    agents: resolveSlots(AGENT_SLOTS, index, 5),
-    humans: resolveSlots(HUMAN_SLOTS, index, 3),
+    agents: resolveSlots(AGENT_SLOTS, index, 5, blueprint.answers),
+    humans: resolveSlots(HUMAN_SLOTS, index, 3, blueprint.answers),
     hub: hubId ? { nodeId: hubId, node: index.get(hubId).node } : null
   };
 }
@@ -57,16 +57,29 @@ function approvalCount(blueprint) {
   return seen.size;
 }
 
+/* Who owns the rollout depends on who the business is. */
+const OWNER_LINE = {
+  solo: 'You own this, so the risk is not a committee but a calendar. Block two fixed hours a ' +
+    'week for it now; a plan with no time set aside is the first thing a solo founder drops.',
+  startup: 'One founder or lead owns this rollout and is allowed to stop it. Shared ownership ' +
+    'between co-founders is how it slips behind the next fundraise or launch.',
+  growth: 'One named lead owns this rollout and is allowed to stop it, with time taken off ' +
+    'their other work to do it. A group that agrees in principle owns nothing.',
+  smb: 'One person, usually the owner or the operations lead, owns this rollout and is allowed ' +
+    'to stop it. If it is everybody\'s side job it becomes nobody\'s, and the routine work wins.',
+  enterprise: 'An executive sponsor clears the path; one named owner below them runs it day to ' +
+    'day and is allowed to stop it. A steering group that agrees in principle owns nothing, and ' +
+    'this is the failure that kills the most of these plans before week three.'
+};
+
 function activationSteps(blueprint) {
   const firstPhase = blueprint.phases[0];
   const focusEntry = blueprint.index.get(blueprint.focus.node);
   const leading = (blueprint.metrics.find(m => m.lead) || {});
   return [
     {
-      title: 'Put one name on it',
-      body: 'One person owns this rollout and is allowed to stop it. A group that agrees in ' +
-        'principle owns nothing, and this is the failure that kills the most of these plans ' +
-        'before week three.'
+      title: blueprint.answers.org === 'solo' ? 'Protect the time' : 'Put one name on it',
+      body: OWNER_LINE[blueprint.answers.stage] || OWNER_LINE.startup
     },
     {
       title: 'Start where it pays',
