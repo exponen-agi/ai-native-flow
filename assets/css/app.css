@@ -261,6 +261,184 @@ h1, h2, h3 {
 .step-t { font-family: var(--display); font-size: 14.5px; font-weight: 600; color: var(--ink); }
 .step-d { font-size: 13px; color: var(--ink-3); line-height: 1.45; }
 
+/* ---------------------------------------------------------------- topbar */
+/* A plain bar above the hero. It carries the repository link so it is findable
+   before anyone scrolls, and it scrolls away with the page. */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+.topbar-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; min-height: 48px;
+}
+.brand {
+  font: 600 13px/1.2 var(--display);
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.gh-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 500 13.5px/1.2 var(--body);
+  color: var(--ink); text-decoration: none;
+  padding: 7px 12px; border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  white-space: nowrap;
+}
+.gh-link:hover { border-color: var(--ink-3); }
+.gh-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.gh-mark { flex: none; }
+@media (max-width: 420px) {
+  .brand { font-size: 11.5px; }
+  .topbar .gh-link { padding: 6px 10px; }
+}
+
+/* ------------------------------------------------------------- hero flow */
+/* The page's idea in one strip: a piece of work passing through AI steps, a rule,
+   and a person, then feeding back. It uses the same role hues as the diagram
+   legend, so the plan below reads as a bigger version of this. Pure CSS: one
+   shared cycle, each stage offset by its --i, so there is nothing to load and
+   nothing runs when motion is reduced. */
+.hero-flow-wrap { padding-bottom: 30px; }
+.hero-flow {
+  --cycle: 7s;
+  --step: 1.2s;
+  margin: 0;
+  padding: 16px 18px 14px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.hero-flow-cap {
+  font: 600 11.5px/1.3 var(--display);
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 12px;
+}
+.flow-track {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; align-items: stretch;
+}
+.flow-node {
+  --c: var(--artifact); --c-soft: var(--artifact-soft);
+  flex: 1 1 0; min-width: 0;
+  display: grid; align-content: start; gap: 2px;
+  padding: 10px 12px 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  position: relative;
+  animation: flow-node var(--cycle) linear infinite;
+  animation-delay: calc(var(--i) * var(--step));
+}
+.flow-node::before {
+  content: ""; position: absolute; left: 0; top: 9px; bottom: 9px;
+  width: 3px; border-radius: 0 3px 3px 0; background: var(--c);
+}
+.flow-node.kind-system   { --c: var(--system);   --c-soft: var(--system-soft); }
+.flow-node.kind-ai       { --c: var(--ai);       --c-soft: var(--ai-soft); }
+.flow-node.kind-gate     { --c: var(--gate);     --c-soft: var(--gate-soft); }
+.flow-node.kind-human    { --c: var(--human);    --c-soft: var(--human-soft); }
+.flow-node.kind-artifact { --c: var(--artifact); --c-soft: var(--artifact-soft); }
+.flow-t { font: 600 13.5px/1.25 var(--display); color: var(--ink); }
+.flow-d { font-size: 12.5px; line-height: 1.35; color: var(--ink-3); }
+
+.flow-link {
+  flex: 0 0 26px;
+  position: relative;
+  align-self: center; height: 10px;
+}
+.flow-link::before {
+  content: ""; position: absolute; left: 3px; right: 3px; top: 50%;
+  border-top: 1.5px dashed var(--rule);
+}
+.flow-dot {
+  position: absolute; top: 50%; left: 0;
+  width: 8px; height: 8px; margin-top: -4px; border-radius: 50%;
+  background: var(--ink);
+  opacity: 0;
+  animation: flow-dot-x var(--cycle) linear infinite;
+  animation-delay: calc(var(--i) * var(--step) + var(--step) * .55);
+}
+
+.flow-return {
+  display: flex; align-items: center; gap: 10px;
+  margin: 12px 0 0;
+  font-size: 12.5px; color: var(--ink-3);
+}
+.flow-return-line {
+  position: relative; flex: 0 0 120px; height: 10px;
+}
+.flow-return-line::before {
+  content: ""; position: absolute; left: 6px; right: 0; top: 50%;
+  border-top: 1.5px dashed var(--rule);
+}
+.flow-return-line::after {  /* arrowhead pointing back to the start */
+  content: ""; position: absolute; left: 0; top: 50%;
+  width: 7px; height: 7px; margin-top: -3.5px;
+  border-left: 1.5px solid var(--ink-3); border-bottom: 1.5px solid var(--ink-3);
+  transform: rotate(45deg);
+}
+.flow-return .flow-dot {
+  background: var(--ai);
+  animation-name: flow-dot-back;
+  animation-delay: calc(5 * var(--step));
+}
+
+/* A stage lights up in its role hue for one step of the cycle, then settles. */
+@keyframes flow-node {
+  0%       { background: var(--surface); border-color: var(--rule); transform: none; }
+  3%, 14%  { background: var(--c-soft);  border-color: var(--c);    transform: translateY(-2px); }
+  20%,100% { background: var(--surface); border-color: var(--rule); transform: none; }
+}
+@keyframes flow-dot-x {
+  0%       { left: 0; opacity: 0; }
+  1%       { opacity: 1; }
+  8%       { left: calc(100% - 8px); opacity: 1; }
+  9%, 100% { left: calc(100% - 8px); opacity: 0; }
+}
+@keyframes flow-dot-back {
+  0%        { left: calc(100% - 8px); opacity: 0; }
+  1%        { opacity: 1; }
+  16%       { left: 0; opacity: 1; }
+  18%, 100% { left: 0; opacity: 0; }
+}
+@keyframes flow-dot-y {
+  0%       { top: 0; opacity: 0; }
+  1%       { opacity: 1; }
+  8%       { top: 100%; opacity: 1; }
+  9%, 100% { top: 100%; opacity: 0; }
+}
+
+/* On a narrow screen five cards side by side would be unreadable, so the strip
+   turns into a column and the work travels down it instead of across. */
+@media (max-width: 760px) {
+  .hero-flow { padding: 14px 14px 12px; }
+  .flow-track { flex-direction: column; }
+  .flow-node { flex: none; padding: 8px 12px 8px 14px; }
+  .flow-node::before { top: 7px; bottom: 7px; }
+  .flow-link { flex: 0 0 14px; align-self: stretch; height: auto; }
+  .flow-link::before {
+    left: 22px; right: auto; top: 2px; bottom: 2px;
+    border-top: 0; border-left: 1.5px dashed var(--rule);
+  }
+  .flow-link .flow-dot {
+    left: 18.5px; top: 0; margin-top: -4px;
+    animation-name: flow-dot-y;
+  }
+  .flow-return { align-items: flex-start; }
+  .flow-return-line { flex-basis: 48px; margin-top: 4px; }
+}
+@media (max-width: 600px) {
+  .hero-flow-wrap { padding-bottom: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-node { animation: none; }
+  .flow-dot { display: none; }
+}
+
 /* ---------------------------------------------------------------- panels */
 main {
   padding-block: 18px 40px;
@@ -1419,6 +1597,19 @@ body.peek-open { overflow: hidden; }
   .peek, .peek-backdrop, .return-pill { transition: none; }
 }
 
+/* ---------------------------------------------------------------- footer */
+.site-foot {
+  border-top: 1px solid var(--rule);
+  background: var(--surface);
+  margin-top: 24px;
+}
+.site-foot-inner {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 12px 24px; padding-block: 22px;
+}
+.site-foot p { margin: 0; font-size: 13.5px; color: var(--ink-2); max-width: 70ch; }
+.site-foot .gh-link { white-space: normal; overflow-wrap: anywhere; }
+
 @media print {
   body { background: #fff; }
   .intake, .tabs, .actions, .skip, .legend, .legend-row, .graph-hint, .btn, .blob, .steps { display: none; }
@@ -1429,5 +1620,6 @@ body.peek-open { overflow: hidden; }
   .graph-scroll { overflow: visible; }
   .workbench .detail { position: static; max-height: none; }
   .tracker, .activate-card, .mini-btn { display: none; }
+  .topbar, .hero-flow-wrap, .site-foot { display: none; }
   .peek, .peek-backdrop, .return-pill { display: none !important; }
 }
