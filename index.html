@@ -50,21 +50,51 @@
       </li>
     </ol>
   </div>
-  <div class="wrap hero-flow-wrap">
-    <figure class="hero-flow" aria-labelledby="hero-flow-cap">
-      <figcaption id="hero-flow-cap" class="hero-flow-cap">How a piece of work moves once the plan is running</figcaption>
-      <ol class="flow-track">
-        <li class="flow-node kind-system" style="--i:0"><span class="flow-t">Work comes in</span><span class="flow-d">An order, a request, an invoice</span></li>
-        <li class="flow-link" style="--i:0" aria-hidden="true"><span class="flow-dot"></span></li>
-        <li class="flow-node kind-ai" style="--i:1"><span class="flow-t">AI sorts and drafts</span><span class="flow-d">Reading your playbook first</span></li>
-        <li class="flow-link" style="--i:1" aria-hidden="true"><span class="flow-dot"></span></li>
-        <li class="flow-node kind-gate" style="--i:2"><span class="flow-t">Checked against your rules</span><span class="flow-d">A fixed rule or a second AI</span></li>
-        <li class="flow-link" style="--i:2" aria-hidden="true"><span class="flow-dot"></span></li>
-        <li class="flow-node kind-human" style="--i:3"><span class="flow-t">A person decides</span><span class="flow-d">Where judgement matters</span></li>
-        <li class="flow-link" style="--i:3" aria-hidden="true"><span class="flow-dot"></span></li>
-        <li class="flow-node kind-artifact" style="--i:4"><span class="flow-t">Done and recorded</span><span class="flow-d">Sent, filed, logged</span></li>
-      </ol>
-      <p class="flow-return"><span class="flow-return-line" aria-hidden="true"><span class="flow-dot"></span></span><span class="flow-return-t">Each decision is written back, so the AI steps get it right more often next time.</span></p>
+  <div class="wrap why-flow-wrap">
+    <figure class="why-flow" aria-labelledby="why-flow-cap">
+      <figcaption id="why-flow-cap" class="why-cap">
+        <span class="why-eyebrow">Why the flow matters more than the tool</span>
+        <span class="why-title">Speeding up one step barely speeds up the business.</span>
+      </figcaption>
+      <div class="why-lanes">
+        <div class="why-lane">
+          <p class="why-lane-t"><span class="why-tag">Common</span>Add AI to one step</p>
+          <div class="why-row">
+            <div class="why-bar" aria-hidden="true" style="--gaps:10px">
+              <span class="why-seg s-person" style="--from:0.1333;--to:0.1333" title="Plan"></span>
+              <span class="why-seg s-ai" style="--from:0.4000;--to:0.0667" title="Do the work"></span>
+              <span class="why-seg s-wait" style="--from:0.0000;--to:0.2667" title="Waiting in a queue"></span>
+              <span class="why-seg s-person" style="--from:0.2000;--to:0.2000" title="Check"></span>
+              <span class="why-seg s-person" style="--from:0.1333;--to:0.1333" title="Sign off"></span>
+              <span class="why-seg s-person" style="--from:0.1333;--to:0.1333" title="Deliver"></span>
+            </div>
+            <p class="why-total"><span class="sr">From 15 days to 14 days</span><span class="t-before" aria-hidden="true">15 days</span><span class="t-after" aria-hidden="true">14 days</span></p>
+          </div>
+          <p class="why-note">The work itself gets six times faster, then waits in a queue for the same people to check and sign it off.</p>
+        </div>
+        <div class="why-lane is-native">
+          <p class="why-lane-t"><span class="why-tag">AI-native</span>Redesign how the work moves</p>
+          <div class="why-row">
+            <div class="why-bar" aria-hidden="true" style="--gaps:8px">
+              <span class="why-saved">10 days back</span>
+              <span class="why-seg s-ai" style="--from:0.1333;--to:0.0667" title="Plan"></span>
+              <span class="why-seg s-ai" style="--from:0.4000;--to:0.0667" title="Do the work"></span>
+              <span class="why-seg s-ai" style="--from:0.2000;--to:0.0667" title="Check"></span>
+              <span class="why-seg s-decide" style="--from:0.1333;--to:0.0667" title="A person decides"></span>
+              <span class="why-seg s-ai" style="--from:0.1333;--to:0.0667" title="Deliver"></span>
+            </div>
+            <p class="why-total"><span class="sr">From 15 days to 5 days</span><span class="t-before" aria-hidden="true">15 days</span><span class="t-after" aria-hidden="true">5 days</span></p>
+          </div>
+          <p class="why-note">AI drafts and checks at every step. A person decides only where judgement matters, so nothing waits.</p>
+        </div>
+      </div>
+      <ul class="why-key" aria-hidden="true">
+        <li class="k-person">Done by a person</li>
+        <li class="k-ai">Done by AI</li>
+        <li class="k-wait">Waiting in a queue</li>
+        <li class="k-decide">A person decides</li>
+        <li class="k-note">Illustrative numbers for one piece of work</li>
+      </ul>
     </figure>
   </div>
 </section>
