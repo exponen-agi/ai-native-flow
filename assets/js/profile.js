@@ -189,7 +189,8 @@ function promptContext(c) {
   const t = industryTerms(c);
   const lower = w => w.charAt(0).toLowerCase() + w.slice(1);
   const org = c.org === 'solo' ? 'solo business' : lower(orgOf(c).short);
-  const who = `We are ${/^[aeiou]/.test(org) ? 'an' : 'a'} ${org} in ${lower(INDUSTRIES[c.industry].short)}.`;
+  const ind = INDUSTRIES[c.industry] || INDUSTRIES['other'];
+  const who = `We are ${/^[aeiou]/.test(org) ? 'an' : 'a'} ${org} in ${lower(ind.short)}.`;
   const guard = t.guard || (has(c, 'regulated') ? 'regulated and personal data stays in approved systems' : '');
   return guard ? `${who} Hard limit: ${guard}.` : who;
 }

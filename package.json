@@ -1,0 +1,21 @@
+{
+  "name": "ai-native-flow",
+  "version": "1.0.0",
+  "description": "Self-service blueprint generator for AI-native operations",
+  "private": true,
+  "scripts": {
+    "start": "npx --yes serve . -l 4321",
+    "dev": "npx --yes serve . -l 4321",
+    "build": "node scripts/validate.js",
+    "test": "node scripts/validate.js"
+  },
+  "keywords": [
+    "ai",
+    "operations",
+    "blueprint",
+    "flow",
+    "static-site"
+  ],
+  "author": "exponen-agi",
+  "license": "MIT"
+}

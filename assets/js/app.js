@@ -364,32 +364,381 @@ function renderPhases(b) {
   });
 }
 
+let currentMetricFilter = 'all';
+
 function renderMetrics(b) {
-  const mount = document.getElementById('metrics');
-  mount.innerHTML = '';
-  b.metrics.forEach(m => {
-    const tr = document.createElement('tr');
-    if (m.goal) tr.className = 'is-goal';
-    [m.goal ? `${m.stage} · your goal` : m.stage, m.lead, m.lag, m.source].forEach((v, i) => {
-      const cell = document.createElement(i === 0 ? 'th' : 'td');
-      if (i === 0) cell.scope = 'row';
-      if (i === 3) cell.className = 'source';
-      cell.textContent = v;
-      tr.appendChild(cell);
+  const sc = computeOutcomeScorecard(b);
+  
+  // 1. Render Executive Scorecard
+  const scoreMount = document.getElementById('measure-scorecard');
+  if (scoreMount) {
+    scoreMount.innerHTML = `
+      <div class="m-card">
+        <div class="m-card-top">
+          <span class="m-kpi-val">${sc.flowScore}<span class="m-denom">/100</span></span>
+          <span class="m-status-pill pill-auto">${sc.grade}</span>
+        </div>
+        <div class="m-kpi-lbl">Flow Automation &amp; Health Score</div>
+        <p class="m-kpi-sub">Calculated from ${b.counts ? b.counts.ai : 12} AI steps, ${b.counts ? b.counts.human : 5} human gates, and Tier ${b.tier} autonomy ceilings.</p>
+      </div>
+
+      <div class="m-card">
+        <div class="m-card-top">
+          <span class="m-kpi-val">${sc.velMult}</span>
+          <span class="m-status-pill pill-vel">${sc.cycleDrop} Faster</span>
+        </div>
+        <div class="m-kpi-lbl">Delivery Velocity Gain</div>
+        <p class="m-kpi-sub">Intent-to-production latency compressed from weeks to hours by eliminating manual handoff queues.</p>
+      </div>
+
+      <div class="m-card">
+        <div class="m-card-top">
+          <span class="m-kpi-val">${sc.reworkDrop}</span>
+          <span class="m-status-pill pill-shield">Pre-Merge Shield</span>
+        </div>
+        <div class="m-kpi-lbl">Defect &amp; Rework Reduction</div>
+        <p class="m-kpi-sub">Automated verification harnesses and adversarial checks catch defects before they escape to customers.</p>
+      </div>
+
+      <div class="m-card">
+        <div class="m-card-top">
+          <span class="m-kpi-val">${sc.totalWeeklyHrs}<span class="m-denom"> hrs/wk</span></span>
+          <span class="m-status-pill pill-roi">${sc.annualDollarsFormatted}/yr</span>
+        </div>
+        <div class="m-kpi-lbl">Team Capacity Returned</div>
+        <p class="m-kpi-sub">Estimated ${sc.hrsPerPerson} hrs/person/wk across ${sc.teamSize} contributor${sc.teamSize > 1 ? 's' : ''} on routine drafting, triage, and review.</p>
+      </div>
+    `;
+  }
+
+  // 2. Wire Metric Filters
+  const filterWrap = document.getElementById('measure-filters');
+  if (filterWrap && !filterWrap.dataset.bound) {
+    filterWrap.dataset.bound = 'true';
+    filterWrap.querySelectorAll('.m-filter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterWrap.querySelectorAll('.m-filter').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        currentMetricFilter = btn.dataset.filter || 'all';
+        applyMetricFilter(currentMetricFilter);
+      });
     });
-    mount.appendChild(tr);
+  }
+
+  // 3. Render Metric Table Rows
+  const tableMount = document.getElementById('metrics');
+  if (tableMount) {
+    tableMount.innerHTML = '';
+    b.metrics.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.className = `m-row ${m.goal ? 'is-goal-row' : ''}`;
+      tr.dataset.category = m.category || (m.track && m.track.includes('ops') ? 'operations' : 'delivery');
+      if (m.goal) tr.dataset.isGoal = 'true';
+
+      // Col 1: Stage
+      const tdStage = document.createElement('td');
+      tdStage.className = 'col-stage';
+      tdStage.innerHTML = `
+        <div class="m-stage-wrap">
+          <span class="m-stage-name">${m.stage}</span>
+          ${m.goal ? '<span class="m-goal-pill">North Star Goal</span>' : ''}
+          <span class="m-stage-sub">${m.category === 'operations' ? 'Operations' : m.category === 'governance' ? 'Governance' : 'Product & Delivery'}</span>
+        </div>
+      `;
+
+      // Col 2: Leading Indicator (Signal)
+      const tdLead = document.createElement('td');
+      tdLead.className = 'col-lead';
+      tdLead.innerHTML = `
+        <div class="m-metric-card is-lead">
+          <div class="m-card-hdr">
+            <span class="m-badge lead-badge">Leading Signal</span>
+            <span class="m-cadence">${m.leadCadence || 'Weekly'}</span>
+          </div>
+          <div class="m-title">${m.leadTitle || m.stage + ' Signal'}</div>
+          <div class="m-target lead-tgt"><span class="tgt-lbl">Target:</span> <strong>${m.leadTarget || 'Within weeks'}</strong></div>
+          <p class="m-desc">${m.leadDesc || m.lead}</p>
+          ${m.leadFormula ? `<div class="m-formula"><span class="formula-lbl">Calculation:</span> <code>${m.leadFormula}</code></div>` : ''}
+        </div>
+      `;
+
+      // Col 3: Lagging Indicator (Outcome)
+      const tdLag = document.createElement('td');
+      tdLag.className = 'col-lag';
+      tdLag.innerHTML = `
+        <div class="m-metric-card is-lag">
+          <div class="m-card-hdr">
+            <span class="m-badge lag-badge">Lagging Outcome</span>
+            <span class="m-cadence">${m.lagCadence || 'Quarterly'}</span>
+          </div>
+          <div class="m-title">${m.lagTitle || m.stage + ' Outcome'}</div>
+          <div class="m-target lag-tgt"><span class="tgt-lbl">Target:</span> <strong>${m.lagTarget || 'Quarterly settling'}</strong></div>
+          <p class="m-desc">${m.lagDesc || m.lag}</p>
+          ${m.lagFormula ? `<div class="m-formula"><span class="formula-lbl">Calculation:</span> <code>${m.lagFormula}</code></div>` : ''}
+        </div>
+      `;
+
+      // Col 4: Source
+      const tdSource = document.createElement('td');
+      tdSource.className = 'col-source';
+      tdSource.innerHTML = `
+        <div class="m-source-wrap">
+          <svg class="m-source-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          <span class="m-source-val">${m.source}</span>
+        </div>
+      `;
+
+      tr.appendChild(tdStage);
+      tr.appendChild(tdLead);
+      tr.appendChild(tdLag);
+      tr.appendChild(tdSource);
+      tableMount.appendChild(tr);
+    });
+
+    applyMetricFilter(currentMetricFilter);
+  }
+
+  // 4. Initialize Interactive Simulator
+  initMeasureCalculator(b, sc);
+}
+
+function applyMetricFilter(filter) {
+  const rows = document.querySelectorAll('#metrics tr.m-row');
+  rows.forEach(r => {
+    if (filter === 'all') {
+      r.hidden = false;
+    } else if (filter === 'goal') {
+      r.hidden = r.dataset.isGoal !== 'true';
+    } else if (filter === 'delivery') {
+      r.hidden = r.dataset.category !== 'delivery' && r.dataset.isGoal !== 'true';
+    } else if (filter === 'operations') {
+      r.hidden = r.dataset.category !== 'operations' && r.dataset.category !== 'governance';
+    }
   });
 }
 
+function initMeasureCalculator(b, sc) {
+  const teamInput = document.getElementById('calc-team-size');
+  const rateInput = document.getElementById('calc-hourly-rate');
+  const hoursInput = document.getElementById('calc-task-hours');
+  if (!teamInput || !rateInput || !hoursInput) return;
+
+  teamInput.value = sc.teamSize || 5;
+  rateInput.value = 75;
+  hoursInput.value = sc.hrsPerPerson || 12;
+
+  const update = () => {
+    const team = Math.max(1, parseInt(teamInput.value, 10) || 1);
+    const rate = Math.max(10, parseFloat(rateInput.value) || 75);
+    const hrs = Math.max(1, parseFloat(hoursInput.value) || 10);
+
+    const annualHrs = Math.round(team * hrs * 50);
+    const annualDollars = Math.round(annualHrs * rate);
+
+    const c = b.answers || {};
+    const bgtVal = typeof budget === 'function' ? budget(c) : 2;
+    const monthlyToolSpend = bgtVal === 1 ? 150 : bgtVal === 2 ? 800 : bgtVal === 3 ? 3500 : 12000;
+    const annualToolSpend = monthlyToolSpend * 12;
+    const paybackWeeks = Math.max(0.4, ((annualToolSpend / Math.max(1, annualDollars)) * 52)).toFixed(1);
+    const roiMult = Math.max(1, Math.round(annualDollars / Math.max(1, annualToolSpend)));
+
+    const elHrs = document.getElementById('calc-annual-hours');
+    const elDollars = document.getElementById('calc-annual-dollars');
+    const elPayback = document.getElementById('calc-payback-weeks');
+    const elRoi = document.getElementById('calc-roi-tag');
+
+    if (elHrs) elHrs.textContent = annualHrs.toLocaleString();
+    if (elDollars) elDollars.textContent = '$' + annualDollars.toLocaleString();
+    if (elPayback) elPayback.textContent = paybackWeeks + ' wks';
+    if (elRoi) elRoi.textContent = `Projected ${roiMult}x Annual ROI`;
+  };
+
+  if (!teamInput.dataset.bound) {
+    teamInput.dataset.bound = 'true';
+    [teamInput, rateInput, hoursInput].forEach(inp => inp.addEventListener('input', update));
+  }
+  update();
+}
+
+let currentRiskFilter = 'all';
+
 function renderRisks(b) {
   const mount = document.getElementById('risks');
-  mount.innerHTML = '';
-  b.risks.forEach(r => {
-    const card = el('article', 'risk');
-    card.appendChild(el('h3', 'risk-title', r.title));
-    card.appendChild(el('p', 'risk-body', r.body));
-    mount.appendChild(card);
-  });
+  const scMount = document.getElementById('risk-scorecard');
+  const tbMount = document.getElementById('risk-toolbar');
+  if (!mount) return;
+
+  // 1. Calculate Scorecard
+  const sc = b.riskScorecard || (typeof computeRiskScorecard === 'function'
+    ? computeRiskScorecard(b.risks, b.answers, b.tier)
+    : { total: b.risks.length, crit: 0, high: 0, med: 0, level: 'Active Risks', levelClass: 'warn', levelDesc: '', topCatLabel: 'Governance', mitigationRate: '100% Guarded' });
+
+  // 2. Render Scorecard
+  if (scMount) {
+    scMount.innerHTML = '';
+
+    // Card 1: Risk Level
+    const c1 = el('div', 'm-card');
+    const t1 = el('div', 'm-card-top');
+    const v1 = el('div', 'm-kpi-val', sc.level);
+    v1.style.fontSize = '20px';
+    const p1 = el('span', `m-status-pill ${sc.levelClass === 'crit' ? 'pill-crit' : (sc.levelClass === 'warn' ? 'pill-shield' : 'pill-auto')}`, sc.crit > 0 ? `${sc.crit} Critical` : 'Controlled');
+    t1.appendChild(v1);
+    t1.appendChild(p1);
+    c1.appendChild(t1);
+    c1.appendChild(el('div', 'm-stat-title', 'Systemic Risk Exposure'));
+    c1.appendChild(el('div', 'm-stat-desc', sc.levelDesc || 'Evaluated against team size, autonomy tier, and sector regulations.'));
+    scMount.appendChild(c1);
+
+    // Card 2: Failure Modes
+    const c2 = el('div', 'm-card');
+    const t2 = el('div', 'm-card-top');
+    const v2 = el('div', 'm-kpi-val', `${sc.total}`);
+    const d2 = el('span', 'm-denom', 'failure modes');
+    v2.appendChild(document.createTextNode(' '));
+    v2.appendChild(d2);
+    const p2 = el('span', 'm-status-pill pill-vel', `${sc.high} High Severity`);
+    t2.appendChild(v2);
+    t2.appendChild(p2);
+    c2.appendChild(t2);
+    c2.appendChild(el('div', 'm-stat-title', 'Identified Failure Modes'));
+    c2.appendChild(el('div', 'm-stat-desc', `${sc.crit} Critical · ${sc.high} High · ${sc.med} Moderate across your workflows.`));
+    scMount.appendChild(c2);
+
+    // Card 3: Dominant Category
+    const c3 = el('div', 'm-card');
+    const t3 = el('div', 'm-card-top');
+    const v3 = el('div', 'm-kpi-val', sc.topCatLabel);
+    v3.style.fontSize = '20px';
+    const p3 = el('span', 'm-status-pill pill-shield', 'Top Vulnerability');
+    t3.appendChild(v3);
+    t3.appendChild(p3);
+    c3.appendChild(t3);
+    c3.appendChild(el('div', 'm-stat-title', 'Primary Risk Domain'));
+    c3.appendChild(el('div', 'm-stat-desc', 'Area requiring the highest density of verification and guardrails.'));
+    scMount.appendChild(c3);
+
+    // Card 4: Blueprint Mitigation
+    const c4 = el('div', 'm-card');
+    const t4 = el('div', 'm-card-top');
+    const v4 = el('div', 'm-kpi-val', '100%');
+    const d4 = el('span', 'm-denom', 'covered');
+    v4.appendChild(document.createTextNode(' '));
+    v4.appendChild(d4);
+    const p4 = el('span', 'm-status-pill pill-auto', 'Shield Active');
+    t4.appendChild(v4);
+    t4.appendChild(p4);
+    c4.appendChild(t4);
+    c4.appendChild(el('div', 'm-stat-title', 'Blueprint Safeguards'));
+    c4.appendChild(el('div', 'm-stat-desc', 'Every failure mode is mapped to a specific artifact, hook, or gate.'));
+    scMount.appendChild(c4);
+  }
+
+  // 3. Bind filter toolbar
+  if (tbMount) {
+    const chips = tbMount.querySelectorAll('[data-risk-filter]');
+    chips.forEach(chip => {
+      const val = chip.getAttribute('data-risk-filter');
+      if (val === currentRiskFilter) {
+        chip.classList.add('is-active');
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('is-active');
+        chip.classList.remove('active');
+      }
+      chip.onclick = () => {
+        chips.forEach(c => { c.classList.remove('active'); c.classList.remove('is-active'); });
+        chip.classList.add('active');
+        chip.classList.add('is-active');
+        currentRiskFilter = chip.getAttribute('data-risk-filter');
+        renderRiskCards();
+      };
+    });
+  }
+
+  // 4. Render cards function
+  function renderRiskCards() {
+    mount.innerHTML = '';
+    const filtered = b.risks.filter(r => {
+      if (currentRiskFilter === 'all') return true;
+      if (currentRiskFilter === 'critical') return (r.severityVal || r.severity) === 'critical';
+      return r.category === currentRiskFilter;
+    });
+
+    if (filtered.length === 0) {
+      const empty = el('div', 'risk-empty');
+      empty.appendChild(el('h4', 'risk-empty-title', 'No risks in this category'));
+      empty.appendChild(el('p', 'risk-empty-desc', 'Your current company answers, stage, and autonomy tier have low exposure in this specific category.'));
+      mount.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach(r => {
+      const sev = r.severityVal || r.severity || 'high';
+      const card = el('article', `risk-card risk-${sev}`);
+
+      // Header row
+      const head = el('div', 'risk-head');
+      const headLeft = el('div', 'risk-head-left');
+
+      // Severity badge
+      const badge = el('span', `risk-badge risk-badge-${sev}`);
+      if (sev === 'critical') {
+        badge.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Critical Severity`;
+      } else if (sev === 'high') {
+        badge.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> High Severity`;
+      } else {
+        badge.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Moderate Severity`;
+      }
+      headLeft.appendChild(badge);
+
+      if (r.categoryLabel) {
+        headLeft.appendChild(el('span', 'risk-cat-pill', r.categoryLabel));
+      }
+      head.appendChild(headLeft);
+
+      if (r.triggerText) {
+        const trig = el('span', 'risk-trigger-pill', `🎯 ${r.triggerText}`);
+        head.appendChild(trig);
+      }
+      card.appendChild(head);
+
+      // Card Title
+      card.appendChild(el('h3', 'risk-card-title', r.title));
+
+      // Business Impact Box
+      const impactBox = el('div', 'risk-impact-box');
+      const impactHead = el('div', 'risk-impact-header');
+      impactHead.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Business Impact &amp; Consequence:`;
+      impactBox.appendChild(impactHead);
+      impactBox.appendChild(el('p', 'risk-impact-text', r.impact || r.body));
+      card.appendChild(impactBox);
+
+      // Two-column Grid: The Failure Trap vs Blueprint Guardrail
+      const grid = el('div', 'risk-grid');
+
+      // Col 1: Pitfall
+      const colTrap = el('div', 'risk-col risk-col-trap');
+      const trapTitle = el('div', 'risk-col-title');
+      trapTitle.innerHTML = `<span class="risk-col-icon">⚠️</span> The Failure Trap ("What happens")`;
+      colTrap.appendChild(trapTitle);
+      colTrap.appendChild(el('p', 'risk-col-text', r.trap || r.body));
+      grid.appendChild(colTrap);
+
+      // Col 2: Guardrail
+      const colGuard = el('div', 'risk-col risk-col-guard');
+      const guardTitle = el('div', 'risk-col-title');
+      guardTitle.innerHTML = `<span class="risk-col-icon">🛡️</span> Blueprint Guardrail ("How to prevent it")`;
+      colGuard.appendChild(guardTitle);
+      colGuard.appendChild(el('p', 'risk-col-text', r.guardrail || 'Establish deterministic gates and verify intent at release.'));
+      grid.appendChild(colGuard);
+
+      card.appendChild(grid);
+      mount.appendChild(card);
+    });
+  }
+
+  renderRiskCards();
 }
 
 /* -------------------------------------------------------------------- tabs */
@@ -542,7 +891,17 @@ function briefMarkdown(b) {
   b.metrics.forEach(m => L.push(`| ${m.goal ? m.stage + ' (your goal)' : m.stage} | ${m.lead} | ${m.lag} | ${m.source} |`));
   L.push('');
   L.push('## Failure patterns to watch');
-  b.risks.forEach(r => { L.push(''); L.push(`**${r.title}.** ${r.body}`); });
+  L.push('Identified failure modes, contextual triggers, business impact, and prescribed blueprint guardrails:');
+  b.risks.forEach(r => {
+    const sev = (r.severityVal || r.severity || 'High').toUpperCase();
+    L.push('');
+    L.push(`### [${sev}] ${r.title}`);
+    if (r.triggerText) L.push(`- **Contextual Trigger:** ${r.triggerText}`);
+    if (r.impact) L.push(`- **Business Impact:** ${r.impact}`);
+    if (r.trap) L.push(`- **The Failure Trap:** ${r.trap}`);
+    if (r.guardrail) L.push(`- **Blueprint Guardrail:** ${r.guardrail}`);
+    if (!r.trap && r.body) L.push(`- **Details:** ${r.body}`);
+  });
   L.push('');
   L.push('---');
   L.push('Generated by the AI-Native Flow Blueprint. Named products are common choices, not endorsements. Prompts are indicative and need rewriting against your own systems.');

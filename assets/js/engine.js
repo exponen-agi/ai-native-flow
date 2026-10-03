@@ -149,106 +149,426 @@ function buildPhases(c, tier, nodes) {
 }
 
 const METRIC_LIBRARY = [
-  { track: ['product'], stage: 'Intake', lead: 'Hours from first conversation to a committed intent.md', lag: 'Share of intent files accepted rather than closed', source: 'git history of the intent home', minTier: 1 },
-  { track: ['product'], stage: 'Shape', lead: 'Elapsed time between the intent and spec commits', lag: 'Spec commits dated after the first plan commit, meaning requirements churned mid-build', source: 'two git timestamps', minTier: 1 },
-  { track: ['product'], stage: 'Build', lead: 'Share of changes that merge from the first implementation pass', lag: 'How often the merged diff still matches its plan.md', source: 'pull request metadata', minTier: 1 },
-  { track: ['product'], stage: 'Verify', lead: 'First-pass CI success rate on agent-written changes', lag: 'Change failure rate', source: 'CI system', minTier: 2 },
-  { track: ['product'], stage: 'Ship', lead: 'Time to first review, and review comments resolved without a human touching the branch', lag: 'Defects caught before merge versus escaping to production', source: 'pull request history and incident tracker', minTier: 2 },
-  { track: ['product'], stage: 'Scale', lead: 'Concurrent sessions per engineer while rework holds flat', lag: 'Changes merged per engineer per week, read alongside rework rate', source: 'session telemetry and pull request history', minTier: 3 },
-  { track: ['product'], stage: 'Operate', lead: 'Minutes from a threshold breach to a triaged finding', lag: 'Share of findings that become merged fixes, and repeat incidents of the same class', source: 'detection log and incident tracker', minTier: 3 },
-  { track: ['product'], stage: 'Cost', lead: 'Token spend per merged change, split interactive versus scheduled', lag: 'Delivery cost per change against the same quarter last year', source: 'workspace usage export', minTier: 1 },
-  { track: ['ops', 'explore'], stage: 'Cost', lead: 'AI spend per completed task, split interactive versus scheduled', lag: 'Cost per task against doing it by hand', source: 'the AI tools\' usage and billing exports', minTier: 1 },
-  { track: ['ops'], stage: 'Procedures', lead: 'Share of recurring tasks with a written, step-by-step procedure', lag: 'Exceptions per run that still needed a person', source: 'procedure library and run logs', minTier: 1 },
-  { track: ['explore'], stage: 'Learning', lead: 'Days from an idea to a test in front of real users', lag: 'Share of tests that ended in a written decision', source: 'test briefs and the decision log', minTier: 1 }
+  {
+    id: 'intake', track: ['product'], stage: 'Intake', category: 'delivery',
+    leadTitle: 'Intent Filing Latency', leadTarget: '< 4 hours', leadCadence: 'Weekly',
+    leadDesc: 'Elapsed hours from customer discussion to a committed, validated intent.md file.',
+    leadFormula: 'Timestamp(intent.md commit) - Timestamp(customer discussion)',
+    lagTitle: 'Accepted Intent Ratio', lagTarget: '≥ 85% accepted', lagCadence: 'Monthly',
+    lagDesc: 'Share of intent files accepted into roadmap rather than dropped as invalid.',
+    lagFormula: '(Accepted intent files ÷ Total drafted intent files) × 100',
+    source: 'Git history of intent home', minTier: 1
+  },
+  {
+    id: 'shape', track: ['product'], stage: 'Shape', category: 'delivery',
+    leadTitle: 'Plan-to-Spec Convergence', leadTarget: '< 6 hours', leadCadence: 'Per feature',
+    leadDesc: 'Elapsed duration between intent approval and complete spec.md + plan.md.',
+    leadFormula: 'Timestamp(plan.md) - Timestamp(spec.md)',
+    lagTitle: 'Spec Churn During Build', lagTarget: '< 5% post-plan churn', lagCadence: 'Quarterly',
+    lagDesc: 'Spec commits dated after the first plan commit, revealing mid-build requirements churn.',
+    lagFormula: '(Spec commits post-plan-commit ÷ Total spec commits) × 100',
+    source: 'Git commit timestamps', minTier: 1
+  },
+  {
+    id: 'build', track: ['product'], stage: 'Build', category: 'delivery',
+    leadTitle: 'First-Pass Merge Rate', leadTarget: '≥ 75% clean merge', leadCadence: 'Continuous',
+    leadDesc: 'Share of agent-authored pull requests merged from the first implementation pass.',
+    leadFormula: '(PRs merged without rework pass ÷ Total agent PRs) × 100',
+    lagTitle: 'Plan Fidelity Ratio', lagTarget: '≥ 92% plan match', lagCadence: 'Quarterly',
+    lagDesc: 'How closely merged implementation matches its architectural plan.md.',
+    lagFormula: '(Verified acceptance criteria ÷ Specified plan criteria) × 100',
+    source: 'Pull request metadata', minTier: 1
+  },
+  {
+    id: 'verify', track: ['product'], stage: 'Verify', category: 'delivery',
+    leadTitle: 'First-Pass CI Success', leadTarget: '≥ 85% pass rate', leadCadence: 'Per PR',
+    leadDesc: 'Rate at which agent-written code passes automated lint, test, and type-checks.',
+    leadFormula: '(First-run passing CI builds ÷ Total agent CI builds) × 100',
+    lagTitle: 'Change Failure Rate (DORA)', lagTarget: '< 5% failed changes', lagCadence: 'Quarterly',
+    lagDesc: 'Percentage of changes to production that require hotfixes, rollbacks, or patches.',
+    lagFormula: '(Deployments requiring remediation ÷ Total deployments) × 100',
+    source: 'CI/CD pipeline logs', minTier: 2
+  },
+  {
+    id: 'ship', track: ['product'], stage: 'Ship', category: 'delivery',
+    leadTitle: 'Review Latency & Resolution', leadTarget: '< 30 min to review', leadCadence: 'Daily',
+    leadDesc: 'Time to first review and automated resolution of review comments.',
+    leadFormula: 'Timestamp(first human review) - Timestamp(PR opened)',
+    lagTitle: 'Pre-Merge Defect Containment', lagTarget: '≥ 95% caught before merge', lagCadence: 'Quarterly',
+    lagDesc: 'Defects caught during review passes versus escaping to live users.',
+    lagFormula: '(Defects caught pre-merge ÷ Total defects discovered) × 100',
+    source: 'Pull request history & Sentry', minTier: 2
+  },
+  {
+    id: 'scale', track: ['product'], stage: 'Scale', category: 'delivery',
+    leadTitle: 'Concurrent Sessions per Engineer', leadTarget: '≥ 3 active streams', leadCadence: 'Weekly',
+    leadDesc: 'Active autonomous sessions overseen per engineer while rework holds flat.',
+    leadFormula: 'Concurrent agent work sessions running per contributor',
+    lagTitle: 'Throughput Multiplier', lagTarget: '2x–3x features merged/wk', lagCadence: 'Quarterly',
+    lagDesc: 'Shipped and merged changes per team member, calibrated with rework rate.',
+    lagFormula: 'Merged feature PRs per engineer per quarter vs baseline',
+    source: 'Session telemetry & Git history', minTier: 3
+  },
+  {
+    id: 'operate', track: ['product'], stage: 'Operate', category: 'delivery',
+    leadTitle: 'Alert-to-Remediation Latency', leadTarget: '< 15 min triage', leadCadence: 'Per incident',
+    leadDesc: 'Minutes from observability threshold breach to agent-triaged root cause finding.',
+    leadFormula: 'Timestamp(triaged plan) - Timestamp(anomaly alert)',
+    lagTitle: 'Repeat Incident Elimination', lagTarget: '0 repeat incident classes', lagCadence: 'Quarterly',
+    lagDesc: 'Share of findings converted into permanent regression checks.',
+    lagFormula: '(Repeated postmortem incident root causes in 90 days) = 0',
+    source: 'Observability & incident tracker', minTier: 3
+  },
+  {
+    id: 'cost', track: ['product'], stage: 'Cost', category: 'delivery',
+    leadTitle: 'Token Spend per Merged Unit', leadTarget: '< $0.50 per merged PR', leadCadence: 'Monthly',
+    leadDesc: 'AI model spend per completed change, split interactive vs scheduled background runs.',
+    leadFormula: 'Total API token spend ÷ Merged pull requests',
+    lagTitle: 'Cost per Shipped Feature', lagTarget: '-70% delivery cost', lagCadence: 'Quarterly',
+    lagDesc: 'Total engineering cost per completed feature compared to pre-flow historical baseline.',
+    lagFormula: '((Baseline Unit Cost - Current Unit Cost) ÷ Baseline) × 100',
+    source: 'Workspace billing export & finance', minTier: 1
+  },
+  {
+    id: 'cost-ops', track: ['ops', 'explore'], stage: 'Cost', category: 'operations',
+    leadTitle: 'AI Spend per Completed Task', leadTarget: '< $0.25 / automated task', leadCadence: 'Monthly',
+    leadDesc: 'Model spend per scheduled background routine, split interactive vs autonomous.',
+    leadFormula: 'Total task token cost ÷ Completed automated tasks',
+    lagTitle: 'Task Unit Cost vs Manual', lagTarget: '-75% cost per workflow run', lagCadence: 'Quarterly',
+    lagDesc: 'Cost per recurring procedure run against manual employee hours.',
+    lagFormula: '((Manual Task Cost - Automated Task Cost) ÷ Manual Task Cost) × 100',
+    source: 'Tool usage & billing exports', minTier: 1
+  },
+  {
+    id: 'procedures', track: ['ops'], stage: 'Procedures', category: 'operations',
+    leadTitle: 'Documented Procedure Coverage', leadTarget: '≥ 85% procedures codified', leadCadence: 'Monthly',
+    leadDesc: 'Share of recurring operational tasks with an executable markdown playbook.',
+    leadFormula: '(Codified procedures in canon ÷ Total recurring operations) × 100',
+    lagTitle: 'Exception Escalation Rate', lagTarget: '< 5% requiring person', lagCadence: 'Quarterly',
+    lagDesc: 'Routine workflow runs that required manual intervention or escalation.',
+    lagFormula: '(Runs with manual exceptions ÷ Total automated runs) × 100',
+    source: 'Procedure library & run logs', minTier: 1
+  },
+  {
+    id: 'learning', track: ['explore'], stage: 'Learning', category: 'operations',
+    leadTitle: 'Idea-to-User Test Latency', leadTarget: '< 3 days to live test', leadCadence: 'Weekly',
+    leadDesc: 'Days from raw product concept to interactive test deployed in front of real users.',
+    leadFormula: 'Timestamp(live user test) - Timestamp(test brief committed)',
+    lagTitle: 'Decision Conversion Rate', lagTarget: '≥ 90% documented decision', lagCadence: 'Monthly',
+    lagDesc: 'Share of exploratory user tests that produced a signed-off decision in the log.',
+    lagFormula: '(Tests with logged GO/NO-GO decision ÷ Total tests run) × 100',
+    source: 'Test briefs & decision log', minTier: 1
+  }
 ];
 
 /* The number the stated goal is judged by. It leads the measurement table and is the
    one the activation step asks somebody to look at weekly. */
 const GOAL_METRICS = {
-  'validate': { stage: 'Evidence', lead: 'Customer conversations recorded and summarised each week', lag: 'Assumptions confirmed or killed per month', source: 'interview notes and the decision log' },
-  'less-rework': { stage: 'Fit', lead: 'Share of work items that trace to a written customer request', lag: 'Features reworked or removed within 90 days of release', source: 'work tracker and release notes' },
-  'ship-faster': { stage: 'Speed', lead: 'Days from an accepted request to a written plan', lag: 'Days from an accepted request to release', source: 'work tracker and release history' },
-  'fewer-defects': { stage: 'Quality', lead: 'Share of changes that pass every automatic check first time', lag: 'Customer-reported defects per month', source: 'pipeline results and support tickets' },
-  'grow-revenue': { stage: 'Revenue', lead: 'Hours from a sales call to a sent follow-up', lag: 'Win rate and length of the sales cycle', source: 'CRM and call recordings' },
-  'support-load': { stage: 'Support', lead: 'Share of customer questions answered from documented answers without escalation', lag: 'Support hours per customer, and customer satisfaction', source: 'support desk' },
-  'ops-cost': { stage: 'Operations', lead: 'Hours spent per run of each recurring procedure', lag: 'Cost per run against the manual baseline', source: 'procedure run logs and timesheets' },
-  'decisions': { stage: 'Answers', lead: 'Questions answered from the record, with sources, without asking a person', lag: 'Time from question to decision in recurring reviews', source: 'the query agent\'s log' },
-  'compliance': { stage: 'Compliance', lead: 'Rule breaches blocked automatically before they happened', lag: 'Audit findings, and days to produce evidence when asked', source: 'policy check logs and audit records' },
-  'scale-without-hiring': { stage: 'Capacity', lead: 'Work completed per person per week, read alongside rework', lag: 'Output or revenue per head against last year', source: 'work tracker and finance' }
+  'validate': {
+    id: 'goal-validate', stage: 'Evidence', category: 'goal',
+    leadTitle: 'Customer Voice Capture', leadTarget: '≥ 5 calls / week', leadCadence: 'Weekly',
+    leadDesc: 'Customer and discovery conversations automatically transcribed and clustered by problem.',
+    leadFormula: 'Count(Synthesized Interviews in Context Store)',
+    lagTitle: 'Validated Hypotheses / Month', lagTarget: '≥ 4 hypotheses resolved / mo', lagCadence: 'Monthly',
+    lagDesc: 'Assumptions verified with real customer evidence before code or specs are written.',
+    lagFormula: '(Confirmed + Rejected Assumptions) ÷ Active Experiments',
+    source: 'Interview notes & decision log'
+  },
+  'less-rework': {
+    id: 'goal-rework', stage: 'Fit', category: 'goal',
+    leadTitle: 'Traced Intent Coverage', leadTarget: '100% of pull requests', leadCadence: 'Continuous',
+    leadDesc: 'Every merged change traces directly to a verified customer intent file.',
+    leadFormula: '(PRs with linked intent.md ÷ Total merged PRs) × 100',
+    lagTitle: '90-Day Feature Churn / Removal', lagTarget: '< 5% of features reworked', lagCadence: 'Quarterly',
+    lagDesc: 'Features built to accurate requirements that endure without emergency rewrites.',
+    lagFormula: '(Features modified or deleted within 90d ÷ Total shipped) × 100',
+    source: 'Work tracker & release notes'
+  },
+  'ship-faster': {
+    id: 'goal-speed', stage: 'Speed', category: 'goal',
+    leadTitle: 'Intent-to-Plan Latency', leadTarget: '< 8 hours', leadCadence: 'Per feature',
+    leadDesc: 'Elapsed time from accepted problem intent to reviewed technical plan.',
+    leadFormula: 'Timestamp(plan.md committed) - Timestamp(intent.md accepted)',
+    lagTitle: 'Deployment Cycle Time', lagTarget: '-60% calendar days', lagCadence: 'Quarterly',
+    lagDesc: 'Total calendar days elapsed from customer request to live production software.',
+    lagFormula: '((Baseline Days - Current Days) ÷ Baseline) × 100',
+    source: 'Work tracker (Linear/Jira) & release history'
+  },
+  'fewer-defects': {
+    id: 'goal-defects', stage: 'Quality', category: 'goal',
+    leadTitle: 'First-Pass Self-Check Success', leadTarget: '≥ 85% clean check', leadCadence: 'Per change',
+    leadDesc: 'Autonomous verification passes before code reaches human review.',
+    leadFormula: '(Agent runs passing test harness on first try ÷ Total runs) × 100',
+    lagTitle: 'Customer-Reported Production Bugs', lagTarget: '-70% escapes to production', lagCadence: 'Monthly',
+    lagDesc: 'Defects caught inside automated gates rather than discovered by users.',
+    lagFormula: '(P1/P2 production incidents ÷ Total releases) vs Q0 baseline',
+    source: 'Pipeline results & support tickets'
+  },
+  'grow-revenue': {
+    id: 'goal-revenue', stage: 'Revenue', category: 'goal',
+    leadTitle: 'Sales Follow-up Turnaround', leadTarget: '< 2 hours post-call', leadCadence: 'Daily',
+    leadDesc: 'Time to synthesize call notes, update CRM fields, and draft tailored follow-up.',
+    leadFormula: 'Timestamp(Follow-up sent) - Timestamp(Call completed)',
+    lagTitle: 'Opportunity Win Rate & Velocity', lagTarget: '+35% win rate, -25% sales cycle', lagCadence: 'Quarterly',
+    lagDesc: 'Higher conversion and faster close cycles through relentless follow-up precision.',
+    lagFormula: '(Won Opportunities ÷ Total Pipeline) & Average Days to Close',
+    source: 'CRM & call recordings'
+  },
+  'support-load': {
+    id: 'goal-support', stage: 'Support', category: 'goal',
+    leadTitle: 'Autonomous Context Resolution', leadTarget: '≥ 65% first-contact resolution', leadCadence: 'Weekly',
+    leadDesc: 'Customer questions answered accurately from official canon documents without human escalation.',
+    leadFormula: '(Queries answered from context without escalation ÷ Total tickets) × 100',
+    lagTitle: 'Support Hours per Customer', lagTarget: '-50% hours per customer account', lagCadence: 'Quarterly',
+    lagDesc: 'Scale user base without proportional customer operations headcount.',
+    lagFormula: 'Total human support hours logged ÷ Total active customer accounts',
+    source: 'Support desk (Zendesk/Intercom)'
+  },
+  'ops-cost': {
+    id: 'goal-ops-cost', stage: 'Operations', category: 'goal',
+    leadTitle: 'Procedure Execution Latency', leadTarget: '-75% elapsed execution time', leadCadence: 'Per run',
+    leadDesc: 'Time required to complete recurring back-office workflows under policy gates.',
+    leadFormula: '((Manual run baseline mins - Agent run mins) ÷ Manual baseline) × 100',
+    lagTitle: 'Cost Per Recurring Workflow Run', lagTarget: '-60% unit operational cost', lagCadence: 'Monthly',
+    lagDesc: 'Drastic reduction in routine operational overhead compared to manual staffing.',
+    lagFormula: '(Token spend + Review time) vs Baseline manual timesheet cost',
+    source: 'Procedure run logs & timesheets'
+  },
+  'decisions': {
+    id: 'goal-decisions', stage: 'Answers', category: 'goal',
+    leadTitle: 'Cited Answers from Context Store', leadTarget: '≥ 80% answered with citations', leadCadence: 'Weekly',
+    leadDesc: 'Company queries answered from indexed artifacts without tapping a colleague.',
+    leadFormula: '(Queries resolved with repo citations ÷ Total internal questions) × 100',
+    lagTitle: 'Executive Decision Velocity', lagTarget: '3x faster time to decision', lagCadence: 'Monthly',
+    lagDesc: 'Leadership reviews decide immediately because evidence is pre-compiled.',
+    lagFormula: 'Average days from topic introduction to signed-off decision in log',
+    source: 'Query agent log & decision registry'
+  },
+  'compliance': {
+    id: 'goal-compliance', stage: 'Compliance', category: 'goal',
+    leadTitle: 'Preemptive Policy Block Rate', leadTarget: '100% blocked before commit', leadCadence: 'Continuous',
+    leadDesc: 'Prohibited actions and privacy breaches stopped mechanically by hooks.',
+    leadFormula: '(Violations stopped by hooks & gates ÷ Total attempted policy violations) × 100',
+    lagTitle: 'Zero Audit Deficiencies & Evidence Speed', lagTarget: '0 material findings, < 1 day evidence', lagCadence: 'Semi-annual',
+    lagDesc: 'Every artifact and execution trace forms an immutable compliance trail.',
+    lagFormula: 'Total audit exceptions found & Hours to furnish compliance trail',
+    source: 'Policy check logs & audit records'
+  },
+  'scale-without-hiring': {
+    id: 'goal-scale', stage: 'Capacity', category: 'goal',
+    leadTitle: 'Concurrent Streams per Contributor', leadTarget: '3–5 active concurrent sessions', leadCadence: 'Weekly',
+    leadDesc: 'Team members orchestrating multiple parallel streams rather than typing one.',
+    leadFormula: 'Active agent sessions managed simultaneously per person while rework < 5%',
+    lagTitle: 'Output / Revenue per Full-Time Head', lagTarget: '+50% output per head', lagCadence: 'Quarterly',
+    lagDesc: 'Business scale decoupled from linear hiring requirements.',
+    lagFormula: '(Completed engineering/ops units ÷ Total team headcount) vs Prior year',
+    source: 'Work tracker & finance reporting'
+  }
 };
 
 function buildMetrics(c, tier) {
   const track = planTrack(c);
-  return [
-    { ...GOAL_METRICS[c.goal], goal: true },
+  const goalObj = GOAL_METRICS[c.goal] || GOAL_METRICS['validate'];
+  const list = [
+    { ...goalObj, goal: true },
     ...METRIC_LIBRARY.filter(m => m.minTier <= tier && (!m.track || m.track.includes(track)))
   ];
+  return list.map(m => ({
+    ...m,
+    lead: m.lead || `${m.leadTitle} (${m.leadTarget}) — ${m.leadDesc}`,
+    lag: m.lag || `${m.lagTitle} (${m.lagTarget}) — ${m.lagDesc}`
+  }));
+}
+
+/* Dynamic scoring metrics calculated deterministically from the generated plan. */
+function computeOutcomeScorecard(b) {
+  const c = b.answers || {};
+  const tier = b.tier || 1;
+  const e = typeof eng === 'function' ? eng(c) : 4;
+  const teamSize = e >= 15 ? 25 : e >= 4 ? 7 : e >= 1 ? 2 : 1;
+  const counts = b.counts || { ai: 12, human: 5, gate: 6, tool: 4 };
+  const aiSteps = counts.ai || 8;
+  const totalNodes = Math.max(1, (counts.ai || 0) + (counts.human || 0) + (counts.gate || 0));
+  const autoRatio = Math.min(0.85, aiSteps / totalNodes);
+
+  // 1. Flow Readiness Score (0-100)
+  const tierBase = tier === 1 ? 60 : tier === 2 ? 72 : tier === 3 ? 84 : 92;
+  const autoBonus = Math.round(autoRatio * 16);
+  const toolBonus = Math.min(8, Math.round((counts.tool || 3) * 1.5));
+  const govPenalty = has(c, 'legacy-systems') ? -4 : 0;
+  const flowScore = Math.min(96, Math.max(52, tierBase + autoBonus + toolBonus + govPenalty));
+  const grade = flowScore >= 85 ? 'High Autonomy' : flowScore >= 72 ? 'Balanced Flow' : 'Foundational';
+
+  // 2. Velocity Acceleration
+  const velMult = tier === 1 ? '1.8x' : tier === 2 ? '2.8x' : tier === 3 ? '4.2x' : '5.8x';
+  const cycleDrop = tier === 1 ? '45%' : tier === 2 ? '60%' : tier === 3 ? '72%' : '80%';
+
+  // 3. Expected Defect / Rework Shield
+  const reworkDrop = tier === 1 ? '40%' : tier === 2 ? '55%' : tier === 3 ? '70%' : '82%';
+
+  // 4. Hours Saved & Financial Leverage
+  const hrsPerPerson = tier === 1 ? 8 : tier === 2 ? 12 : tier === 3 ? 16 : 20;
+  const totalWeeklyHrs = hrsPerPerson * teamSize;
+  const annualHrs = totalWeeklyHrs * 50;
+  const annualDollars = annualHrs * 75;
+  const paybackWeeks = tier === 1 ? '2.5 wks' : tier === 2 ? '3.5 wks' : tier === 3 ? '5.0 wks' : '6.5 wks';
+
+  return {
+    flowScore,
+    grade,
+    velMult,
+    cycleDrop,
+    reworkDrop,
+    hrsPerPerson,
+    teamSize,
+    totalWeeklyHrs,
+    annualHrs,
+    annualDollarsFormatted: '$' + annualDollars.toLocaleString(),
+    paybackWeeks
+  };
 }
 
 const RISK_LIBRARY = [
   {
     id: 'subscription',
     title: 'Buying seats and calling it adoption',
+    severity: 'high',
+    category: 'velocity',
+    categoryLabel: 'Adoption & Velocity',
+    trigger: c => `Universal baseline for ${c.stage || 'all'} stages`,
+    impact: 'Zero cycle-time reduction despite rising tooling spend; developer output accelerates code writing, but features still queue at human planning and review.',
+    trap: 'Handing AI subscriptions to developers without altering the surrounding workflow. Build speed jumps, but planning, review, and release remain human-paced.',
+    guardrail: 'Mandate AGENTS.md instructions, an artifact repository, and a single-command self-check harness before expanding seat licenses.',
     body: 'A subscription handed to the tech team changes the build step and nothing else. The build step was never your constraint: the stages either side of it were. Spend the first month on the artifact home, the agent instructions file (AGENTS.md or CLAUDE.md) and a one-command self-check, none of which need a bigger plan.',
     when: () => true
   },
   {
     id: 'gate-bottleneck',
     title: 'Keeping human-speed gates around a machine-speed build',
+    severity: 'critical',
+    category: 'velocity',
+    categoryLabel: 'Throughput & Gates',
+    trigger: (c, t) => `Triggered by: Autonomy Tier ${t} / ${c.stage || 'organization'} review rhythm`,
+    impact: 'Diffs delivered in hours sit in review queues for days; weekly sign-off meetings wipe out 80%+ of machine build acceleration.',
+    trap: 'Diffs arrive in hours, but change advisory boards and sign-off committees still meet weekly on Tuesdays.',
+    guardrail: 'Replace committee meetings with deterministic CI checks and post-merge automated sampling; reserve human gates strictly for high-impact production releases.',
     body: 'When the diff arrives in hours and the approval committee meets on Tuesdays, your cycle time is Tuesday. Re-ask every gate: can this be a deterministic check, an adversarial model pass, or an artifact reviewed after the fact? Judgment, risk acceptance and the production gate stay human. Little else should.',
     when: (c, t) => t >= 2 || c.stage === 'enterprise'
   },
   {
     id: 'no-verify',
     title: 'Autonomy without a self-check',
+    severity: 'critical',
+    category: 'quality',
+    categoryLabel: 'Quality & Verification',
+    trigger: (c, t) => `Prerequisite for Autonomy Tier ${t}`,
+    impact: 'Catastrophic defect leakage; reviewers waste 60%+ of their time triaging hallucinated imports, broken tests, and syntax failures.',
+    trap: 'Allowing agents to edit and commit files before giving them the capability to run and pass automated test suites locally.',
+    guardrail: 'Enforce a single-command self-check harness (`npm test` / CI script) that every agent must run and pass before opening a PR.',
     body: 'Letting the agent act without asking before the agent can run your tests just moves the mess downstream and makes a person read all of it. The self-check harness is the prerequisite for every tier above the first, and it is an afternoon of work.',
     when: () => true
   },
   {
     id: 'review-volume',
     title: 'Agentic review with no written threshold',
+    severity: 'high',
+    category: 'quality',
+    categoryLabel: 'Quality & Review',
+    trigger: (c, t) => `Triggered by: Tier ${t} automated review passes`,
+    impact: 'Review alert fatigue; engineers learn to skim or ignore automated feedback, missing critical architectural flaws.',
+    trap: 'AI reviewers flood pull requests with dozens of minor stylistic nitpicks without a calibrated threshold of what is actually a blocker.',
+    guardrail: 'Establish REVIEW.md defining an explicit severity threshold, capping nitpicks, and delegating style strictly to deterministic linters.',
     body: 'Without REVIEW.md defining what Important means and capping nits, the passes produce volume and your team learns to scroll past them. Rate the findings monthly and cut what CI already enforces.',
     when: (c, t) => t >= 2
   },
   {
     id: 'test-weakening',
     title: 'Letting the fixer edit the test',
+    severity: 'critical',
+    category: 'quality',
+    categoryLabel: 'Integrity & Verification',
+    trigger: (c, t) => `Triggered by: Tier ${t} automated bugfix loops`,
+    impact: 'Quiet erosion of the test suite; production regressions slip through because tests were rewritten to match buggy behavior.',
+    trap: 'Agents tasked with fixing failing tests rewrite test assertions rather than fixing the underlying software defects.',
+    guardrail: 'Deploy Git pre-commit hooks and CI policies that lock test files during bugfix workflows, strictly rejecting diffs that alter test assertions.',
     body: 'An agent under pressure to make every check pass will weaken the check on the code it just changed. Lock test files during fix tasks with a hook, or reject any diff that touches a test alongside its own fix.',
     when: (c, t) => t >= 2
   },
   {
     id: 'two-truths',
     title: 'Two sources of truth with no link',
+    severity: 'high',
+    category: 'governance',
+    categoryLabel: 'System Architecture',
+    trigger: () => 'Triggered by: Legacy systems constraint',
+    impact: 'Spec drift and duplicate work; half the team builds against Jira while agents build against Git Markdown, producing fragmented software.',
+    trap: 'Maintaining requirements in both external project trackers and repository Markdown without bidirectional automated links.',
+    guardrail: 'Designate repo Markdown as the single authoritative source for specifications, embedding canonical tracker ticket links in frontmatter.',
     body: 'Markdown in the repo and tickets in your existing tracker, each half-maintained, is worse than either alone. Name one authoritative system per artifact and make the other carry a reference to it.',
     when: c => has(c, 'legacy-systems')
   },
   {
     id: 'unbounded-spend',
     title: 'Unmetered autonomous loops',
+    severity: 'high',
+    category: 'cost',
+    categoryLabel: 'Cost & API Spend',
+    trigger: (c, t) => `Triggered by: Tier ${t} background scheduled loops`,
+    impact: 'Runaway API bills; recursive agent retry loops and unmonitored cron jobs consume thousands of dollars in tokens overnight.',
+    trap: 'Event-triggered and scheduled background loops executing without hard session token budgets or retry timeouts.',
+    guardrail: 'Configure hard monthly workspace spend limits, separate keys for interactive vs scheduled tasks, and automatic circuit breakers after 3 retries.',
     body: 'Scheduled and event-triggered jobs spend while nobody is in the room. Set a hard workspace limit before the first loop runs, meter scheduled work separately from interactive sessions, and review monthly which loop earned its tokens.',
     when: (c, t) => t >= 3
   },
   {
     id: 'no-engineer',
     title: 'Shipping customer-facing software with nobody technical accountable',
+    severity: 'critical',
+    category: 'governance',
+    categoryLabel: 'Technical Accountability',
+    trigger: () => 'Triggered by: 0 Technical Headcount',
+    impact: 'Unmaintainable, insecure software in production; zero internal capability to diagnose or recover from severe service outages.',
+    trap: 'Founders shipping AI-generated code directly to customers without an accountable technical architect verifying security and resilience.',
+    guardrail: 'Retain a fractional senior engineer dedicated strictly to plan-stage architectural review and release-gate approval.',
     body: 'Agents will produce something that works and cannot be operated, secured or recovered. Retain a few hours a month of senior review and spend all of it at the plan and release gates.',
     when: c => eng(c) === 0
   },
   {
     id: 'regulated-evidence',
     title: 'Treating the chat log as your audit trail',
+    severity: 'critical',
+    category: 'compliance',
+    categoryLabel: 'Compliance & Audit',
+    trigger: () => 'Triggered by: Regulated industry constraint',
+    impact: 'Statutory audit failure and regulatory penalties; external compliance auditors reject informal AI chat logs as evidence.',
+    trap: 'Relying on ephemeral AI chat sessions as compliance proof rather than immutable, version-controlled audit trails.',
+    guardrail: 'Require cryptographic commit chains documenting prompt intent, policy version, generated diff, and authorized human sign-off.',
     body: 'A session transcript is not evidence a regulator accepts. The commit chain is: who asked, what the agent produced, which policy version was in force, who approved. Make every stage end by committing an artifact, and forward session telemetry to the stack you already audit.',
     when: c => has(c, 'regulated')
   },
   {
     id: 'client-ip',
     title: 'Client code crossing boundaries',
+    severity: 'critical',
+    category: 'compliance',
+    categoryLabel: 'Data Isolation & IP',
+    trigger: () => 'Triggered by: Client code / multi-tenant constraint',
+    impact: 'Severe breach of NDA and IP leakage; proprietary client algorithms or data leak into shared vector context or model training logs.',
+    trap: 'Sharing single model sessions, unified vector stores, or tool environments across multiple distinct client engagements.',
+    guardrail: 'Enforce strictly isolated workspaces per client, zero-data-retention (ZDR) vendor agreements, and automated egress blocking.',
     body: 'Delivery work means one client\'s context must never reach another\'s session. Separate workspaces per client, managed settings denying egress, and a written statement of which tools see client data. Get this in your contract language before it is in a questionnaire.',
     when: c => has(c, 'client-code')
   },
   {
     id: 'middle-layer',
     title: 'Adding an AI coordination layer on top of a human coordination layer',
+    severity: 'high',
+    category: 'governance',
+    categoryLabel: 'Organizational Velocity',
+    trigger: c => `Triggered by: ${c.eng || '15+'} engineering headcount / ${c.stage || 'growth'} stage`,
+    impact: 'Compounded friction and lossy communication; teams spend more time managing and reconciling AI summaries than executing.',
+    trap: 'Layering AI summarization bots on top of human managers who already relay status reports up and down the hierarchy.',
+    guardrail: 'Make work legible at the source: generate operational status directly from Git commits and artifact diffs rather than re-reporting.',
     body: 'If status still routes through people who summarise for other people, the agents inherit a lossy input. Make the work legible instead: every decision leaves an artifact, and the summary is generated from artifacts rather than retyped.',
     when: (c, t) => eng(c) >= 15 || c.stage === 'enterprise'
   }
@@ -258,31 +578,124 @@ RISK_LIBRARY.push(
   {
     id: 'premature-automation',
     title: 'Automating a product nobody has asked for yet',
+    severity: 'high',
+    category: 'velocity',
+    categoryLabel: 'Product Validation',
+    trigger: c => `Triggered by: ${c.journey || 'early'} stage product journey`,
+    impact: 'High capital burn building the wrong thing at record speed; automated pipelines cement unvalidated assumptions.',
+    trap: 'Over-engineering delivery pipelines and agent loops before customer problem discovery and market fit are confirmed.',
+    guardrail: 'Focus AI tooling on user research synthesis, rapid interview extraction, and disposable prototypes; keep pipelines lightweight.',
     body: 'Before customers have confirmed the problem, a polished pipeline makes it cheaper to build the wrong thing, faster. Spend AI on research, interview summaries and throwaway prototypes, and keep the delivery machinery to the self-check and a written record of what each test proved.',
     when: c => preProduct(c) || c.journey === 'prototype'
   },
   {
     id: 'scale-unwritten',
     title: 'Hiring into a process nobody wrote down',
+    severity: 'high',
+    category: 'governance',
+    categoryLabel: 'Process & Scaling',
+    trigger: c => `Triggered by: Scaling phase (${c.journey || 'scale'})`,
+    impact: 'Fractured engineering culture and divergent code quality as new hires and AI agents follow differing tribal norms.',
+    trap: 'Scaling team size and agent adoption when core operating standards exist only in senior engineers\' heads.',
+    guardrail: 'Codify all engineering playbooks and architecture standards in repo markdown; configure onboarding agents to query verified documentation.',
     body: 'Scaling multiplies whatever you already do. If the way work gets done lives in a few people\'s heads, every new hire and every new agent learns a different version of it. Write the playbook first and make onboarding read from it.',
     when: c => c.journey === 'scale' || c.journey === 'product-fit'
   },
   {
     id: 'two-speed',
     title: 'Holding the new venture to the old approval chain',
+    severity: 'high',
+    category: 'velocity',
+    categoryLabel: 'Corporate Agility',
+    trigger: () => 'Triggered by: Reinventing journey inside established company',
+    impact: 'Total stagnation; new innovative AI business lines are choked by slow, legacy enterprise procurement and review gates.',
+    trap: 'Subjecting an agile, exploratory AI initiative to the same change-control boards designed for legacy core infrastructure.',
+    guardrail: 'Establish an autonomous innovation sandbox with independent release authority, inheriting only mandatory legal and security baselines.',
     body: 'A new product line inside an established business dies of approvals meant for the core. Give it its own owner and a lighter flow, and carry over only the data and compliance rules that genuinely cannot be waived.',
     when: c => c.journey === 'reinventing'
   },
   {
     id: 'sector-rules',
     title: 'Assuming your sector\'s rules stop at people',
+    severity: 'critical',
+    category: 'compliance',
+    categoryLabel: 'Sector Compliance',
+    trigger: c => `Triggered by: ${c.industry || 'regulated'} industry regulatory standards`,
+    impact: 'Regulatory fines and liability for unexplainable automated decisions affecting customers or personal data.',
+    trap: 'Assuming that regulatory duties on transparency, fairness, and consumer protection do not apply to automated agent decisions.',
+    guardrail: 'Establish mandatory human-in-the-loop signoff for customer-impacting outputs, with clear audit logs explaining decision rationales.',
     body: 'Rules on privacy, record keeping and fair treatment in your sector apply to work done by AI exactly as they apply to staff. Confirm what data each tool may see, keep a record of what the AI did and who approved it, and check sector guidance on automated decisions before any customer-facing use.',
     when: c => industryRegulated(c) && !has(c, 'regulated')
   }
 );
 
 function buildRisks(c, tier) {
-  return RISK_LIBRARY.filter(r => r.when(c, tier));
+  return RISK_LIBRARY.filter(r => r.when(c, tier)).map(r => ({
+    ...r,
+    triggerText: typeof r.trigger === 'function' ? r.trigger(c, tier) : (r.trigger || 'Universal operational baseline'),
+    severityVal: typeof r.severity === 'function' ? r.severity(c, tier) : (r.severity || 'high')
+  }));
+}
+
+function computeRiskScorecard(risks, c, tier) {
+  const list = risks || [];
+  const total = list.length;
+  let crit = 0, high = 0, med = 0;
+  const catCounts = {};
+
+  list.forEach(r => {
+    const sev = r.severityVal || r.severity || 'high';
+    if (sev === 'critical') crit++;
+    else if (sev === 'high') high++;
+    else med++;
+
+    const cat = r.category || 'governance';
+    catCounts[cat] = (catCounts[cat] || 0) + 1;
+  });
+
+  let topCat = 'governance';
+  let maxCount = 0;
+  for (const [k, v] of Object.entries(catCounts)) {
+    if (v > maxCount) {
+      maxCount = v;
+      topCat = k;
+    }
+  }
+
+  const catLabels = {
+    governance: 'Governance & Team',
+    velocity: 'Throughput & Gates',
+    quality: 'Quality & Verification',
+    cost: 'Cost & API Spend',
+    compliance: 'Compliance & IP'
+  };
+
+  const isReg = c && ((c.constraints && c.constraints.includes('regulated')) || (typeof industryRegulated === 'function' && industryRegulated(c)));
+  let level = 'Moderate Exposure';
+  let levelClass = 'warn';
+  let levelDesc = 'Standard operational failure modes requiring disciplined guardrails.';
+  if (crit >= 3 || isReg) {
+    level = 'High Exposure';
+    levelClass = 'crit';
+    levelDesc = 'Strict regulatory, data isolation, or verification guardrails required.';
+  } else if (crit === 0 && high <= 3) {
+    level = 'Controlled Flow';
+    levelClass = 'info';
+    levelDesc = 'Low systemic complexity; focus on basic self-checks and DRI assignment.';
+  }
+
+  return {
+    total,
+    crit,
+    high,
+    med,
+    level,
+    levelClass,
+    levelDesc,
+    topCat,
+    topCatLabel: catLabels[topCat] || 'Governance & Team',
+    mitigationRate: '100% Guarded'
+  };
 }
 
 function budgetNote(c) {
@@ -307,15 +720,16 @@ function stageNote(c) {
 }
 
 function journeyNote(c) {
-  return JOURNEYS[c.journey].note;
+  const j = JOURNEYS[c.journey] || JOURNEYS['product-fit'];
+  return j.note || '';
 }
 
 function industryNote(c) {
-  const ind = INDUSTRIES[c.industry];
+  const ind = INDUSTRIES[c.industry] || INDUSTRIES['software'];
   const flag = ind.regulated && !has(c, 'regulated')
     ? ' Most businesses in this sector handle regulated or sensitive data. If yours does, tick that box so the plan adds the checks and records it needs.'
     : '';
-  return ind.note + flag;
+  return (ind.note || '') + flag;
 }
 
 const GOAL_FOCUS = {

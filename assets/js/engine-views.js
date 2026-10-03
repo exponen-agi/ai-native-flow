@@ -226,46 +226,124 @@ const COMPANY_PHASES = [
 ];
 
 const COMPANY_METRICS = [
-  { stage: 'Legibility', lead: 'Share of recurring meetings and decisions that leave a filed artifact', lag: 'Questions answered from the record without interrupting a person', source: 'transcript archive and decision log', minTier: 1 },
-  { stage: 'Loops', lead: 'Loop outputs passing the adversarial gate first time', lag: 'Cost per loop outcome, against the manual baseline', source: 'gate logs and the usage export', minTier: 2 },
-  { stage: 'Canon', lead: 'Days between a practice changing and the canon reflecting it', lag: 'Repeat questions and repeat mistakes on the same topic', source: 'canon repository history', minTier: 2 },
-  { stage: 'Learning', lead: 'Failures converted into a permanent eval case within a week', lag: 'Share of improvements the system proposed rather than a person', source: 'eval suite and pull request authorship', minTier: 3 }
+  {
+    id: 'legibility', stage: 'Legibility', category: 'governance',
+    leadTitle: 'Meeting & Decision Filing Rate', leadTarget: '≥ 95% logged', leadCadence: 'Weekly',
+    leadDesc: 'Share of recurring meetings and key decisions filed as searchable markdown artifacts.',
+    leadFormula: '(Filed decision & meeting artifacts ÷ Total calendar events) × 100',
+    lagTitle: 'Ad-hoc Context Interruptions', lagTarget: '-60% status pings', lagCadence: 'Quarterly',
+    lagDesc: 'Questions answered from the context layer without interrupting or tapping a teammate.',
+    lagFormula: 'Queries answered by AI assistant without human mention/escalation',
+    source: 'Transcript archive & decision log', minTier: 1
+  },
+  {
+    id: 'loops', stage: 'Loops', category: 'operations',
+    leadTitle: 'Adversarial Gate Clearance', leadTarget: '≥ 80% pass on round 1', leadCadence: 'Per run',
+    leadDesc: 'Loop outputs passing the adversarial model gate without human rejection or correction.',
+    leadFormula: '(Outputs passing adversarial check first time ÷ Total loop runs) × 100',
+    lagTitle: 'Automated Outcome Unit Cost', lagTarget: '-50% unit cost', lagCadence: 'Quarterly',
+    lagDesc: 'Cost per completed workflow deliverable compared against the manual staff baseline.',
+    lagFormula: '(Automated execution token spend ÷ Historical manual labor cost) × 100',
+    source: 'Gate logs & usage export', minTier: 2
+  },
+  {
+    id: 'canon', stage: 'Canon', category: 'governance',
+    leadTitle: 'Canon Sync Latency', leadTarget: '< 48 hours', leadCadence: 'Weekly',
+    leadDesc: 'Days between an operational practice change and the canon repository reflecting it.',
+    leadFormula: 'Timestamp(canon PR merged) - Timestamp(policy change approved)',
+    lagTitle: 'Repeat Procedural Errors', lagTarget: '< 1 repeat error / mo', lagCadence: 'Quarterly',
+    lagDesc: 'Repeat mistakes, outdated answers, or compliance deviations on established topics.',
+    lagFormula: 'Count of repeat compliance/procedural tickets logged',
+    source: 'Canon repository history', minTier: 2
+  },
+  {
+    id: 'evals', stage: 'Learning', category: 'governance',
+    leadTitle: 'Failure-to-Eval Speed', leadTarget: '100% within 5 days', leadCadence: 'Continuous',
+    leadDesc: 'Production defects or hallucinations converted into permanent automated eval test cases.',
+    leadFormula: '(Eval cases created from postmortems ÷ Total postmortems) × 100',
+    lagTitle: 'Self-Proposed Flow Improvements', lagTarget: '≥ 40% system-authored', lagCadence: 'Quarterly',
+    lagDesc: 'Share of workflow and prompt optimizations suggested by learning loops rather than staff.',
+    lagFormula: '(Learning agent improvement PRs merged ÷ Total workflow PRs) × 100',
+    source: 'Eval suite & Git commit authorship', minTier: 3
+  }
 ];
 
 const COMPANY_RISKS = [
   {
     id: 'record-no-retention',
     title: 'Recording everything before deciding what you keep',
+    severity: 'critical',
+    category: 'compliance',
+    categoryLabel: 'Data Protection & Privacy',
+    trigger: () => 'Universal context risk across company operations',
+    impact: 'Statutory privacy violations under GDPR/CCPA; unfulfillable Subject Access Requests (SARs) due to unindexed personal data in AI transcripts.',
+    trap: 'Transcribing every customer interaction, call, and document without predefined retention schedules or automated PII scrubbing.',
+    guardrail: 'Configure automated PII scrubbing at ingest time and enforce strict source-level retention expiration before vector indexing.',
     body: 'Transcribing every call and indexing every document collides with data protection the moment a subject access request or an audit arrives. Decide retention windows, redaction at ingest and per-source access before the corpus exists. Retrofitting redaction across a year of transcripts is brutal and sometimes impossible.',
     when: c => true
   },
   {
     id: 'canon-unowned',
     title: 'A canon nobody owns',
+    severity: 'high',
+    category: 'quality',
+    categoryLabel: 'Knowledge Governance',
+    trigger: (c, t) => `Triggered by: Autonomy Tier ${t} self-updating knowledge base`,
+    impact: 'Knowledge drift and compounding hallucinations; agents and employees make costly operational mistakes based on stale or incorrect wiki edits.',
+    trap: 'Letting an internal knowledge base or company handbook self-update without human sign-off and line-level citations.',
+    guardrail: 'Appoint a single named human owner per document; require automated edits to arrive as pull requests with verified source citations.',
     body: 'A self-writing handbook with no named reviewer drifts toward answers that sound sure of themselves but are wrong, and people quietly stop trusting it. One owner per document, edits arriving as a diff with a citation per line, and a length somebody will actually read.',
     when: (c, t) => t >= 2
   },
   {
     id: 'tool-sprawl',
     title: 'Connector sprawl with no scope',
+    severity: 'critical',
+    category: 'compliance',
+    categoryLabel: 'Security & Access',
+    trigger: (c, t) => `Triggered by: Autonomy Tier ${t} multi-tool integration`,
+    impact: 'Privilege escalation and unauthorized data exposure; an agent granted broad database or billing write-access triggers catastrophic unintended actions.',
+    trap: 'Granting standing, long-lived read/write credentials to AI agents across production databases, billing platforms, and code repos.',
+    guardrail: 'Enforce an explicit tool allowlist per role, require short-lived ephemeral credentials, and review access permissions monthly.',
     body: 'Every new connector widens what an agent can reach, and access granted for one task stays granted. Keep tool access an allowlist per role, use short-lived credentials, and review the list monthly. An agent with standing write access to your billing system is a question you do not want to answer twice.',
     when: (c, t) => t >= 2
   },
   {
     id: 'loop-no-dri',
     title: 'Loops without a named owner',
+    severity: 'high',
+    category: 'governance',
+    categoryLabel: 'Operational Accountability',
+    trigger: () => 'Applies to all scheduled company loops',
+    impact: 'Silent loop failure and unmonitored queues; broken background workflows burn tokens while degrading customer-facing services.',
+    trap: 'Deploying autonomous background loops governed by general committee consensus rather than a single accountable operator.',
+    guardrail: 'Designate exactly one named Directly Responsible Individual (DRI) per loop with explicit authority to modify or terminate underperforming loops.',
     body: 'A loop with a committee behind it degrades silently: nobody clears the flagged queue, nobody updates the policy, and nobody switches it off when it stops earning. One name per loop, and a monthly review that is allowed to kill things.',
     when: c => true
   },
   {
     id: 'dashboard-theatre',
     title: 'Dashboards instead of a queryable record',
+    severity: 'medium',
+    category: 'governance',
+    categoryLabel: 'Data & Telemetry',
+    trigger: (c, t) => `Triggered by: Autonomy Tier ${t} operational tracking`,
+    impact: 'Fragmented visibility and delayed incident response; disjointed SaaS dashboards prevent agents from diagnosing cross-loop bottlenecks.',
+    trap: 'Relying on isolated third-party vendor dashboards that cannot be programmatically queried or synthesized by AI models.',
+    guardrail: 'Stream operational telemetry and event logs into a centralized queryable data store (e.g. SQLite/Parquet) accessible to agents.',
     body: 'Data trapped in each vendor\'s dashboard cannot be joined, so the interesting questions stay unanswerable and people go back to asking each other. Export the few metrics that matter into one store where an agent can query across them.',
     when: (c, t) => t >= 2
   },
   {
     id: 'copy-the-org',
     title: 'Automating the org chart you already have',
+    severity: 'high',
+    category: 'velocity',
+    categoryLabel: 'Organizational Topology',
+    trigger: c => `Triggered by: ${c.stage || 'established'} organizational hierarchy`,
+    impact: 'Solidifying organizational friction; expensive AI agents act as robotic status relays between silos without shortening lead time.',
+    trap: 'Deploying agents to mirror existing department handoffs 1:1 instead of eliminating redundant intermediate coordination steps.',
+    guardrail: 'Restructure work around end-to-end autonomous loops where humans inspect outputs at boundaries rather than relaying status in between.',
     body: 'Pointing agents at existing handoffs preserves the handoffs. The gain comes from removing the routing, not accelerating it: make the work legible and let people sit at the edges where judgment is needed, rather than in the middle relaying status.',
     when: c => eng(c) >= 15 || c.stage === 'enterprise' || c.stage === 'growth'
   }
@@ -342,9 +420,28 @@ function buildFullBlueprint(c) {
     views, index, phases, counts,
     focus: { ...want, node: focusId, line: localize(want.line, c) },
     metrics: [...base.metrics, ...COMPANY_METRICS.filter(m => m.minTier <= tier)]
-      .map(m => ({ ...m, lead: localize(m.lead, c), lag: localize(m.lag, c) })),
-    risks: [...COMPANY_RISKS.filter(r => r.when(c, tier)), ...base.risks]
-      .map(r => ({ ...r, title: localize(r.title, c), body: localize(r.body, c) })),
+      .map(m => ({
+        ...m,
+        lead: localize(m.lead || `${m.leadTitle} (${m.leadTarget}) — ${m.leadDesc}`, c),
+        lag: localize(m.lag || `${m.lagTitle} (${m.lagTarget}) — ${m.lagDesc}`, c)
+      })),
+    risks: (() => {
+      const combined = [...COMPANY_RISKS.filter(r => r.when(c, tier)), ...base.risks]
+        .map(r => ({
+          ...r,
+          title: localize(r.title, c),
+          body: localize(r.body, c),
+          impact: r.impact ? localize(r.impact, c) : (r.body || ''),
+          trap: r.trap ? localize(r.trap, c) : '',
+          guardrail: r.guardrail ? localize(r.guardrail, c) : '',
+          triggerText: typeof r.trigger === 'function' ? r.trigger(c, tier) : (r.triggerText || r.trigger || 'Universal operational baseline'),
+          severityVal: typeof r.severity === 'function' ? r.severity(c, tier) : (r.severityVal || r.severity || 'high')
+        }));
+      return combined;
+    })(),
+    riskScorecard: typeof computeRiskScorecard === 'function'
+      ? computeRiskScorecard([...COMPANY_RISKS.filter(r => r.when(c, tier)), ...base.risks], c, tier)
+      : null,
     stageNote: localize(base.stageNote, c),
     horizon: phases.length ? Math.max(...phases.map(p => p.end)) : 0
   };
