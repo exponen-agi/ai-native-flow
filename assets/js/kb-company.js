@@ -494,9 +494,9 @@ const TOOL_CATEGORIES = [
       { name: 'Claude Code', note: 'Terminal and CI agent, hooks and skills for policy as code', fit: c => (['growth', 'smb'].includes(c.stage) ? 3 : 2) },
       { name: 'GitHub Copilot', note: 'Where procurement and code already live with GitHub or Microsoft', fit: c => (c.stage === 'enterprise' ? 3 : 1) },
       { name: 'OpenAI Codex', note: 'Terminal and cloud agent from another model family', fit: c => 2 },
-      { name: 'Gemini CLI', note: 'Terminal agent, a natural fit where the company runs on Google Cloud', fit: c => 1 },
+      { name: 'Antigravity CLI', note: 'Google\'s terminal agent. It replaced the free Gemini CLI for individual users in June 2026, and suits teams already on Google Cloud', fit: c => 1 },
       { name: 'OpenCode', note: 'Open source, model-agnostic, self-hostable', fit: c => (has(c, 'regulated') ? 3 : 0) },
-      { name: 'Antigravity', note: 'Agent-first IDE, newer and moving fast', fit: c => 1 }
+      { name: 'Antigravity', note: 'Google\'s agent-first code editor, newer and moving fast', fit: c => 1 }
     ]
   },
   {
