@@ -88,7 +88,7 @@ Activation is a state of the sitting, not a stored fact. Opening the tab activat
 as the button does, so there is no way to arrive at the panel and find it claiming otherwise, and
 generating a new plan clears it — a plan nobody has read again has not been activated.
 
-After activation, a highlighted scheduling link offers a call to discuss the plan and where to
+After activation, a compact scheduling link offers a call to discuss the plan and where to
 start. It opens Google Calendar in a new tab; booking is optional and the plan remains available.
 
 ### Why no LLM call
