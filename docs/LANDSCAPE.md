@@ -16,3 +16,7 @@ Reviewed, not changed:
 - Vendor-blog survey figures (agent adoption, pilot failure rates) were not used: no primary source reached.
 
 Note: many publisher sites were blocked from the run environment, so some claims could only be checked through a scraping tool.
+
+## 2026-10 (second check, 11 Oct)
+
+No changes. The last review was four days earlier. Searches since then found only secondary comparison posts and small-business surveys (Upwork, Bluehost, Thryv) that agree with the existing notes; no primary-source rename, shutdown or new sector trend. Open point for the owner: an unconfirmed report that Copilot moved to usage-based credits on 1 June 2026 (not checked against GitHub's own page, so not used).
