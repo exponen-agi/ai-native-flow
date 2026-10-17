@@ -7,11 +7,13 @@
 A free, instant blueprint: what to automate, who still decides, which tools to use, and what to build first.
 No sign-up. No servers. No AI guesswork — the same answers always give the same plan.
 
-[Open the app](index.html) · [How it works](docs/METHOD.md) · [Architecture](docs/ARCHITECTURE.md)
+[**Open the live app**](https://exponen-agi.github.io/ai-native-flow/) · [How it works](docs/METHOD.md) · [Architecture](docs/ARCHITECTURE.md)
 
 ![static site](https://img.shields.io/badge/static-no%20build%20step-2ea44f)
 ![no tracking](https://img.shields.io/badge/tracking-none-2ea44f)
 ![license](https://img.shields.io/badge/license-MIT-blue)
+
+<a href="https://exponen-agi.github.io/ai-native-flow/"><img src="docs/images/blueprint.png" alt="A generated AI-native blueprint: the company drawn as loops of signals, work, approval gates and learning" width="900"></a>
 
 </div>
 
@@ -61,7 +63,7 @@ match your situation.
 
 ## Try it
 
-Open `index.html` in a browser, or serve it locally:
+Use the [live app](https://exponen-agi.github.io/ai-native-flow/), open `index.html` in a browser, or serve it locally:
 
 ```sh
 python3 -m http.server 8000   # then visit http://localhost:8000
@@ -71,9 +73,9 @@ python3 -m http.server 8000   # then visit http://localhost:8000
 
 | | |
 | --- | --- |
-| [docs/METHOD.md](docs/METHOD.md) | The rules and the sources behind them |
+| [docs/METHOD.md](docs/METHOD.md) | How the blueprint is derived: the rules and the sources behind them |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Code layout, deployment to GitHub Pages, extending the knowledge base |
-| [docs/LANDSCAPE.md](docs/LANDSCAPE.md) | The tool landscape the catalogue is drawn from |
+| [docs/LANDSCAPE.md](docs/LANDSCAPE.md) | Monthly review log of changes in the AI tool landscape |
 
 ## Contributing
 

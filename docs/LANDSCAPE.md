@@ -1,5 +1,8 @@
 # Landscape review log
 
+The tool catalogue names real products, and products change. Once a month the landscape is reviewed and
+the catalogue (`assets/js/kb-company.js`) is updated where needed. This file records each review.
+
 One entry per monthly run, newest last. Each says what was reviewed, so the next run does not repeat it.
 
 ## 2026-10

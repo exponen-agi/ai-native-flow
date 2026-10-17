@@ -1,7 +1,12 @@
 # Architecture and contributor guide
 
 Technical reference for `ai-native-flow`. For what the project is and why, see the [README](../README.md);
-for how the blueprint rules are derived, see [METHOD.md](METHOD.md).
+for how the blueprint rules are derived, see [METHOD.md](METHOD.md); for the monthly tool-catalogue
+review, see [LANDSCAPE.md](LANDSCAPE.md).
+
+**In short:** a static site (HTML, CSS and plain JavaScript) turns eight answers into a blueprint using
+fixed rules. There is no server or build step. To change what it recommends, edit the knowledge base
+in `assets/js`; see [Extending the knowledge base](#extending-the-knowledge-base).
 
 ## Architecture
 
@@ -21,7 +26,7 @@ Static by design. No server, no build step, no model call, no analytics, no cook
 | `assets/js/network.js` | The "who does what" view: pods, wires, and hand-rolled pan and zoom |
 | `assets/js/activate.js` | The activation step: the roster, the first week, and the switch-on checklist |
 | `assets/js/app.js` | Tabs, intake, detail panel, zoom and full screen, Markdown export, URL state |
-|  `METHOD.md` | The rules in prose, and the sources behind them |
+| `docs/METHOD.md` | The rules in prose, and the sources behind them |
 
 ### The five views
 
