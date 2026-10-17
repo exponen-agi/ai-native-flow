@@ -29,10 +29,10 @@ results barely change and nobody knows why.
 
 ## How it works
 
-```mermaid
-flowchart LR
-    A["1. Describe your business<br/>8 plain-language questions"] --> B["2. Get your blueprint<br/>5 views, generated instantly"]
-    B --> C["3. Activate it<br/>roster, week-one checklist"]
+```
+  1. DESCRIBE            2. REVIEW               3. ACTIVATE
+  8 plain questions ───▶ 5 interactive views ───▶ roster + week-one checklist
+  about 2 minutes        about 5 minutes          start this week
 ```
 
 | Step | What you do | Time |
@@ -71,17 +71,19 @@ python3 -m http.server 8000   # then visit http://localhost:8000
 
 ## Learn more
 
-| | |
+| Document | What it covers |
 | --- | --- |
+| [docs/VIEWS.md](docs/VIEWS.md) | What each tab shows and how to read it |
 | [docs/METHOD.md](docs/METHOD.md) | How the blueprint is derived: the rules and the sources behind them |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Code layout, deployment to GitHub Pages, extending the knowledge base |
-| [docs/LANDSCAPE.md](docs/LANDSCAPE.md) | Monthly review log of changes in the AI tool landscape |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the code is organised and why it is static |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Run it locally, deploy it, extend the knowledge base |
+| [docs/LANDSCAPE.md](docs/LANDSCAPE.md) | The tools the catalogue covers, with a monthly review log |
 
 ## Contributing
 
 Every step, tool and rule is one small object in `assets/js/kb.js` and `assets/js/kb-company.js`.
 Add one, reload the page — there is nothing to build. See
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#extending-the-knowledge-base) for the format, and run
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md#extending-the-knowledge-base) for the format, and run
 `npm test` before opening a PR.
 
 ## License

@@ -10,7 +10,8 @@ answers always give the same plan.
 | Looking for | Go to |
 | --- | --- |
 | How much autonomy a plan gets | [The four tiers](#the-four-tiers) |
-| What each view shows | [Five views over one set of answers](#five-views-over-one-set-of-answers) |
+| How the views relate | [One set of answers, many views](#one-set-of-answers-many-views) |
+| What each view shows | [VIEWS.md](VIEWS.md) |
 | The order to build things | [Rollout order](#rollout-order) |
 | Where the ideas come from | [Sources](#sources) |
 | What it will not do | [What this tool deliberately does not do](#what-this-tool-deliberately-does-not-do) |
@@ -51,11 +52,22 @@ tier 2, and while the first version is being built (prototype, MVP) at tier 3, b
 run with no person in the path need live traffic to act on and learn from.
 
 Regulated data does not lower the tier. It adds governance nodes (managed settings, approval gates,
-scheduled scans, a policy owner in the spec loop) and multiplies the calendar by 1.5. Legacy systems
-add a source-of-truth map and 1.25. Enterprise stage adds 1.25. Client codebases add 1.15. A large
-enterprise (10,000+ people) adds a further 0.15, and so does a sector where regulated data is the
-norm (healthcare, financial services, legal, public sector and similar) when the regulated-data box
-is not ticked, since sector rules still apply to work done by AI.
+scheduled scans, a policy owner in the spec loop) and stretches the calendar. The stretch is a weight
+that starts at 1.0 and adds:
+
+| Condition | Adds |
+| --- | --- |
+| Regulated or sensitive data ticked | +0.50 |
+| Legacy systems kept | +0.25 |
+| Enterprise stage | +0.25 |
+| Large enterprise (10,000+ people) | +0.15 |
+| Regulated sector, box not ticked (healthcare, financial services, legal, public sector and similar) | +0.15 |
+| Client codebases | +0.15 |
+
+Sector rules still apply to work done by AI, which is why a regulated sector adds weight even when the
+box is not ticked. Each phase's length is then multiplied by the weight, and by 1.2 for a team of 15 or
+more people or 1.15 when nobody technical is in house, to allow for coordination and for no one to
+review.
 
 ## Who the business is, in business terms
 
@@ -106,37 +118,30 @@ as equivalents. Tool slots score every option against the answers, so the starti
 changes with the business rather than defaulting to one product, and the everyday assistant slot
 follows the office suite the business already runs.
 
-## Five views over one set of answers
+## One set of answers, many views
 
-The delivery lifecycle is one function's internals, not the company. The views separate them:
+Every view is generated from the same answers by the same rules, and none adds content of its own.
+The lane views (Company, Delivery, Tool stack, Learning loop) select and connect parts of the
+knowledge base. **Who does what** draws the same plan as a team: five jobs as agent pods and three as
+people, each bound to whichever part fills that job, and left out if no part does at these answers.
+**Activate** reads the blueprint as work: its roster reuses that slot resolution, its four "before you
+start" lines are read off the tier, the goal focus, the count of real approval gates and the first
+leading metric, and its checklist is the front of the rollout cut at roughly six items. What each view
+shows and how to use it is in [VIEWS.md](VIEWS.md).
 
-- **Company.** Signals in, function loops, quality gates, action and record, learning. The loops
-  cover product and delivery, support, demand, revenue, back office, hiring and leadership queries.
-  Underneath sits the shared context: the index, the canon, the decision log, the agent context
-  files, and retention rules where the data demands them.
-- **Delivery.** The six lanes below, which are the product loop opened up.
-- **Tool stack.** One slot per category, a starting recommendation scored against the answers, the
-  alternatives kept visible, what each slot emits, and which of six collection mechanisms carries
-  that data to the context store: connectors in session, event push, scheduled pull, warehouse sync,
-  capture and transcribe, or authored by hand.
-- **Learning loop.** Record, index, distill, serve, gate, improve. The recursive part: recorded work
-  becomes canon on a schedule, canon becomes the context the next session loads, and failures become
-  permanent test cases. The overnight self-repair agent sits at the end because it depends on every
-  gate before it.
-- **Who does what.** The same plan drawn as the team that runs it rather than as a lifecycle. The
-  four views above answer what should happen; this one answers who does it and what they hand each
-  other, which is the question people ask once they have read the plan and are deciding whether they
-  can staff it. Five jobs are drawn as agent pods and three as people, each bound to whichever part
-  of this blueprint fills that job — so a company with nobody in house gets a visibly different team
-  from one with fifteen engineers, and the difference is the argument. Nothing is added to the
-  knowledge base for it: if a slot has no part at these answers, it is left out.
-- **Activate.** Not a sixth view but the step after all of them: the same blueprint read as work
-  rather than as a picture. The roster reuses the slot resolution above, the four "before you start"
-  lines are read off the tier, the goal focus, the count of real approval gates and the first leading
-  metric, and the checklist is the front of the rollout cut at roughly six items. No new rules and
-  no new content — the only thing it adds is the assumption that the visitor intends to start.
+The Delivery view is one function's internals, not the company, which is why the Company view exists
+separately: it holds the loops for product and delivery, support, demand, revenue, back office, hiring
+and leadership queries, with the shared context (index, canon, decision log, agent context files, and
+retention rules where the data demands them) underneath.
 
 ## Six lanes and a spine
+
+```
+ Intake ──▶ Shape ──▶ Build ──▶ Verify ──▶ Ship ──▶ Operate
+   ▲                                                    │
+   └──────── a finding re-enters as the next intent ────┘
+ ═════════════════════ spine: what every lane reads ═════════════════
+```
 
 Lanes are the stages of work: Intake, Shape, Build, Verify, Ship, Operate. The spine holds what every
 lane reads: the artifact home, the agent instructions file (`AGENTS.md`, or `CLAUDE.md` and its
@@ -149,8 +154,8 @@ finding re-enters the flow as the next `intent.md` rather than bypassing the gat
 
 ## Rollout order
 
-Eight phases spanning all four views, in dependency order rather than lane order, overlapping by
-roughly 40 percent. Each ends in something demonstrable:
+Eight phases spanning the company, in dependency order rather than lane order. Each starts when the
+previous is about 60 percent through, so they overlap by roughly 40 percent. Each ends in something demonstrable:
 
 1. **Make the work legible.** Meeting capture, public channels by default, every action leaves an
    artifact, the artifact home, the decision log, a spend envelope, and retention rules where the
