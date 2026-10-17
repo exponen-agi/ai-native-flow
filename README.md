@@ -7,11 +7,13 @@
 A free, instant blueprint: what to automate, who still decides, which tools to use, and what to build first.
 No sign-up. No servers. No AI guesswork — the same answers always give the same plan.
 
-[Open the app](index.html) · [How it works](docs/METHOD.md) · [Architecture](docs/ARCHITECTURE.md)
+[**Open the live app**](https://exponen-agi.github.io/ai-native-flow/) · [How it works](docs/METHOD.md) · [Architecture](docs/ARCHITECTURE.md)
 
 ![static site](https://img.shields.io/badge/static-no%20build%20step-2ea44f)
 ![no tracking](https://img.shields.io/badge/tracking-none-2ea44f)
 ![license](https://img.shields.io/badge/license-MIT-blue)
+
+<a href="https://exponen-agi.github.io/ai-native-flow/"><img src="docs/images/blueprint.png" alt="A generated AI-native blueprint: the company drawn as loops of signals, work, approval gates and learning" width="900"></a>
 
 </div>
 
@@ -27,10 +29,10 @@ results barely change and nobody knows why.
 
 ## How it works
 
-```mermaid
-flowchart LR
-    A["1. Describe your business<br/>8 plain-language questions"] --> B["2. Get your blueprint<br/>5 views, generated instantly"]
-    B --> C["3. Activate it<br/>roster, week-one checklist"]
+```
+  1. DESCRIBE            2. REVIEW               3. ACTIVATE
+  8 plain questions ───▶ 5 interactive views ───▶ roster + week-one checklist
+  about 2 minutes        about 5 minutes          start this week
 ```
 
 | Step | What you do | Time |
@@ -61,7 +63,7 @@ match your situation.
 
 ## Try it
 
-Open `index.html` in a browser, or serve it locally:
+Use the [live app](https://exponen-agi.github.io/ai-native-flow/), open `index.html` in a browser, or serve it locally:
 
 ```sh
 python3 -m http.server 8000   # then visit http://localhost:8000
@@ -69,17 +71,19 @@ python3 -m http.server 8000   # then visit http://localhost:8000
 
 ## Learn more
 
-| | |
+| Document | What it covers |
 | --- | --- |
-| [docs/METHOD.md](docs/METHOD.md) | The rules and the sources behind them |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Code layout, deployment to GitHub Pages, extending the knowledge base |
-| [docs/LANDSCAPE.md](docs/LANDSCAPE.md) | The tool landscape the catalogue is drawn from |
+| [docs/VIEWS.md](docs/VIEWS.md) | What each tab shows and how to read it |
+| [docs/METHOD.md](docs/METHOD.md) | How the blueprint is derived: the rules and the sources behind them |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the code is organised and why it is static |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Run it locally, deploy it, extend the knowledge base |
+| [docs/LANDSCAPE.md](docs/LANDSCAPE.md) | The tools the catalogue covers, with a monthly review log |
 
 ## Contributing
 
 Every step, tool and rule is one small object in `assets/js/kb.js` and `assets/js/kb-company.js`.
 Add one, reload the page — there is nothing to build. See
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#extending-the-knowledge-base) for the format, and run
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md#extending-the-knowledge-base) for the format, and run
 `npm test` before opening a PR.
 
 ## License

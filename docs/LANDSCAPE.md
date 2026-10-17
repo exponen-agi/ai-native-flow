@@ -1,6 +1,39 @@
-# Landscape review log
+# Landscape
 
-One entry per monthly run, newest last. Each says what was reviewed, so the next run does not repeat it.
+The tool landscape behind the blueprint: what the app tracks, how it is kept current, and what each
+review changed.
+
+**In short:** the Tool stack view names real products because a blueprint that says "a CRM" helps
+nobody. Products change faster than rules, so the catalogue is reviewed monthly and every review is
+logged here.
+
+## What the catalogue covers
+
+The catalogue lives in `assets/js/kb-company.js` (`TOOL_CATEGORIES`). Each category is a slot in the
+stack, scored against the answers, with the alternatives kept visible.
+
+| Area | Categories |
+| --- | --- |
+| Build | Source control, Coding agents, Pipeline, Agent evaluation, Design and prototyping |
+| Run the business | AI assistant for everyone, Work tracking, Knowledge and docs, CRM and pipeline, Support desk, Billing and finance, Working channels |
+| Learn and observe | Meeting capture, Product analytics, Observability, Warehouse and index |
+| Connect and control | Orchestration, Identity and access |
+
+The named products are common choices at each stage, not endorsements. Notes stay functional (what it
+is good for, who it suits) because feature claims age badly. See
+[CONTRIBUTING.md](CONTRIBUTING.md#on-naming-products).
+
+## How it is reviewed
+
+Once a month the landscape is checked for changes that affect the catalogue: renamed or retired
+products, shifts in how businesses adopt AI, and changes to coding agents. A change goes into
+`kb-company.js`. Anything checked but left alone is logged here with the reason, so the next review
+does not repeat it. Claims are taken from primary sources where they can be reached, and marked when
+they cannot.
+
+## Review log
+
+One entry per monthly run, newest last. Each says what was reviewed.
 
 ## 2026-10
 
