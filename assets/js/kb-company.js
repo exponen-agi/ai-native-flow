@@ -508,7 +508,7 @@ const TOOL_CATEGORIES = [
       { name: 'Microsoft 365 Copilot', note: 'Where email, documents and chat already live in Microsoft 365', fit: c => (c.stage === 'enterprise' ? 3 : c.stage === 'smb' ? 2 : 0) },
       { name: 'Gemini in Google Workspace', note: 'Where email, documents and chat already live in Google Workspace', fit: c => (['solo', 'smb'].includes(c.stage) ? 3 : 1) },
       { name: 'ChatGPT Business or Enterprise', note: 'Broad general assistant with admin controls and connectors', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 2) },
-      { name: 'Claude for Work', note: 'Strong on long documents and writing, with connectors to your tools', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 2) },
+      { name: 'Claude Team or Enterprise', note: 'Strong on long documents and writing, with connectors to your tools', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 2) },
       { name: 'A self-hosted open model', note: 'Where data may not leave your own infrastructure', fit: c => (has(c, 'regulated') && c.stage === 'enterprise' ? 3 : 0) }
     ]
   },
