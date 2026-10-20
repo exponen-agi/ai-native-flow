@@ -49,3 +49,16 @@ Reviewed, not changed:
 - Vendor-blog survey figures (agent adoption, pilot failure rates) were not used: no primary source reached.
 
 Note: many publisher sites were blocked from the run environment, so some claims could only be checked through a scraping tool.
+
+## 2026-10 (second pass, 18 Oct)
+
+Reviewed: small-business AI surveys (Upwork Q1 2026, Bluehost May 2026), forward-deployed engineering announcements (AWS, OpenAI, Cursor, Ramp, EY), coding-agent ownership and naming changes.
+
+Changed:
+- AI assistant for everyone: "Claude for Work" is now "Claude Team or Enterprise". The vendor's pricing page lists Team and Enterprise plans and no longer uses the old name. Source: https://claude.com/pricing
+
+Reviewed, not changed:
+- Upwork found more small-business leaders piloting AI agents than not considering them, with data security (27%) and unclear return (24%) as top barriers. This fits the existing notes and the tool's "start with one owned procedure" advice. The Bluehost survey (350 US owners) is a small sample. Neither is a basis for an industry note change. Sources: https://www.upwork.com/resources/state-of-ai-in-smbs, https://www.bluehost.com/state-of-small-business-ai-confidence
+- Forward-deployed engineering: AWS announced a $1 billion team (30 Jun 2026); secondary coverage only. The app names no such vendors.
+- Windsurf, Continue, Codegen and Amazon Q Developer changes were reported by secondary sites only, and the app does not list them. Cursor ownership news does not change its note.
+- census.gov could not be reached this run, so no new sector figures were checked.
