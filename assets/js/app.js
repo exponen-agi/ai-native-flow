@@ -824,8 +824,55 @@ function switchTab(tab) {
     if (activateDirty) renderActivateView();
     if (!activated) setActivated(true);
   }
+  syncJourney(tab);
   writeHash(current.answers);
 }
+
+/* ---------------------------------------------------------------- journey
+   The tabs are a menu; the journey is the order to read them in once a plan exists:
+   activate, run the rollout, measure the value, check the risks, take it away. The
+   tracker marks where the visitor is, and each step's panel ends with a link to the
+   next one, so nobody has to guess what to open after Activate. */
+
+const JOURNEY = [
+  { tab: 'activate', label: 'Activate' },
+  { tab: 'rollout', label: 'Rollout' },
+  { tab: 'measure', label: 'Measure & ROI' },
+  { tab: 'risks', label: 'Risks' },
+  { tab: 'export', label: 'Take it with you' }
+];
+
+function syncJourney(tab) {
+  document.querySelectorAll('#tracker [data-go]').forEach(b => b.classList.toggle('is-here', b.dataset.go === tab));
+  document.getElementById('track-activate').classList.toggle('is-here', tab === 'activate');
+}
+
+function buildJourneyFooters() {
+  JOURNEY.forEach((step, i) => {
+    const panel = document.getElementById(PANELS[step.tab]);
+    const prev = JOURNEY[i - 1];
+    const next = JOURNEY[i + 1];
+    const nav = document.createElement('nav');
+    nav.className = 'journey-next';
+    nav.setAttribute('aria-label', 'Next step');
+    nav.innerHTML =
+      (prev ? `<button type="button" class="btn ghost" data-go="${prev.tab}">&larr; ${prev.label}</button>` : '<span></span>') +
+      (next ? `<button type="button" class="btn primary" data-go="${next.tab}">Next: ${next.label} &rarr;</button>` : '');
+    panel.appendChild(nav);
+  });
+}
+
+function goStep(tab) {
+  if (tab === 'activate') return activate();
+  switchTab(tab);
+  document.getElementById(PANELS[tab]).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+buildJourneyFooters();
+document.addEventListener('click', ev => {
+  const btn = ev.target.closest('[data-go]');
+  if (btn) goStep(btn.dataset.go);
+});
 
 /* ------------------------------------------------------------------ export */
 

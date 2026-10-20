@@ -1550,14 +1550,25 @@ code.artifact {
   opacity: .7;
 }
 
-/* Interactive Value Simulator Card */
+/* Interactive Value Simulator Card: first thing in Measure, so it is not scrolled past. */
 .measure-calc {
-  margin-top: 28px;
+  margin: 0 0 28px;
   background: var(--surface);
-  border: 1px solid var(--rule);
+  border: 1px solid var(--ai);
+  border-top-width: 3px;
   border-radius: var(--r-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), 0 0 0 4px var(--ai-soft);
   padding: 20px 22px;
+}
+.m-calc-kicker {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 12px;
+  font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ai);
+}
+.m-calc-dot {
+  width: 8px; height: 8px; border-radius: 999px; background: var(--ai);
+  animation: track-nudge 1.8s ease-in-out infinite;
 }
 .m-calc-header {
   display: flex;
@@ -2063,6 +2074,9 @@ code.artifact {
 .track-go.is-live .track-t { color: var(--ai); }
 .track-go.is-live .track-n,
 .track-go.is-live.is-done .track-n { background: var(--ai-soft); color: var(--ai); }
+.track-later { border-style: dashed; }
+.track-step.is-here { border-color: var(--ai); box-shadow: 0 0 0 3px var(--ai-soft); }
+.track-step.is-here .track-t { color: var(--ai); }
 .track-arrow { color: var(--ink-3); font-size: 15px; }
 .track-arrow.is-waiting { color: var(--ink); animation: track-nudge 1.8s ease-in-out infinite; }
 
@@ -2445,3 +2459,27 @@ body.peek-open { overflow: hidden; }
   .topbar, .why-flow-wrap, .site-foot { display: none; }
   .peek, .peek-backdrop, .return-pill { display: none !important; }
 }
+
+/* Next-step links at the end of each journey panel, and the "what next" cards on Activate. */
+.journey-next {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--rule-soft);
+}
+.next-grid {
+  list-style: none; margin: 14px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px;
+}
+.next-card {
+  width: 100%; height: 100%; text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px 16px; border: 1px solid var(--rule); border-radius: var(--r-md);
+  background: var(--surface); color: var(--ink-2); font: inherit; font-size: 13px;
+}
+.next-card strong { color: var(--ink); font-size: 14px; }
+.next-card:hover { border-color: var(--ink-3); }
+.next-card.is-key { border-color: var(--ai); background: var(--ai-soft); }
+.next-n {
+  width: 20px; height: 20px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
+}
+@media print { .journey-next, .next-steps { display: none; } }
