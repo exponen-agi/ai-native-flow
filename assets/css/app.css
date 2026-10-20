@@ -2106,13 +2106,42 @@ code.artifact {
   80%, 100% { opacity: 0; transform: scale(2.6); }
 }
 
+/* Shown from activation until a new plan is generated, on every tab, so the offer is
+   there when the visitor is ready rather than only on one panel. Quiet on purpose: a
+   tinted edge and icon, no filled button. */
 .activation-call {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
-  margin: 20px 0; padding: 14px 0;
-  border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  position: fixed; left: 16px; bottom: 16px; z-index: 40;
+  display: flex; align-items: center; gap: 12px;
+  max-width: min(440px, calc(100vw - 32px)); padding: 10px 12px 10px 14px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--ai) 28%, var(--rule));
+  border-radius: 14px; box-shadow: var(--shadow);
+  animation: ac-in .4s ease-out both;
 }
-.activation-call p { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.6; }
-.activation-call-btn { flex-shrink: 0; min-height: 44px; padding: 10px 14px; font-size: 13px; }
+.activation-call[hidden] { display: none; }
+.ac-icon {
+  flex-shrink: 0; display: grid; place-items: center; width: 34px; height: 34px;
+  border-radius: 10px; background: var(--ai-soft); color: var(--ai);
+}
+.ac-text { margin: 0; display: grid; gap: 1px; min-width: 0; line-height: 1.35; }
+.ac-text strong { font-size: 13px; font-weight: 600; color: var(--ink); }
+.ac-text span { font-size: 12px; color: var(--ink-2); }
+.ac-btn {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 36px; padding: 0 12px; border-radius: 9px;
+  font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap;
+  color: var(--ai); background: var(--ai-soft);
+  border: 1px solid color-mix(in srgb, var(--ai) 22%, transparent);
+  transition: background .15s, border-color .15s;
+}
+.ac-btn:hover { border-color: var(--ai); }
+.ac-btn:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+@keyframes ac-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .activation-call { animation: none; } }
+@media (max-width: 560px) {
+  .activation-call { left: 12px; right: 12px; bottom: 12px; max-width: none; }
+  .ac-text span { display: none; }
+}
 @media print { .activation-call { display: none; } }
 
 .activate-grid { display: grid; gap: 18px; margin-top: 18px; }
