@@ -323,7 +323,7 @@
         </dl>
       </div>
 
-      <div class="tracker" id="tracker">
+      <div class="tracker" id="tracker" aria-label="Your path through the plan">
         <button type="button" class="track-step is-done" id="track-edit">
           <span class="track-n" aria-hidden="true">&check;</span>
           <span class="track-t">1. Plan generated</span>
@@ -334,6 +334,23 @@
           <span class="track-n" aria-hidden="true">2</span>
           <span class="track-t">Activate this plan</span>
         </button>
+        <span class="track-arrow" aria-hidden="true">&rarr;</span>
+        <button type="button" class="track-step track-later" id="track-rollout" data-go="rollout" disabled title="Activate the plan first">
+          <span class="track-n" aria-hidden="true">3</span>
+          <span class="track-t">Run the rollout</span>
+          <span class="track-d">first steps</span>
+        </button>
+        <span class="track-arrow" aria-hidden="true">&rarr;</span>
+        <button type="button" class="track-step track-later" id="track-measure" data-go="measure" disabled title="Activate the plan first">
+          <span class="track-n" aria-hidden="true">4</span>
+          <span class="track-t">Measure &amp; ROI</span>
+          <span class="track-d">simulate the value</span>
+        </button>
+        <span class="track-arrow" aria-hidden="true">&rarr;</span>
+        <button type="button" class="track-step track-later" id="track-export" data-go="export" disabled title="Activate the plan first">
+          <span class="track-n" aria-hidden="true">5</span>
+          <span class="track-t">Take it with you</span>
+        </button>
       </div>
 
       <nav class="tabs" role="tablist" aria-label="Blueprint sections">
@@ -343,11 +360,11 @@
         <button role="tab" class="tab" id="tab-improve" data-tab="improve" data-view="improve" aria-selected="false"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>Learning loop</button>
         <button role="tab" class="tab" id="tab-network" data-tab="network" aria-selected="false"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Who does what</button>
         <span class="tab-sep" aria-hidden="true"></span>
-        <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" aria-selected="false"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>Rollout</button>
-        <button role="tab" class="tab" id="tab-measure" data-tab="measure" aria-selected="false"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>Measure</button>
-        <button role="tab" class="tab" id="tab-risks" data-tab="risks" aria-selected="false"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>Risks</button>
-        <button role="tab" class="tab" id="tab-export" data-tab="export" aria-selected="false"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Export</button>
         <button role="tab" class="tab tab-activate" id="tab-activate" data-tab="activate" aria-selected="false"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Activate</button>
+        <button role="tab" class="tab" id="tab-rollout" data-tab="rollout" data-gated aria-selected="false" disabled title="Activate the plan first"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>Rollout</button>
+        <button role="tab" class="tab" id="tab-measure" data-tab="measure" data-gated aria-selected="false" disabled title="Activate the plan first"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>Measure</button>
+        <button role="tab" class="tab" id="tab-risks" data-tab="risks" data-gated aria-selected="false" disabled title="Activate the plan first"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>Risks</button>
+        <button role="tab" class="tab" id="tab-export" data-tab="export" data-gated aria-selected="false" disabled title="Activate the plan first"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Export</button>
       </nav>
     </div>
   </div>
@@ -434,40 +451,9 @@
       <p class="panel-note">Compare leading operational signals (weeks) against lagging business results (quarter). Every metric is calibrated to your generated plan with concrete targets, calculation formulas, and systems of record.</p>
     </div>
 
-    <!-- Executive Outcome Scorecard -->
-    <div class="measure-scorecard" id="measure-scorecard"></div>
-
-    <!-- Metric Filter Toolbar & Comparison Explainer -->
-    <div class="measure-toolbar">
-      <div class="measure-filters" id="measure-filters" role="tablist" aria-label="Filter metrics">
-        <button type="button" class="m-filter is-active" data-filter="all">All Metrics</button>
-        <button type="button" class="m-filter" data-filter="goal">North Star Goal</button>
-        <button type="button" class="m-filter" data-filter="delivery">Product &amp; Delivery</button>
-        <button type="button" class="m-filter" data-filter="operations">Company &amp; Operations</button>
-      </div>
-      <div class="measure-legend">
-        <span class="m-legend-item"><span class="m-badge lead-badge">Leading</span> Early signal (days–weeks)</span>
-        <span class="m-legend-item"><span class="m-badge lag-badge">Lagging</span> Business result (quarterly)</span>
-      </div>
-    </div>
-
-    <!-- Rich Comparative Table -->
-    <div class="table-scroll">
-      <table class="metrics-table">
-        <thead>
-          <tr>
-            <th class="col-stage">Stage &amp; Focus</th>
-            <th class="col-lead">Leading Indicator <span class="th-sub">(Early Operational Signal)</span></th>
-            <th class="col-lag">Lagging Indicator <span class="th-sub">(Quarterly Business Outcome)</span></th>
-            <th class="col-source">Source of Truth</th>
-          </tr>
-        </thead>
-        <tbody id="metrics"></tbody>
-      </table>
-    </div>
-
     <!-- Interactive Outcome & ROI Simulator -->
     <div class="measure-calc" id="measure-calc">
+      <p class="m-calc-kicker"><span class="m-calc-dot" aria-hidden="true"></span>Try it &mdash; change the three numbers and watch the result</p>
       <div class="m-calc-header">
         <div>
           <h3>Plan Outcome &amp; Value Simulator</h3>
@@ -508,6 +494,38 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Executive Outcome Scorecard -->
+    <div class="measure-scorecard" id="measure-scorecard"></div>
+
+    <!-- Metric Filter Toolbar & Comparison Explainer -->
+    <div class="measure-toolbar">
+      <div class="measure-filters" id="measure-filters" role="tablist" aria-label="Filter metrics">
+        <button type="button" class="m-filter is-active" data-filter="all">All Metrics</button>
+        <button type="button" class="m-filter" data-filter="goal">North Star Goal</button>
+        <button type="button" class="m-filter" data-filter="delivery">Product &amp; Delivery</button>
+        <button type="button" class="m-filter" data-filter="operations">Company &amp; Operations</button>
+      </div>
+      <div class="measure-legend">
+        <span class="m-legend-item"><span class="m-badge lead-badge">Leading</span> Early signal (days–weeks)</span>
+        <span class="m-legend-item"><span class="m-badge lag-badge">Lagging</span> Business result (quarterly)</span>
+      </div>
+    </div>
+
+    <!-- Rich Comparative Table -->
+    <div class="table-scroll">
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th class="col-stage">Stage &amp; Focus</th>
+            <th class="col-lead">Leading Indicator <span class="th-sub">(Early Operational Signal)</span></th>
+            <th class="col-lag">Lagging Indicator <span class="th-sub">(Quarterly Business Outcome)</span></th>
+            <th class="col-source">Source of Truth</th>
+          </tr>
+        </thead>
+        <tbody id="metrics"></tbody>
+      </table>
     </div>
   </section>
 
@@ -605,6 +623,17 @@
         the rest of the sequence. Ticking boxes here is just for this sitting &mdash; nothing is saved.</p>
       <ol class="checklist" id="activate-checklist"></ol>
       <p class="check-progress" id="check-progress"></p>
+    </section>
+
+    <section class="activate-block next-steps" id="next-steps">
+      <h3>What happens after you activate</h3>
+      <p class="block-note">The rest of this page is the same plan, now in the order you will use it.</p>
+      <ol class="next-grid">
+        <li><button type="button" class="next-card" data-go="rollout"><span class="next-n">3</span><strong>Run the rollout</strong><span>See the phases, owners and order of work behind the checklist above.</span></button></li>
+        <li><button type="button" class="next-card is-key" data-go="measure"><span class="next-n">4</span><strong>Measure &amp; simulate ROI</strong><span>Put in your team size and rates to see hours returned, capacity unlocked and payback.</span></button></li>
+        <li><button type="button" class="next-card" data-go="risks"><span class="next-n">&bull;</span><strong>Check the risks</strong><span>What can go wrong at your level of autonomy, and how it is guarded.</span></button></li>
+        <li><button type="button" class="next-card" data-go="export"><span class="next-n">5</span><strong>Take it with you</strong><span>Copy the plan, the checklist or a prompt, or print it for your team.</span></button></li>
+      </ol>
     </section>
 
     <div class="actions">
