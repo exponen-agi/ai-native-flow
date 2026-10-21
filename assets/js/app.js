@@ -773,6 +773,7 @@ function renderNetworkView() {
    activates the plan, exactly as the button does, so there is no way to arrive at the
    panel and find it claiming otherwise. Generating a new plan clears it, because a plan
    nobody has read again has not been activated. */
+const GATED_TABS = ['rollout', 'measure', 'risks', 'export'];
 let activated = false;
 let activateDirty = true;
 
@@ -798,7 +799,7 @@ function setActivated(on) {
   arrow.classList.toggle('is-waiting', !on);
   step.querySelector('.track-n').innerHTML = on ? '&check;' : '2';
   label.textContent = on ? '2. Activated' : 'Activate this plan';
-  document.querySelectorAll('#tracker .track-later').forEach(b => {
+  document.querySelectorAll('#tracker .track-later, .tab[data-gated]').forEach(b => {
     b.disabled = !on;
     b.title = on ? '' : 'Activate the plan first';
   });
@@ -814,6 +815,8 @@ function activate() {
 }
 
 function switchTab(tab) {
+  /* Rollout, Measure, Risks and Export open only once the plan is activated. */
+  if (GATED_TABS.includes(tab) && !activated) tab = 'company';
   const panelId = PANELS[tab];
   /* The way back only makes sense while the visitor is still on the diagrams. */
   if (!VIEW_META[tab]) dropReturn();
@@ -1070,7 +1073,7 @@ document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => switchTab(t.dataset.tab));
 });
 document.querySelector('.tabs').addEventListener('keydown', ev => {
-  const tabs = [...document.querySelectorAll('.tab')];
+  const tabs = [...document.querySelectorAll('.tab:not(:disabled)')];
   const i = tabs.indexOf(document.activeElement);
   if (i < 0) return;
   const next = ev.key === 'ArrowRight' ? i + 1 : ev.key === 'ArrowLeft' ? i - 1 : -1;
