@@ -2075,6 +2075,8 @@ code.artifact {
 .track-go.is-live .track-n,
 .track-go.is-live.is-done .track-n { background: var(--ai-soft); color: var(--ai); }
 .track-later { border-style: dashed; }
+.track-later:disabled { opacity: .5; cursor: not-allowed; }
+.track-later:disabled:hover { border-color: var(--rule); color: var(--ink-2); }
 .track-step.is-here { border-color: var(--ai); box-shadow: 0 0 0 3px var(--ai-soft); }
 .track-step.is-here .track-t { color: var(--ai); }
 .track-arrow { color: var(--ink-3); font-size: 15px; }

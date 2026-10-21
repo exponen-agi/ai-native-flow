@@ -798,6 +798,10 @@ function setActivated(on) {
   arrow.classList.toggle('is-waiting', !on);
   step.querySelector('.track-n').innerHTML = on ? '&check;' : '2';
   label.textContent = on ? '2. Activated' : 'Activate this plan';
+  document.querySelectorAll('#tracker .track-later').forEach(b => {
+    b.disabled = !on;
+    b.title = on ? '' : 'Activate the plan first';
+  });
   document.getElementById('activation-call').hidden = !on;
   const actBtn = document.getElementById('activate-btn');
   if (actBtn) actBtn.textContent = on ? 'Back to the activated plan' : 'Activate this plan';
