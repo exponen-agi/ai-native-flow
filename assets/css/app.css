@@ -719,16 +719,31 @@ fieldset.field legend { margin-bottom: 6px; }
 /* ------------------------------------------------------------------ tabs */
 .tabs {
   position: sticky; top: 0; z-index: 6;
-  display: flex; flex-wrap: nowrap; align-items: center; gap: 2px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
+  display: flex; flex-direction: column; gap: 0;
   background: var(--surface);
   border-top: 1px solid var(--rule-soft);
-  padding: 4px 0;
+  padding: 0;
 }
-.tabs::-webkit-scrollbar { display: none; }
+/* Two labelled rows: the diagrams of the plan, then what you do once it is activated. */
+.tab-group {
+  display: flex; flex-wrap: nowrap; align-items: center; gap: 2px;
+  overflow-x: auto; overflow-y: hidden;
+  overscroll-behavior-x: contain; scrollbar-width: none;
+  padding: 3px 0;
+}
+.tab-group::-webkit-scrollbar { display: none; }
+.tab-group.is-after { border-top: 1px dashed var(--rule); background: var(--ai-soft); padding-inline: 8px; margin-inline: -8px; }
+.tab-group-label {
+  flex: 0 0 150px; display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ink-3); white-space: nowrap;
+}
+.is-after .tab-group-label { color: var(--ai); }
+.tab-group-n {
+  width: 18px; height: 18px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 10.5px;
+}
+.is-after .tab-group-n { background: var(--ai); color: var(--on-accent); }
 .tab {
   display: inline-flex;
   align-items: center;
@@ -2002,17 +2017,8 @@ code.artifact {
    120px -- a fifth of the viewport, a quarter in landscape -- permanently. One row
    that scrolls sideways is the usual phone treatment and costs about 40px. */
 @media (max-width: 760px) {
-  .tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    padding-inline: 2px;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
   .tab { flex: 0 0 auto; }
-  .tab-sep { flex: 0 0 auto; margin: 0 4px; }
+  .tab-group-label { flex-basis: auto; padding-inline: 4px 6px; }
 }
 
 /* iOS Safari zooms the whole page when a form control under 16px takes focus, and
