@@ -62,3 +62,10 @@ Reviewed, not changed:
 - Forward-deployed engineering: AWS announced a $1 billion team (30 Jun 2026); secondary coverage only. The app names no such vendors.
 - Windsurf, Continue, Codegen and Amazon Q Developer changes were reported by secondary sites only, and the app does not list them. Cursor ownership news does not change its note.
 - census.gov could not be reached this run, so no new sector figures were checked.
+
+## 2026-10 (third pass, 25 Oct)
+
+No changes. Checked small-business agent surveys (Upwork, Bluehost, Thryv), Census BTOS AI figures (overall use 17–20
+## 2026-10 (third pass, 25 Oct)
+
+No changes. Checked small-business agent surveys (Upwork, Bluehost, Thryv), Census BTOS AI figures (overall use 17–20%, higher in firms of 250+ people; no sector table reached), coding-agent shutdowns and renames, and automation-tool news (Zapier, Make, n8n). Nothing new from a primary source that changes an industry note, tool name or routine-work example.
