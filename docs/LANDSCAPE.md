@@ -62,3 +62,7 @@ Reviewed, not changed:
 - Forward-deployed engineering: AWS announced a $1 billion team (30 Jun 2026); secondary coverage only. The app names no such vendors.
 - Windsurf, Continue, Codegen and Amazon Q Developer changes were reported by secondary sites only, and the app does not list them. Cursor ownership news does not change its note.
 - census.gov could not be reached this run, so no new sector figures were checked.
+
+## 2026-11
+
+No changes. Reviewed agent adoption surveys, forward-deployed engineering announcements (AWS, OpenAI, Anthropic; secondary coverage only) and coding-agent renames (Windsurf to Devin Desktop, Amazon Q Developer to Kiro, Continue, Roo Code; none are listed in the app). The latest primary sector data found is still the US Census release of 26 May 2026 (AI use 19.8% overall; information 39.7%, finance and insurance 33.9%, retail about 14%), which agrees with the existing industry notes: https://www.census.gov/library/stories/2026/05/ai-use-businesses.html. Vendor-survey figures were not used because no primary source was reached.
