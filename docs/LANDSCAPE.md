@@ -62,3 +62,7 @@ Reviewed, not changed:
 - Forward-deployed engineering: AWS announced a $1 billion team (30 Jun 2026); secondary coverage only. The app names no such vendors.
 - Windsurf, Continue, Codegen and Amazon Q Developer changes were reported by secondary sites only, and the app does not list them. Cursor ownership news does not change its note.
 - census.gov could not be reached this run, so no new sector figures were checked.
+
+## 2026-11
+
+No changes. Checked SMB agent surveys, forward-deployed engineering news and coding-agent changes; nothing was both backed by a primary source and relevant to the catalogue. Noted only: Google stopped selling new Gemini Code Assist subscriptions on 9 Oct 2026 and points buyers to Antigravity (https://developers.google.com/gemini-code-assist/docs/deprecations); the app lists neither, so no edit. Jules wind-down, Roo Code and Codegen closures and an OpenCode change were secondary or single-source and the app does not name them (OpenCode is listed, but its change is unconfirmed, so left alone; recheck next month). Census figures (24.6% of firms using AI) came from a secondary summary only.
