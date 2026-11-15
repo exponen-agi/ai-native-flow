@@ -490,7 +490,7 @@ const TOOL_CATEGORIES = [
     collection: 'col-api',
     when: c => writesSoftware(c),
     options: [
-      { name: 'Cursor', note: 'Editor-first, strong for small teams who want an IDE loop', fit: c => (['solo', 'startup'].includes(c.stage) ? 3 : 1) },
+      { name: 'Cursor', note: 'Editor-first, strong for small teams who want an IDE loop. Now sold as part of the X subscription, and models from other vendors are billed on top', fit: c => (['solo', 'startup'].includes(c.stage) ? 3 : 1) },
       { name: 'Claude Code', note: 'Terminal and CI agent, hooks and skills for policy as code', fit: c => (['growth', 'smb'].includes(c.stage) ? 3 : 2) },
       { name: 'GitHub Copilot', note: 'Where procurement and code already live with GitHub or Microsoft', fit: c => (c.stage === 'enterprise' ? 3 : 1) },
       { name: 'OpenAI Codex', note: 'Terminal and cloud agent from another model family', fit: c => 2 },
@@ -574,7 +574,7 @@ const TOOL_CATEGORIES = [
     collection: 'col-webhook',
     when: c => !preProduct(c) && c.domain !== 'internal-ops',
     options: [
-      { name: 'Intercom', note: 'Conversations plus help centre, strong API', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 1) },
+      { name: 'Intercom', note: 'Conversations plus help centre, strong API. The company is now called Fin and is part of Salesforce', fit: c => (['startup', 'growth'].includes(c.stage) ? 3 : 1) },
       { name: 'Zendesk', note: 'Where support is a larger organised function', fit: c => (c.stage === 'enterprise' || c.stage === 'smb' ? 2 : 1) },
       { name: 'Pylon', note: 'Built for support that happens in shared customer channels', fit: c => (c.domain === 'saas' || c.domain === 'data-ai' ? 2 : 0) },
       { name: 'Plain or Freshdesk', note: 'Lighter alternatives for a small queue', fit: c => (budget(c) <= 2 ? 1 : 0) },

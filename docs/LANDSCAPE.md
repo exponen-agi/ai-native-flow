@@ -66,3 +66,21 @@ Reviewed, not changed:
 ## 2026-11
 
 No changes. Checked SMB agent surveys, forward-deployed engineering news and coding-agent changes; nothing was both backed by a primary source and relevant to the catalogue. Noted only: Google stopped selling new Gemini Code Assist subscriptions on 9 Oct 2026 and points buyers to Antigravity (https://developers.google.com/gemini-code-assist/docs/deprecations); the app lists neither, so no edit. Jules wind-down, Roo Code and Codegen closures and an OpenCode change were secondary or single-source and the app does not name them (OpenCode is listed, but its change is unconfirmed, so left alone; recheck next month). Census figures (24.6% of firms using AI) came from a secondary summary only.
+
+## 2026-11 (second pass, 15 Nov)
+
+Reviewed: vendor pricing and plan pages for the assistants, coding agents and support desks the app names; Q3 2026 earnings calls; small-business AI surveys; US Census and Federal Reserve figures.
+
+Changed:
+- Coding agents: the Cursor note now says it is sold as part of the X subscription and that models from other vendors are billed on top. The vendor's pricing page shows the cheapest paid plan runs Grok models only. Source: https://cursor.com/pricing
+- Support desk: the Intercom note now says the company is called Fin and is part of Salesforce (deal completed 10 Sep 2026). The helpdesk is still sold as Intercom, so the name stays. Sources: https://www.salesforce.com/news/press-releases/2026/09/10/salesforce-completes-acquisition-of-fin/, https://www.intercom.com/
+
+Reviewed, not changed:
+- Assistant plan names: ChatGPT Business and Enterprise, Claude Team and Enterprise, and Gemini in Google Workspace all match the vendors' pricing pages. Sources: https://chatgpt.com/pricing, https://claude.com/pricing, https://workspace.google.com/pricing
+- Microsoft 365 Copilot: from 1 Dec 2026 it can be bought without a Microsoft 365 base plan. The product name and the note ("where email, documents and chat already live in Microsoft 365") still hold. Source: https://learn.microsoft.com/en-us/partner-center/announcements/2026-october
+- Langfuse has been part of ClickHouse since January 2026 and is still open source and self-hostable, which is all its note claims. Secondary source only.
+- Antigravity CLI and OpenCode are both still published under those names (vendor docs and release notes). Last month's unconfirmed OpenCode change stays unconfirmed; dropped from the watch list.
+- Industry notes: Census sector ranking (information, professional services, education and finance highest; manufacturing and retail lowest) is unchanged, read through a secondary summary because the Census data page does not render its figures to the run environment. The Federal Reserve small-business report (published March 2026) says firms use AI mostly for writing and marketing, which fits the notes. Source: https://www.fedsmallbusiness.org/reports/survey/2026/2026-report-on-employer-firms
+- Forward-deployed engineering: monday.com launched a forward-deployed service (Q3 2026 call). The app names no such services.
+- New meeting, spreadsheet and office tools from assistant vendors are in beta; not added.
+- TubeAlfred transcripts were not used this run; primary pages answered every question.
